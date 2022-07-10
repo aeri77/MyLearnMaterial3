@@ -20,9 +20,22 @@ object Deps {
     val composeTestManifest by lazy {"androidx.compose.ui:ui-test-manifest:${Versions.compose}"}
     val composeMaterial3 by lazy {"androidx.compose.material3:material3:${Versions.composeMaterial3}"}
     val composeActivity by lazy {"androidx.activity:activity-compose:${Versions.composeActivity}"}
+    val composeViewModel by lazy {"androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.compose}"}
     val lifecycleRuntime by lazy {"androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleRuntime}"}
     val hilt by lazy {"com.google.dagger:hilt-android:${Versions.hilt}"}
     val hiltCompiler by lazy {"com.google.dagger:hilt-android-compiler:${Versions.hilt}"}
+    val navigationFragment by lazy {"androidx.navigation:navigation-fragment-ktx:${Versions.navigation}"}
+    val navigationUI by lazy {"androidx.navigation:navigation-ui-ktx:${Versions.navigation}"}
+    val navigationDynamic by lazy {"androidx.navigation:navigation-dynamic-features-fragment:${Versions.navigation}"}
+    val navigationCompose by lazy {"androidx.navigation:navigation-compose:${Versions.navigation}"}
+    val navigationTesting by lazy {"androidx.navigation:navigation-testing:${Versions.navigation}"}
+    val constraintLayout by lazy {"androidx.constraintlayout:constraintlayout-compose:${Versions.constraint}"}
     val testJUnit by lazy {"androidx.test.ext:junit:1.1.3"}
     val testEspresso by lazy {"androidx.test.espresso:espresso-core:3.4.0"}
+
+    object Accompanist {
+        val pager by lazy {"com.google.accompanist:accompanist-pager:${Versions.Accompanist.pager}"}
+        val pagerIndicator by lazy {"com.google.accompanist:accompanist-pager-indicators:${Versions.Accompanist.pager}"}
+        val systemUIController by lazy {"com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist.pager}"}
+    }
 }

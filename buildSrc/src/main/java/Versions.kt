@@ -13,4 +13,17 @@ object Versions {
     object Accompanist {
         const val pager = "0.24.13-rc"
     }
+
+    object Datastore {
+        const val version = "1.0.0"
+    }
+
+    object KTX {
+        const val version = "1.5.0"
+    }
+
+    object SquareUp {
+        const val version = "2.9.0"
+    }
+
 }

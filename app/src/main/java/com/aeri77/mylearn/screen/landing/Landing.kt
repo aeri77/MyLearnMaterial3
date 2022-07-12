@@ -1,10 +1,12 @@
 package com.aeri77.mylearn.screen.landing
 
+import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,18 +17,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.R
+import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.landing.component.ButtonNext
 import com.aeri77.mylearn.screen.landing.component.ButtonPrev
 import com.aeri77.mylearn.screen.landing.component.LandingMainItems
 import com.google.accompanist.pager.*
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
 fun Landing(navController: NavController, viewModel: LandingViewModel = viewModel()) {
     val pagerState = rememberPagerState()
+    val scope = rememberCoroutineScope()
     ConstraintLayout(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.onPrimary)
@@ -34,8 +39,22 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
     ) {
         val (buttonArea, mainItem, indicator) = createRefs()
         val systemUiController = rememberSystemUiController()
-        var color by mutableStateOf(MaterialTheme.colorScheme.primary)
+        val baseColor = MaterialTheme.colorScheme.primary
+        var color by remember { mutableStateOf(baseColor) }
         var pagePosition by remember { viewModel.pagePosition }
+        val success by viewModel.isSuccess.observeAsState()
+
+        LaunchedEffect(success) {
+            if(success == true){
+                viewModel.isSuccess.value = false
+                scope.launch {
+                    Log.d("signUp", "moved")
+                    navController.navigate(Navigation.signUp)
+                    viewModel.loading = false
+                }
+            }
+        }
+
         HorizontalPager(
             modifier = Modifier.constrainAs(mainItem) {
                 top.linkTo(parent.top)

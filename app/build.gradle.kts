@@ -58,7 +58,6 @@ dependencies {
     implementation(Deps.composeRuntimeLiveData)
     implementation(Deps.Lifecycle.composeViewModel)
     implementation(Deps.Lifecycle.lifecycleRuntime)
-    implementation(Deps.Lifecycle.lifecycleExtension)
     implementation(Deps.Lifecycle.lifeCycleViewModel)
     implementation(Deps.hilt)
     implementation(Deps.navigationDynamic)

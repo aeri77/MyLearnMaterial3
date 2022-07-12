@@ -3,19 +3,17 @@ package com.aeri77.mylearn
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.navigation.Navigation
+import com.aeri77.mylearn.screen.home.Home
 import com.aeri77.mylearn.screen.landing.Landing
+import com.aeri77.mylearn.screen.signup.SignUp
 import com.aeri77.mylearn.ui.theme.MyLearnTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,8 +30,9 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 NavHost(navController = navController, startDestination = Navigation.landing) {
                     composable(Navigation.landing) { Landing(navController) }
-                    composable("profile") { Profile(navController) }
-                    composable("friendslist") { FriendsList(navController) }
+                    composable(Navigation.signIn) {}
+                    composable(Navigation.signUp) { SignUp(navController) }
+                    composable(Navigation.home) { Home(navController) }
                 }
             }
         }
@@ -46,10 +45,11 @@ fun Profile(navController: NavController) {
         Text(text = "Navigate next")
     }
 }
+
 @Composable
 fun FriendsList(navController: NavController) {
 //    Button(onClick = { navController.navigate("friendslist") }) {
-        Text(text = "FriendList")
+    Text(text = "FriendList")
 //    }
 }
 

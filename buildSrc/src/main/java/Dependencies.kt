@@ -51,7 +51,6 @@ object Deps {
     object Lifecycle {
         val composeViewModel by lazy { "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.compose}" }
         val lifecycleRuntime by lazy { "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleRuntime}" }
-        val lifecycleExtension by lazy {"androidx.lifecycle:lifecycle-extensions:${Versions.lifecycleRuntime}"}
         val lifeCycleViewModel by lazy {"androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycleRuntime}"}
     }
 

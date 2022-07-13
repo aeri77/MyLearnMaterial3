@@ -11,7 +11,7 @@ object Versions {
     const val constraint = "1.0.0-beta02"
 
     object Accompanist {
-        const val pager = "0.24.13-rc"
+        const val version = "0.24.13-rc"
     }
 
     object Datastore {
@@ -26,4 +26,7 @@ object Versions {
         const val version = "2.9.0"
     }
 
+    object JakeWharton {
+        const val timber = "5.0.1"
+    }
 }

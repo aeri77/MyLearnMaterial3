@@ -20,7 +20,8 @@ object Deps {
     val composeTestManifest by lazy { "androidx.compose.ui:ui-test-manifest:${Versions.compose}" }
     val composeMaterial3 by lazy { "androidx.compose.material3:material3:${Versions.composeMaterial3}" }
     val composeActivity by lazy { "androidx.activity:activity-compose:${Versions.composeActivity}" }
-    val composeRuntimeLiveData by lazy {"androidx.compose.runtime:runtime-livedata:${Versions.compose}"}
+    val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.compose}" }
+    val composeIconsExtended by lazy { "androidx.compose.material:material-icons-extended:${Versions.compose}" }
     val hilt by lazy { "com.google.dagger:hilt-android:${Versions.hilt}" }
     val hiltCompiler by lazy { "com.google.dagger:hilt-android-compiler:${Versions.hilt}" }
     val navigationFragment by lazy { "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}" }
@@ -32,10 +33,12 @@ object Deps {
     val testJUnit by lazy { "androidx.test.ext:junit:1.1.3" }
     val testEspresso by lazy { "androidx.test.espresso:espresso-core:3.4.0" }
 
+
     object Accompanist {
-        val pager by lazy { "com.google.accompanist:accompanist-pager:${Versions.Accompanist.pager}" }
-        val pagerIndicator by lazy { "com.google.accompanist:accompanist-pager-indicators:${Versions.Accompanist.pager}" }
-        val systemUIController by lazy { "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist.pager}" }
+        val pager by lazy { "com.google.accompanist:accompanist-pager:${Versions.Accompanist.version}" }
+        val pagerIndicator by lazy { "com.google.accompanist:accompanist-pager-indicators:${Versions.Accompanist.version}" }
+        val systemUIController by lazy { "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist.version}" }
+        val navigationAnimation by lazy { "com.google.accompanist:accompanist-navigation-animation:${Versions.Accompanist.version}" }
     }
 
     object DataStore {
@@ -51,12 +54,16 @@ object Deps {
     object Lifecycle {
         val composeViewModel by lazy { "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.compose}" }
         val lifecycleRuntime by lazy { "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleRuntime}" }
-        val lifeCycleViewModel by lazy {"androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycleRuntime}"}
+        val lifeCycleViewModel by lazy { "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycleRuntime}" }
     }
 
     object SquareUp {
         val retrofit by lazy { "com.squareup.retrofit2:retrofit:${Versions.SquareUp.version}" }
         val gsonConverter by lazy { "com.squareup.retrofit2:converter-gson:${Versions.SquareUp.version}" }
         val httpLogging by lazy { "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3" }
+    }
+
+    object JakeWharton {
+        val timber by lazy { "com.jakewharton.timber:timber:${Versions.JakeWharton.timber}" }
     }
 }

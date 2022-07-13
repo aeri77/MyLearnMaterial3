@@ -1,6 +1,7 @@
 package com.aeri77.mylearn.screen.landing.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,9 +23,11 @@ import kotlinx.coroutines.launch
 
 @ExperimentalPagerApi
 @Composable
-fun ButtonPrev(pagerState : PagerState, color: Color){
+fun ButtonPrev(pagerState: PagerState, color: Color) {
     val scope = rememberCoroutineScope()
     Button(
+        modifier = Modifier
+            .height(60.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.Transparent
@@ -50,7 +53,7 @@ fun ButtonPrev(pagerState : PagerState, color: Color){
 @ExperimentalPagerApi
 @Preview
 @Composable
-fun ButtonPrevPreview(){
+fun ButtonPrevPreview() {
     val pageState = rememberPagerState()
     ButtonPrev(pagerState = pageState, MaterialTheme.colorScheme.onTertiary)
 }

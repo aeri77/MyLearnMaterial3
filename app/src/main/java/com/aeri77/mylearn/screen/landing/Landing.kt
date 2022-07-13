@@ -1,6 +1,7 @@
 package com.aeri77.mylearn.screen.landing
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -37,18 +38,18 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
             .background(MaterialTheme.colorScheme.onPrimary)
             .fillMaxSize()
     ) {
-        val (buttonArea, mainItem, indicator) = createRefs()
+        val (buttonArea, mainItem, indicator, loading) = createRefs()
         val systemUiController = rememberSystemUiController()
+        val isLoading = viewModel.loading
         val baseColor = MaterialTheme.colorScheme.primary
         var color by remember { mutableStateOf(baseColor) }
         var pagePosition by remember { viewModel.pagePosition }
         val success by viewModel.isSuccess.observeAsState()
 
         LaunchedEffect(success) {
-            if(success == true){
+            if (success == true) {
                 viewModel.isSuccess.value = false
                 scope.launch {
-                    Log.d("signUp", "moved")
                     navController.navigate(Navigation.signUp)
                     viewModel.loading = false
                 }
@@ -61,8 +62,8 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(indicator.top)
-                height = Dimension.preferredWrapContent
-            },
+                height = Dimension.fillToConstraints
+            }.fillMaxSize(),
             count = 3, state = pagerState,
         ) { page ->
             when (pagerState.currentPage) {
@@ -104,7 +105,6 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(buttonArea.top)
-                    height = Dimension.preferredWrapContent
                 }
                 .padding(vertical = 24.dp),
             pagerState = pagerState
@@ -113,11 +113,9 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
             modifier = Modifier
                 .fillMaxWidth()
                 .constrainAs(buttonArea) {
-                    top.linkTo(indicator.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
-                    height = Dimension.preferredWrapContent
                 },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -131,6 +129,15 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
                 }
             }
             ButtonNext(pagerState, color, viewModel)
+        }
+        Crossfade(modifier = Modifier.constrainAs(loading) {
+            start.linkTo(parent.start)
+            end.linkTo(parent.end)
+            bottom.linkTo(parent.bottom)
+        }, targetState = isLoading && pagerState.currentPage != 2) {
+            if (it){
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
         }
     }
 

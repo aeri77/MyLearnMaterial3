@@ -30,12 +30,15 @@ fun AppBar(
     actions: @Composable () -> Unit = {
         Icon(imageVector = Icons.Filled.Home, contentDescription = "home", tint = contentColor)
     }, onActions: () -> Unit = {},
+    secondActions: @Composable RowScope.() -> Unit = {
+
+    },
     title: String = "",
     topAppbar: TopAppBar = TopAppBar.Large
 ) {
     val height: Dp = when (topAppbar) {
         TopAppBar.Large -> {
-            152.dp
+            112.dp
         }
         else -> {
             45.dp
@@ -47,6 +50,26 @@ fun AppBar(
         contentColor = contentColor
     ) {
         when (topAppbar) {
+            TopAppBar.CenterAligned -> {
+                Box(modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .clip(CircleShape)
+                    .clickable {
+                        onActions()
+                    }) {
+                    actions()
+                }
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = title,
+                    color = contentColor,
+                    fontWeight = W400,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
+                secondActions()
+            }
             TopAppBar.Large -> {
                 Box(
                     Modifier
@@ -67,7 +90,7 @@ fun AppBar(
                             .fillMaxWidth()
                             .align(Alignment.BottomStart)
                             .padding(horizontal = 14.dp)
-                            .padding(bottom = 28.dp),
+                            .padding(bottom = 16.dp),
                         text = title,
                         color = contentColor,
                         fontWeight = W400,

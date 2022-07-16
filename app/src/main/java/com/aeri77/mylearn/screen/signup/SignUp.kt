@@ -3,6 +3,7 @@ package com.aeri77.mylearn.screen.signup
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.component.AppBar
+import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -51,7 +53,7 @@ fun SignUp(navController: NavHostController) {
                 onActions = {
                     navController.navigateUp()
                 },
-                title = "Sign In"
+                title = "Sign Up"
             )
         }) {
         Surface(
@@ -62,8 +64,8 @@ fun SignUp(navController: NavHostController) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(32.dp),
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(18.dp)
                 ) {
@@ -179,7 +181,10 @@ fun SignUp(navController: NavHostController) {
                     Text(text = "Already have an account ?", fontSize = 16.sp)
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        "Sign In", style = TextStyle(
+                        modifier = Modifier.clickable {
+                            navController.navigate(Navigation.signIn)
+                        },
+                        text = "Sign In", style = TextStyle(
                             textDecoration = TextDecoration.Underline
                         ), color = MaterialTheme.colorScheme.tertiary, fontSize = 16.sp
                     )

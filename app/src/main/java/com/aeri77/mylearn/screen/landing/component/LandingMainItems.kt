@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aeri77.mylearn.R
@@ -32,12 +33,11 @@ fun LandingMainItems(
                 .background(
                     backgroundColor
                 )
-                .height(IntrinsicSize.Max)
+                .fillMaxHeight()
                 .padding(horizontal = 24.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-
             Text(
                 text = title,
                 color = textColor,
@@ -60,4 +60,10 @@ fun LandingMainItems(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun LandingMainItemsPreview(){
+    LandingMainItems(title = "Cras Augue", desc = "ababda w.. kkak lwlasdda. opreadmmawrae", image = painterResource(id = R.drawable.onboard_image_1), backgroundColor = MaterialTheme.colorScheme.primary, textColor = MaterialTheme.colorScheme.onPrimary )
 }

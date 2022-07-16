@@ -62,7 +62,7 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(indicator.top)
-                height = Dimension.fillToConstraints
+                height = Dimension.preferredWrapContent
             }.fillMaxSize(),
             count = 3, state = pagerState,
         ) { page ->

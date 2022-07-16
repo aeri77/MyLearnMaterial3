@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.Home
 import com.aeri77.mylearn.screen.landing.Landing
+import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.aeri77.mylearn.ui.theme.MyLearnTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -40,12 +41,22 @@ class MainActivity : ComponentActivity() {
                     startDestination = Navigation.landing
                 ) {
                     composable(Navigation.landing) { Landing(navController) }
-                    composable(Navigation.signIn) {}
+                    composable(Navigation.signIn, enterTransition = {
+                        slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
+                    }, exitTransition = {
+                        Timber.d("initial state =${initialState.destination.route} ")
+                        when (initialState.destination.route) {
+                            Navigation.signIn -> {
+                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                            }
+                            else -> null
+                        }
+                    }) { SignIn(navController) }
                     composable(Navigation.signUp, enterTransition = {
                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                     }, exitTransition = {
                         Timber.d("initial state =${initialState.destination.route} ")
-                        when(initialState.destination.route){
+                        when (initialState.destination.route) {
                             Navigation.signUp -> {
                                 slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
                             }

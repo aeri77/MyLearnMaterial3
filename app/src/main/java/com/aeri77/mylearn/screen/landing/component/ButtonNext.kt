@@ -42,9 +42,10 @@ fun ButtonNext(pagerState: PagerState, color: Color, viewModel: LandingViewModel
     val sizeState by transition.animateDp(label = "") { state ->
         when (state) {
             OnboardButtonState.Next -> 96.dp
-            OnboardButtonState.Continue ->if(isLoading) 96.dp else 192.dp
+            OnboardButtonState.Continue -> if(isLoading) 96.dp else 192.dp
         }
     }
+
     val colorState by transition.animateColor(label = "") { state ->
         when (state) {
             OnboardButtonState.Next -> {

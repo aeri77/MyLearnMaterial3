@@ -1,8 +1,5 @@
 package com.aeri77.mylearn.screen.landing
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,7 +22,6 @@ import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.landing.component.ButtonNext
 import com.aeri77.mylearn.screen.landing.component.ButtonPrev
 import com.aeri77.mylearn.screen.landing.component.LandingMainItems
-import com.aeri77.mylearn.utils.BackNavElement
 import com.google.accompanist.pager.*
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -58,7 +54,7 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
             if (success == true) {
                 viewModel.isSuccess.value = false
                 scope.launch {
-                    navController.navigate(Navigation.signUp)
+                    navController.navigate(Navigation.SIGN_UP)
                     viewModel.loading = false
                 }
             }

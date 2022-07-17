@@ -1,6 +1,5 @@
 package com.aeri77.mylearn.screen.signup
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -10,8 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +24,6 @@ import com.aeri77.mylearn.component.AppBar
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ExperimentalMaterial3Api
@@ -182,7 +178,7 @@ fun SignUp(navController: NavHostController) {
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         modifier = Modifier.clickable {
-                            navController.navigate(Navigation.signIn)
+                            navController.navigate(Navigation.SIGN_IN)
                         },
                         text = "Sign In", style = TextStyle(
                             textDecoration = TextDecoration.Underline

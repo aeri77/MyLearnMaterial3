@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.navigation
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.Home
 import com.aeri77.mylearn.screen.landing.Landing
@@ -39,31 +38,31 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 AnimatedNavHost(
                     navController = navController,
-                    startDestination = Navigation.landing
+                    startDestination = Navigation.LANDING
                 ) {
-                    composable(Navigation.landing) { Landing(navController) }
-                    composable(Navigation.signIn, enterTransition = {
+                    composable(Navigation.LANDING) { Landing(navController) }
+                    composable(Navigation.SIGN_IN, enterTransition = {
                         slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                     }, exitTransition = {
                         Timber.d("initial state =${initialState.destination.route} ")
                         when (initialState.destination.route) {
-                            Navigation.signIn -> {
+                            Navigation.SIGN_IN -> {
                                 slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
                             }
                             else -> null
                         }
                     }) { SignIn(navController) }
-                    composable(Navigation.signUp, enterTransition = {
+                    composable(Navigation.SIGN_UP, enterTransition = {
                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                     }, exitTransition = {
                         when (initialState.destination.route) {
-                            Navigation.signUp -> {
+                            Navigation.SIGN_UP -> {
                                 slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
                             }
                             else -> null
                         }
                     }) { SignUp(navController) }
-                    composable(Navigation.home) { Home(navController) }
+                    composable(Navigation.HOME) { Home(navController) }
                 }
             }
         }

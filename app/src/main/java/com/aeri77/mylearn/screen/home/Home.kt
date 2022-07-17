@@ -1,5 +1,6 @@
 package com.aeri77.mylearn.screen.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
@@ -7,14 +8,11 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.component.AppBar
@@ -40,8 +38,9 @@ import timber.log.Timber
 fun Home(navController: NavHostController) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val homeNavController = rememberAnimatedNavController()
     // icons to mimic drawer destinations
-    val items = listOf(Icons.Default.Favorite, Icons.Default.Face, Icons.Default.Email)
+    val items = listOf(HomePage.FirstPage, HomePage.SecondPage)
     val selectedItem = remember { mutableStateOf(items[0]) }
 
     DefaultBackHandler(backNavElement = ExitDialog {
@@ -53,11 +52,26 @@ fun Home(navController: NavHostController) {
         drawerContent = {
             items.forEach { item ->
                 NavigationDrawerItem(
-                    icon = { Icon(item, contentDescription = null) },
-                    label = { Text(item.name) },
+                    icon = { Icon(item.image, contentDescription = null) },
+                    label = { Text(item.title) },
                     selected = item == selectedItem.value,
                     onClick = {
-                        scope.launch { drawerState.close() }
+                        scope.launch {
+                            homeNavController.navigate(item.route) {
+                                // Pop up to the start destination of the graph to
+                                // avoid building up a large stack of destinations
+                                // on the back stack as users select items
+                                popUpTo(homeNavController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
+                            }
+                            drawerState.close()
+                        }
                         selectedItem.value = item
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -94,35 +108,32 @@ fun Home(navController: NavHostController) {
                 Surface(
                     modifier = Modifier.padding(it)
                 ) {
-                    val homeNavController = rememberAnimatedNavController()
                     AnimatedNavHost(
                         navController = homeNavController,
-                        startDestination = Navigation.landing
+                        startDestination = HomePageNavigation.FIRST_PAGE
                     ) {
-                        composable(Navigation.landing) { Landing(navController) }
-                        composable(Navigation.signIn, enterTransition = {
+                        composable(HomePageNavigation.FIRST_PAGE) { Landing(navController) }
+                        composable(HomePageNavigation.SECOND_PAGE, enterTransition = {
                             slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                         }, exitTransition = {
-                            Timber.d("initial state =${initialState.destination.route} ")
                             when (initialState.destination.route) {
-                                Navigation.signIn -> {
+                                Navigation.SIGN_IN -> {
                                     slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
                                 }
                                 else -> null
                             }
                         }) { SignIn(navController) }
-                        composable(Navigation.signUp, enterTransition = {
+                        composable(Navigation.SIGN_UP, enterTransition = {
                             slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                         }, exitTransition = {
-                            Timber.d("initial state =${initialState.destination.route} ")
                             when (initialState.destination.route) {
-                                Navigation.signUp -> {
+                                Navigation.SIGN_UP -> {
                                     slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
                                 }
                                 else -> null
                             }
                         }) { SignUp(navController) }
-                        composable(Navigation.home) { Home(navController) }
+                        composable(Navigation.HOME) { Home(navController) }
                     }
                 }
             }

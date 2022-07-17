@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.navigation
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.Home
 import com.aeri77.mylearn.screen.landing.Landing
@@ -55,7 +56,6 @@ class MainActivity : ComponentActivity() {
                     composable(Navigation.signUp, enterTransition = {
                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                     }, exitTransition = {
-                        Timber.d("initial state =${initialState.destination.route} ")
                         when (initialState.destination.route) {
                             Navigation.signUp -> {
                                 slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)

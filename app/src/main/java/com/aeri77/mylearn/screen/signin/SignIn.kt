@@ -22,9 +22,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.component.AppBar
+import com.aeri77.mylearn.navigation.Navigation.home
 import com.aeri77.mylearn.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -100,7 +102,11 @@ fun SignIn(navController: NavHostController) {
                             .fillMaxWidth()
                             .height(54.dp),
                         onClick = {
-                            Timber.d("previous route = ${navController.previousBackStackEntry?.destination?.route}")
+                            navController.navigate(home) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = true
+                                }
+                            }
                         }) {
                         Text(text = "Sign In", fontSize = 16.sp)
                     }

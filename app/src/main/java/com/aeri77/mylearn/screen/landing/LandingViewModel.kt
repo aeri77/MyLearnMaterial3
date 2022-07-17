@@ -22,7 +22,7 @@ class LandingViewModel @Inject constructor() : ViewModel() {
     fun setLoading(){
         viewModelScope.launch {
             loading = !loading
-            delay(5000)
+//            delay(5000)
             isSuccess.postValue(true)
         }
     }

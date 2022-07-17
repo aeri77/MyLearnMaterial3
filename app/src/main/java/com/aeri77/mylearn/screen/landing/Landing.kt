@@ -1,6 +1,7 @@
 package com.aeri77.mylearn.screen.landing
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -18,10 +19,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.R
+import com.aeri77.mylearn.component.DefaultBackHandler
+import com.aeri77.mylearn.component.ExitDialog
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.landing.component.ButtonNext
 import com.aeri77.mylearn.screen.landing.component.ButtonPrev
 import com.aeri77.mylearn.screen.landing.component.LandingMainItems
+import com.aeri77.mylearn.utils.BackNavElement
 import com.google.accompanist.pager.*
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -46,6 +50,10 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
         var pagePosition by remember { viewModel.pagePosition }
         val success by viewModel.isSuccess.observeAsState()
 
+        DefaultBackHandler(backNavElement = ExitDialog {
+
+        })
+
         LaunchedEffect(success) {
             if (success == true) {
                 viewModel.isSuccess.value = false
@@ -57,13 +65,15 @@ fun Landing(navController: NavController, viewModel: LandingViewModel = viewMode
         }
 
         HorizontalPager(
-            modifier = Modifier.constrainAs(mainItem) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(indicator.top)
-                height = Dimension.preferredWrapContent
-            }.fillMaxSize(),
+            modifier = Modifier
+                .constrainAs(mainItem) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(indicator.top)
+                    height = Dimension.preferredWrapContent
+                }
+                .fillMaxSize(),
             count = 3, state = pagerState,
         ) { page ->
             when (pagerState.currentPage) {
@@ -183,5 +193,3 @@ fun ThirdPage(systemUiController: SystemUiController) {
         textColor = MaterialTheme.colorScheme.tertiary
     )
 }
-
-

@@ -1,7 +1,7 @@
 
 
 buildscript {
-    extra["compose_version"] = Versions.compose
+    extra["compose_version"] = Versions.composeCompiler
     dependencies {
         classpath("com.google.dagger:hilt-android-gradle-plugin:${Versions.hilt}")
     }
@@ -9,8 +9,16 @@ buildscript {
 plugins {
     id("com.android.application") version "7.2.1" apply false
     id("com.android.library") version "7.2.1" apply false
-    id("org.jetbrains.kotlin.android") version "1.6.10" apply false
+    id("org.jetbrains.kotlin.android") version "1.7.0" apply false
 }
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class).configureEach {
+    kotlinOptions {
+        jvmTarget = "11"
+        freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all-compatibility"
+    }
+}
+
 tasks.register("clean",Delete::class){
     delete(rootProject.buildDir)
 }

@@ -13,15 +13,15 @@ object BuildPlugins {
 object Deps {
     val coreKTX by lazy { "androidx.core:core-ktx:${Versions.coreKTX}" }
     val junit by lazy { "junit:junit:${Versions.jUnit}" }
-    val composeUI by lazy { "androidx.compose.ui:ui:${Versions.compose}" }
-    val composeToolingPreview by lazy { "androidx.compose.ui:ui-tooling-preview:${Versions.compose}" }
-    val composeJUnit by lazy { "androidx.compose.ui:ui-test-junit4:${Versions.compose}" }
-    val composeUITooling by lazy { "androidx.compose.ui:ui-tooling:${Versions.compose}" }
-    val composeTestManifest by lazy { "androidx.compose.ui:ui-test-manifest:${Versions.compose}" }
+    val composeUI by lazy { "androidx.compose.ui:ui:${Versions.composeUi}" }
+    val composeToolingPreview by lazy { "androidx.compose.ui:ui-tooling-preview:${Versions.composeUi}" }
+    val composeJUnit by lazy { "androidx.compose.ui:ui-test-junit4:${Versions.composeUi}" }
+    val composeUITooling by lazy { "androidx.compose.ui:ui-tooling:${Versions.composeUi}" }
+    val composeTestManifest by lazy { "androidx.compose.ui:ui-test-manifest:${Versions.composeUi}" }
     val composeMaterial3 by lazy { "androidx.compose.material3:material3:${Versions.composeMaterial3}" }
     val composeActivity by lazy { "androidx.activity:activity-compose:${Versions.composeActivity}" }
-    val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.compose}" }
-    val composeIconsExtended by lazy { "androidx.compose.material:material-icons-extended:${Versions.compose}" }
+    val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.composeUi}" }
+    val composeIconsExtended by lazy { "androidx.compose.material:material-icons-extended:${Versions.composeCompiler}" }
     val hilt by lazy { "com.google.dagger:hilt-android:${Versions.hilt}" }
     val hiltCompiler by lazy { "com.google.dagger:hilt-android-compiler:${Versions.hilt}" }
     val navigationFragment by lazy { "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}" }
@@ -52,7 +52,7 @@ object Deps {
     }
 
     object Lifecycle {
-        val composeViewModel by lazy { "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.compose}" }
+        val composeViewModel by lazy { "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.composeUi}" }
         val lifecycleRuntime by lazy { "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleRuntime}" }
         val lifeCycleViewModel by lazy { "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycleRuntime}" }
     }

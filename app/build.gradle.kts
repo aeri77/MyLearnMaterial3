@@ -1,5 +1,4 @@
 import org.apache.tools.ant.util.JavaEnvUtils.JAVA_11
-import org.apache.tools.ant.util.JavaEnvUtils.VERSION_11
 
 plugins {
     id("com.android.application")
@@ -41,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
+        kotlinCompilerExtensionVersion = Versions.composeCompiler
     }
     packagingOptions {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"

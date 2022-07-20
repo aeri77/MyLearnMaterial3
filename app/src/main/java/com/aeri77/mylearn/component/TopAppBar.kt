@@ -99,6 +99,7 @@ fun AppBar(
                     )
                 }
             }
+            else -> {}
         }
     }
 }

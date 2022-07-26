@@ -1,68 +1,120 @@
 package com.aeri77.mylearn.screen.home.model
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-
 data class ShopsItemsModel(
-    val name: String,
+    val name: CakesName,
     val price: String,
     val isWishlist: Boolean = false,
     val isFavorite: Boolean = false,
-    val cakeSize: List<CakeSize>,
-    val toppings: List<Toppings>,
-    val category: CategoriesName
+    val cakeSize: List<SizeCake>,
+    val toppings: List<Toppings>
 )
 
-data class CategoriesName(
-    val name: String,
-    val isSelected: Boolean = false
-//    val color: Color,
-//    val icons: ImageVector
-)
+/** Enums **/
 
-data class CakeSize(
-    val name: String,
-    val size: Int
-)
+enum class CakesName(
+    val names: String
+) {
+    BUTTER("Butter Cake"),
+    SPONGE("Sponge Cake"),
+    POUND("Pound Cake"),
+    GENOISE("Genoise Cake"),
+    BISCUIT("Biscuit Cake"),
+    ANGEL_FOOD("Angel Food Cake"),
+    CHIFFON("Chiffon Cake"),
+}
 
-data class Toppings(
-    val name: String,
-    val color : Color
-)
+enum class Toppings(
+    val names: String
+) {
+    CHOCOLATE("Chocolates"),
+    CHEESE("Cheeses"),
+    FRUITS("Fruits"),
+    OREOS("Oreos")
+}
 
+
+enum class SizeCake(val idx: Int, val cm: String, val size: Int) {
+    SMALL(0, "10cm", 10),
+    MEDIUM(1, "12cm", 12),
+    LARGE(2, "16cm", 16),
+    EXTRA_LARGE(3, "20cm", 20)
+}
 
 /** Dummy Model **/
 
 fun getAllCakes(): List<ShopsItemsModel> {
     return listOf(
-        ShopsItemsModel()
+        ShopsItemsModel(
+            name = CakesName.SPONGE,
+            price = "Rp. 60,000",
+            cakeSize = getSomeSize(
+                SizeCake.MEDIUM, SizeCake.SMALL, SizeCake.LARGE
+            ),
+            toppings = getSomeToppings(
+                Toppings.CHOCOLATE, Toppings.CHEESE
+            )
+        ),
+        ShopsItemsModel(
+            name = CakesName.BISCUIT,
+            price = "Rp. 65,000",
+            cakeSize = getSomeSize(
+                SizeCake.MEDIUM, SizeCake.SMALL, SizeCake.LARGE, SizeCake.EXTRA_LARGE
+            ),
+            toppings = getSomeToppings(
+                Toppings.CHOCOLATE, Toppings.CHEESE, Toppings.OREOS
+            )
+        ),
+        ShopsItemsModel(
+            name = CakesName.BUTTER,
+            price = "Rp. 70,000",
+            cakeSize = getSomeSize(
+                SizeCake.MEDIUM, SizeCake.SMALL, SizeCake.LARGE
+            ),
+            toppings = getSomeToppings(
+                Toppings.CHOCOLATE, Toppings.CHEESE, Toppings.FRUITS
+            )
+        ),
+        ShopsItemsModel(
+            name = CakesName.SPONGE,
+            price = "Rp. 60,000",
+            cakeSize = getSomeSize(
+                SizeCake.MEDIUM, SizeCake.SMALL
+            ),
+            toppings = getSomeToppings(
+                Toppings.CHOCOLATE, Toppings.CHEESE
+            )
+        ),
     )
 }
 
-fun getAllCategories(): List<CategoriesName> {
+fun getAllCategories(): List<CakesName> {
     return listOf(
-        CategoriesName("Butter"),
-        CategoriesName("Sponge"),
-        CategoriesName("Pound"),
-        CategoriesName("Genoise"),
-        CategoriesName("Biscuit"),
-        CategoriesName("Angel Food"),
-        CategoriesName("Chiffon"),
+        CakesName.CHIFFON,
+        CakesName.ANGEL_FOOD,
+        CakesName.BUTTER,
+        CakesName.BISCUIT,
+        CakesName.GENOISE,
+        CakesName.POUND,
+        CakesName.SPONGE
     )
 }
 
-fun getAllSize(): List<CakeSize>{
+fun getAllSize(): List<SizeCake> {
     return listOf(
-        CakeSize("10cm", 10),
-        CakeSize("12cm", 12),
-        CakeSize("16cm", 16),
-        CakeSize("20cm", 20),
+        SizeCake.SMALL, SizeCake.LARGE, SizeCake.MEDIUM, SizeCake.EXTRA_LARGE
     )
 }
 
-fun getAlToppings(): List<Toppings>{
+fun getSomeSize(vararg size: SizeCake): List<SizeCake> {
+    return size.asList()
+}
+
+fun getAllToppings(): List<Toppings> {
     return listOf(
-        Toppings("Chocolate",)
+        Toppings.CHOCOLATE, Toppings.CHEESE, Toppings.FRUITS, Toppings.OREOS
     )
+}
+
+fun getSomeToppings(vararg toppings: Toppings): List<Toppings> {
+    return toppings.asList()
 }

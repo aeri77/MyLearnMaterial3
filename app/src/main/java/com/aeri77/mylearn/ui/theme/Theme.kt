@@ -17,28 +17,55 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Primary80,
+    secondary = Secondary80,
+    tertiary = Tertiary80,
+    onPrimary = Primary20,
+    onSecondary = Secondary20,
+    onTertiary = Tertiary20,
+    primaryContainer = Primary30,
+    onPrimaryContainer = Primary90,
+    secondaryContainer = Secondary30,
+    onSecondaryContainer = Secondary90,
+    tertiaryContainer = Tertiary30,
+    onTertiaryContainer = Tertiary90,
+    error = Error80,
+    onError = Error20,
+    errorContainer = Error30,
+    onErrorContainer = Error90,
+    surface = Neutral10,
+    onSurface = Neutral80,
+    background = Neutral10,
+    onBackground = Neutral90,
+    surfaceVariant = NeutralVariant30,
+    onSurfaceVariant = NeutralVariant80,
+    outline = NeutralVariant60
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = Primary40,
+    secondary = Secondary40,
+    tertiary = Tertiary40,
+    onPrimary = Primary100,
+    onSecondary = Secondary100,
+    onTertiary = Tertiary100,
+    primaryContainer = Primary90,
+    onPrimaryContainer = Primary10,
+    secondaryContainer = Secondary90,
+    onSecondaryContainer = Secondary10,
+    tertiaryContainer = Tertiary90,
+    onTertiaryContainer = Tertiary10,
+    error = Error40,
+    onError = Error100,
+    errorContainer = Error90,
+    onErrorContainer = Error10,
+    surface = Neutral99,
+    onSurface = Neutral10,
+    background = Neutral99,
+    onBackground = Neutral10,
+    surfaceVariant = NeutralVariant90,
+    onSurfaceVariant = NeutralVariant30,
+    outline = NeutralVariant50
 )
 
 @Composable

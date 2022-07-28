@@ -67,6 +67,7 @@ dependencies {
     implementation(Deps.Accompanist.pagerIndicator)
     implementation(Deps.Accompanist.systemUIController)
     implementation(Deps.Accompanist.navigationAnimation)
+    implementation(Deps.Accompanist.flowLayout)
     implementation(Deps.constraintLayout)
     implementation(Deps.DataStore.core)
     implementation(Deps.DataStore.datastore)

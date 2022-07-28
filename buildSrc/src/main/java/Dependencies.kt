@@ -39,6 +39,7 @@ object Deps {
         val pagerIndicator by lazy { "com.google.accompanist:accompanist-pager-indicators:${Versions.Accompanist.version}" }
         val systemUIController by lazy { "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist.version}" }
         val navigationAnimation by lazy { "com.google.accompanist:accompanist-navigation-animation:${Versions.Accompanist.version}" }
+        val flowLayout by lazy { "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist.version}" }
     }
 
     object DataStore {

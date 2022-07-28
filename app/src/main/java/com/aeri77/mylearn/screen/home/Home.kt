@@ -1,12 +1,10 @@
 package com.aeri77.mylearn.screen.home
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Surface
@@ -36,7 +34,7 @@ import com.aeri77.mylearn.component.ExitDialog
 import com.aeri77.mylearn.component.NoRippleEffect
 import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
-import com.aeri77.mylearn.screen.landing.Landing
+import com.aeri77.mylearn.screen.home.page.ShopsPage
 import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -47,6 +45,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
+@ExperimentalFoundationApi
 @ExperimentalPagerApi
 @ExperimentalMaterial3Api
 @ExperimentalAnimationApi
@@ -56,7 +55,7 @@ fun Home(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val homeNavController = rememberAnimatedNavController()
     // icons to mimic drawer destinations
-    val items = listOf(HomePage.FirstPage, HomePage.SecondPage)
+    val items = listOf(HomePages.ShopsPage, HomePages.SecondPage)
     val selectedItem = remember { mutableStateOf(items[0]) }
 
     DefaultBackHandler(backNavElement = ExitDialog {
@@ -218,10 +217,10 @@ fun Home(navController: NavHostController) {
                 ) {
                     AnimatedNavHost(
                         navController = homeNavController,
-                        startDestination = HomePageNavigation.FIRST_PAGE
+                        startDestination = HomePageNavigation.SHOPS_PAGE
                     ) {
-                        composable(HomePageNavigation.FIRST_PAGE) {
-                            Landing(navController)
+                        composable(HomePageNavigation.SHOPS_PAGE) {
+                            ShopsPage(navController)
                             selectedItem.value = items[0]
                         }
                         composable(HomePageNavigation.SECOND_PAGE, enterTransition = {
@@ -254,6 +253,7 @@ fun Home(navController: NavHostController) {
         })
 }
 
+@ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi

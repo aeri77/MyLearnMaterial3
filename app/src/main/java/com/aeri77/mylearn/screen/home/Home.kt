@@ -55,7 +55,8 @@ fun Home(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val homeNavController = rememberAnimatedNavController()
     // icons to mimic drawer destinations
-    val items = listOf(HomePages.ShopsPage, HomePages.SecondPage)
+    val items = listOf(HomePages.ShopsPage, HomePages.CheckoutPage)
+
     val selectedItem = remember { mutableStateOf(items[0]) }
 
     DefaultBackHandler(backNavElement = ExitDialog {

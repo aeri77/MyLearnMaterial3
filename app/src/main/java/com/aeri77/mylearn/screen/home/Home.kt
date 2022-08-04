@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +36,7 @@ import com.aeri77.mylearn.component.NoRippleEffect
 import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.page.ShopsPage
+import com.aeri77.mylearn.screen.landing.LandingViewModel
 import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -50,7 +52,7 @@ import timber.log.Timber
 @ExperimentalMaterial3Api
 @ExperimentalAnimationApi
 @Composable
-fun Home(navController: NavHostController) {
+fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
     val drawerState = rememberDrawerState(DrawerValue.Open)
     val scope = rememberCoroutineScope()
     val homeNavController = rememberAnimatedNavController()
@@ -98,13 +100,28 @@ fun Home(navController: NavHostController) {
                         bottom.linkTo(image.bottom)
                         width = Dimension.fillToConstraints
                     }) {
-                    Text(text = "Full Name", fontSize = 28.sp, fontWeight = FontWeight.W600, color = MaterialTheme.colorScheme.onSecondary)
+                    Text(
+                        text = "Full Name",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.W600,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
                     Row(
                         verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Icon(modifier = Modifier.size(12.dp),imageVector = Icons.Filled.Favorite, contentDescription = "wishlist", tint = Color.Red)
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(12.dp),
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "wishlist",
+                            tint = Color.Red
+                        )
                         Spacer(Modifier.size(4.dp))
-                        Text(text = "20 Wish List >", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSecondary, fontStyle = FontStyle.Italic)
+                        Text(
+                            text = "20 Wish List >",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSecondary,
+                            fontStyle = FontStyle.Italic
+                        )
                     }
                 }
             }
@@ -173,7 +190,14 @@ fun Home(navController: NavHostController) {
                         contentDescription = "logout"
                     )
                 },
-                label = { Text(text = "Logout") }, selected = false, onClick = { /*TODO*/ })
+                onClick = {
+                    viewModel.clearUserStore()
+                    navController.navigate(Navigation.LANDING) {
+                        popUpTo(0)
+                    }
+                },
+                label = { Text(text = "Logout") }, selected = false
+            )
 
             Box(
                 modifier = Modifier.fillMaxSize()

@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,21 +21,27 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.component.AppBar
 import com.aeri77.mylearn.navigation.Navigation.HOME
+import com.aeri77.mylearn.screen.landing.LandingViewModel
 import com.aeri77.mylearn.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @ExperimentalMaterial3Api
 @Composable
-fun SignIn(navController: NavHostController) {
+fun SignIn(
+    navController: NavHostController,
+    viewModel: SignInViewModel = hiltViewModel(),
+    landingViewModel: LandingViewModel = hiltViewModel()
+) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
     val onMainColor = MaterialTheme.colorScheme.onPrimary
-
+    val userStore by landingViewModel.userStore.observeAsState()
     systemUiController.setStatusBarColor(mainColor)
 
     Scaffold(
@@ -97,6 +105,7 @@ fun SignIn(navController: NavHostController) {
                             .fillMaxWidth()
                             .height(54.dp),
                         onClick = {
+                            viewModel.signIn()
                             navController.navigate(HOME) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     inclusive = true

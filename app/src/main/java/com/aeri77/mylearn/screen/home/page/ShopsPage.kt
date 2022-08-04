@@ -126,7 +126,7 @@ fun ShopsPage(navController: NavHostController) {
                 LazyVerticalGrid(modifier= Modifier.height(height).background(Primary95),columns = GridCells.Fixed(2)){
                     items(count){
                         Box(Modifier.size(240.dp)){
-                            Card(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+                            Card(modifier = Modifier.fillMaxSize().padding(12.dp), shape = RoundedCornerShape(20.dp)) {
                                 Text("Hello")
                             }
                         }

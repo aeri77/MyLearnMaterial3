@@ -3,16 +3,22 @@ package com.aeri77.mylearn
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.Home
 import com.aeri77.mylearn.screen.landing.Landing
+import com.aeri77.mylearn.screen.landing.LandingViewModel
 import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.aeri77.mylearn.ui.theme.MyLearnTheme
@@ -29,13 +35,25 @@ import timber.log.Timber
 @ExperimentalPagerApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val landingViewModel: LandingViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
+        landingViewModel.initUserStore()
+
         setContent {
             val navController = rememberAnimatedNavController()
+            val userStore by landingViewModel.userStore.observeAsState()
+            LaunchedEffect(userStore) {
+                if (userStore?.username?.isNotEmpty() == true) {
+                    navController.navigate(Navigation.HOME) {
+                        popUpTo(0)
+                    }
+                }
+            }
             MyLearnTheme {
                 // A surface container using the 'background' color from the theme
                 AnimatedNavHost(
@@ -53,7 +71,7 @@ class MainActivity : ComponentActivity() {
                             }
                             else -> null
                         }
-                    }) { SignIn(navController) }
+                    }) { SignIn(navController, landingViewModel = landingViewModel) }
                     composable(Navigation.SIGN_UP, enterTransition = {
                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                     }, exitTransition = {
@@ -64,7 +82,9 @@ class MainActivity : ComponentActivity() {
                             else -> null
                         }
                     }) { SignUp(navController) }
-                    composable(Navigation.HOME) { Home(navController) }
+                    composable(Navigation.HOME, enterTransition = {
+                        fadeIn()
+                    }) { Home(navController) }
                 }
             }
         }

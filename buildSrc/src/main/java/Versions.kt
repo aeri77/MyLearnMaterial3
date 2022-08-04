@@ -18,6 +18,13 @@ object Versions {
     object Datastore {
         const val version = "1.0.0"
     }
+    object Hilt {
+        const val version = "1.0.0-alpha01"
+    }
+
+    object Google {
+        const val javaLiteVersion = "3.18.0"
+    }
 
     object KTX {
         const val version = "1.5.0"

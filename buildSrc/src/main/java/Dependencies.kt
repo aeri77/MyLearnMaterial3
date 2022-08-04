@@ -22,12 +22,11 @@ object Deps {
     val composeActivity by lazy { "androidx.activity:activity-compose:${Versions.composeActivity}" }
     val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.composeUi}" }
     val composeIconsExtended by lazy { "androidx.compose.material:material-icons-extended:${Versions.composeCompiler}" }
-    val hilt by lazy { "com.google.dagger:hilt-android:${Versions.hilt}" }
-    val hiltCompiler by lazy { "com.google.dagger:hilt-android-compiler:${Versions.hilt}" }
     val navigationFragment by lazy { "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}" }
     val navigationUI by lazy { "androidx.navigation:navigation-ui-ktx:${Versions.navigation}" }
     val navigationDynamic by lazy { "androidx.navigation:navigation-dynamic-features-fragment:${Versions.navigation}" }
     val navigationCompose by lazy { "androidx.navigation:navigation-compose:${Versions.navigation}" }
+    val navigationHilt by lazy { "androidx.hilt:hilt-navigation-compose:1.0.0" }
     val navigationTesting by lazy { "androidx.navigation:navigation-testing:${Versions.navigation}" }
     val constraintLayout by lazy { "androidx.constraintlayout:constraintlayout-compose:${Versions.constraint}" }
     val testJUnit by lazy { "androidx.test.ext:junit:1.1.3" }
@@ -40,6 +39,17 @@ object Deps {
         val systemUIController by lazy { "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist.version}" }
         val navigationAnimation by lazy { "com.google.accompanist:accompanist-navigation-animation:${Versions.Accompanist.version}" }
         val flowLayout by lazy { "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist.version}" }
+    }
+
+    object Hilt {
+        val hilt by lazy { "com.google.dagger:hilt-android:${Versions.hilt}" }
+        val hiltGoogleCompiler by lazy { "com.google.dagger:hilt-android-compiler:${Versions.hilt}" }
+        val hiltViewModel by lazy { "androidx.hilt:hilt-lifecycle-viewmodel:${Versions.Hilt.version}" }
+        val hiltCompiler by lazy { "androidx.hilt:hilt-compiler:${Versions.Hilt.version}" }
+    }
+
+    object Google {
+        val protobuf by lazy { "com.google.protobuf:protobuf-javalite:${Versions.Google.javaLiteVersion}" }
     }
 
     object DataStore {

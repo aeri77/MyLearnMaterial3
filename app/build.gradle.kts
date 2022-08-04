@@ -1,3 +1,4 @@
+import com.google.protobuf.gradle.*
 import org.apache.tools.ant.util.JavaEnvUtils.JAVA_11
 
 plugins {
@@ -5,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+    id("com.google.protobuf") version "0.8.12"
 }
 
 android {
@@ -44,9 +46,30 @@ android {
     }
     packagingOptions {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        resources.excludes.add("META-INF/*")
+        resources.excludes.add("META-INF/gradle/incremental.annotation.processors")
 
     }
 }
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.14.0"
+    }
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
 
 dependencies {
     implementation(Deps.coreKTX)
@@ -58,11 +81,13 @@ dependencies {
     implementation(Deps.Lifecycle.composeViewModel)
     implementation(Deps.Lifecycle.lifecycleRuntime)
     implementation(Deps.Lifecycle.lifeCycleViewModel)
-    implementation(Deps.hilt)
+    implementation(Deps.Hilt.hilt)
+    implementation(Deps.Hilt.hiltGoogleCompiler)
     implementation(Deps.navigationDynamic)
     implementation(Deps.navigationCompose)
     implementation(Deps.navigationUI)
     implementation(Deps.navigationFragment)
+    implementation(Deps.navigationHilt)
     implementation(Deps.Accompanist.pager)
     implementation(Deps.Accompanist.pagerIndicator)
     implementation(Deps.Accompanist.systemUIController)
@@ -77,7 +102,8 @@ dependencies {
     implementation(Deps.SquareUp.gsonConverter)
     implementation(Deps.SquareUp.httpLogging)
     implementation(Deps.JakeWharton.timber)
-    kapt(Deps.hiltCompiler)
+    implementation(Deps.Google.protobuf)
+    kapt(Deps.Hilt.hiltCompiler)
     testImplementation(Deps.junit)
     androidTestImplementation(Deps.testJUnit)
     androidTestImplementation(Deps.testEspresso)

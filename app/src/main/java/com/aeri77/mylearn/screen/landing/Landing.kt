@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.aeri77.mylearn.R
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
-fun Landing(navController: NavController, viewModel: LandingViewModel = viewModel()) {
+fun Landing(navController: NavController, viewModel: LandingViewModel = hiltViewModel()) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
     ConstraintLayout(

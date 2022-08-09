@@ -103,6 +103,7 @@ dependencies {
     implementation(Deps.SquareUp.httpLogging)
     implementation(Deps.JakeWharton.timber)
     implementation(Deps.Google.protobuf)
+    implementation("androidx.core:core-ktx:+")
     kapt(Deps.Hilt.hiltCompiler)
     testImplementation(Deps.junit)
     androidTestImplementation(Deps.testJUnit)

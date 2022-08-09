@@ -2,8 +2,13 @@
 
 buildscript {
     extra["compose_version"] = Versions.composeCompiler
+    val kotlinVersion by extra("1.7.0")
     dependencies {
         classpath("com.google.dagger:hilt-android-gradle-plugin:${Versions.hilt}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
+    repositories {
+        mavenCentral()
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {

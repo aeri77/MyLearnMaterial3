@@ -35,9 +35,8 @@ import com.aeri77.mylearn.component.ExitDialog
 import com.aeri77.mylearn.component.NoRippleEffect
 import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
+import com.aeri77.mylearn.screen.home.page.CheckoutPage
 import com.aeri77.mylearn.screen.home.page.ShopsPage
-import com.aeri77.mylearn.screen.landing.LandingViewModel
-import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -57,7 +56,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
     val scope = rememberCoroutineScope()
     val homeNavController = rememberAnimatedNavController()
     // icons to mimic drawer destinations
-    val items = listOf(HomePages.ShopsPage, HomePages.CheckoutPage)
+    val items = listOf(HomePages.ShopsPage, HomePages.CheckoutPage, HomePages.MessagesPage)
 
     val selectedItem = remember { mutableStateOf(items[0]) }
 
@@ -248,20 +247,13 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
                             ShopsPage(navController)
                             selectedItem.value = items[0]
                         }
-                        composable(HomePageNavigation.SECOND_PAGE, enterTransition = {
+                        composable(HomePageNavigation.CHECKOUT, enterTransition = {
                             slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
-                        }, exitTransition = {
-                            when (initialState.destination.route) {
-                                Navigation.SIGN_IN -> {
-                                    slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
-                                }
-                                else -> null
-                            }
                         }) {
-                            SignIn(navController)
+                            CheckoutPage(navController)
                             selectedItem.value = items[1]
                         }
-                        composable(Navigation.SIGN_UP, enterTransition = {
+                        composable(HomePageNavigation., enterTransition = {
                             slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                         }, exitTransition = {
                             when (initialState.destination.route) {

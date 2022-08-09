@@ -263,8 +263,12 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
                                 }
                                 else -> null
                             }
-                        }) { SignUp(navController) }
-                        composable(Navigation.HOME) { MessagesPage(navController) }
+                        }) {
+                            MessagesPage(navController)
+                            selectedItem.value = items[2] }
+                        composable(Navigation.HOME) {
+                            Home(navController)
+                        }
                     }
                 }
             }

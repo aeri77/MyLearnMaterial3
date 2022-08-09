@@ -87,7 +87,7 @@ fun ShopsPage(navController: NavHostController) {
                     Spacer(modifier = Modifier.size(12.dp))
 
                     Box(
-                        modifier = Modifier.align(
+                        modifier = Modifier.padding(bottom = 12.dp).align(
                             CenterHorizontally
                         )
                     ) {

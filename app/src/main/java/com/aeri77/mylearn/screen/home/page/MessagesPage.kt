@@ -1,9 +1,9 @@
 package com.aeri77.mylearn.screen.home.page
 
 import androidx.compose.runtime.Composable
-import com.aeri77.mylearn.screen.home.HomePages
+import androidx.navigation.NavHostController
 
 @Composable
-fun MessagesPage(){
+fun MessagesPage(navController: NavHostController) {
 
 }

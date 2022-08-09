@@ -36,6 +36,7 @@ import com.aeri77.mylearn.component.NoRippleEffect
 import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.page.CheckoutPage
+import com.aeri77.mylearn.screen.home.page.MessagesPage
 import com.aeri77.mylearn.screen.home.page.ShopsPage
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -247,13 +248,13 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
                             ShopsPage(navController)
                             selectedItem.value = items[0]
                         }
-                        composable(HomePageNavigation.CHECKOUT, enterTransition = {
+                        composable(HomePageNavigation.CHECKOUT_PAGE, enterTransition = {
                             slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                         }) {
                             CheckoutPage(navController)
                             selectedItem.value = items[1]
                         }
-                        composable(HomePageNavigation., enterTransition = {
+                        composable(HomePageNavigation.MESSAGES_PAGE, enterTransition = {
                             slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                         }, exitTransition = {
                             when (initialState.destination.route) {
@@ -263,7 +264,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
                                 else -> null
                             }
                         }) { SignUp(navController) }
-                        composable(Navigation.HOME) { Home(navController) }
+                        composable(Navigation.HOME) { MessagesPage(navController) }
                     }
                 }
             }

@@ -39,10 +39,12 @@ import com.aeri77.mylearn.screen.home.page.CheckoutPage
 import com.aeri77.mylearn.screen.home.page.MessagesPage
 import com.aeri77.mylearn.screen.home.page.ShopsPage
 import com.aeri77.mylearn.screen.signup.SignUp
+import com.aeri77.mylearn.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -53,8 +55,9 @@ import timber.log.Timber
 @ExperimentalAnimationApi
 @Composable
 fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
-    val drawerState = rememberDrawerState(DrawerValue.Open)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val systemUiController = rememberSystemUiController()
     val homeNavController = rememberAnimatedNavController()
     // icons to mimic drawer destinations
     val items = listOf(HomePages.ShopsPage, HomePages.CheckoutPage, HomePages.MessagesPage)
@@ -64,6 +67,8 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
     DefaultBackHandler(backNavElement = ExitDialog {
 
     })
+
+    systemUiController.setStatusBarColor(Primary95)
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -217,7 +222,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
                         actions = {
                             Icon(
                                 imageVector = Icons.Filled.Menu, contentDescription = "Menu",
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         },
                         onActions = {
@@ -226,14 +231,7 @@ fun Home(navController: NavHostController, viewModel: HomeViewModel = hiltViewMo
                                 Timber.d("drawer isOpen = ${drawerState.currentValue}")
                             }
                         },
-                        topAppbar = TopAppBar.CenterAligned,
-                        trailingIcons = {
-                            Icon(
-                                modifier = Modifier.align(Alignment.CenterEnd),
-                                imageVector = Icons.Filled.Search, contentDescription = "Search",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
+                        topAppbar = TopAppBar.CenterAligned
                     )
                 }
             ) {

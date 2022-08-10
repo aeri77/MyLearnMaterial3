@@ -19,11 +19,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aeri77.mylearn.component.enums.TopAppBar
+import com.aeri77.mylearn.ui.theme.Primary95
 
 @Composable
 fun AppBar(
-    backgroundColor: Color = MaterialTheme.colorScheme.primary,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    backgroundColor: Color = Primary95,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
     actions: @Composable () -> Unit = {
         Icon(imageVector = Icons.Filled.Home, contentDescription = "home", tint = contentColor)
     }, onActions: () -> Unit = {},
@@ -44,7 +45,8 @@ fun AppBar(
     TopAppBar(
         modifier = Modifier.height(height),
         backgroundColor = backgroundColor,
-        contentColor = contentColor
+        contentColor = contentColor,
+        elevation = 0.dp
     ) {
         when (topAppbar) {
             TopAppBar.CenterAligned -> {

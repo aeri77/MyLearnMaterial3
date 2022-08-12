@@ -1,4 +1,4 @@
-package com.aeri77.mylearn.screen.landing.enums
+package com.aeri77.mylearn.screen.onboarding.enums
 
 enum class PageStateEnum {
     First,

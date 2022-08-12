@@ -1,4 +1,4 @@
-package com.aeri77.mylearn.screen.landing.component
+package com.aeri77.mylearn.screen.onboarding.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.aeri77.mylearn.screen.landing.LandingViewModel
+import com.aeri77.mylearn.screen.onboarding.OnBoardingViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
@@ -33,7 +33,7 @@ private enum class OnboardButtonState {
 
 @ExperimentalPagerApi
 @Composable
-fun ButtonNext(pagerState: PagerState, color: Color, viewModel: LandingViewModel = viewModel()) {
+fun ButtonNext(pagerState: PagerState, color: Color, viewModel: OnBoardingViewModel = viewModel()) {
     val isLoading = viewModel.loading
     val scope = rememberCoroutineScope()
 

@@ -1,4 +1,4 @@
-package com.aeri77.mylearn.screen.landing.component
+package com.aeri77.mylearn.screen.onboarding.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.aeri77.mylearn.R
 
 @Composable
-fun LandingMainItems(
+fun OnBoardingMainItems(
     title: String,
     desc: String,
     image: Painter,
@@ -65,5 +65,5 @@ fun LandingMainItems(
 @Preview
 @Composable
 fun LandingMainItemsPreview(){
-    LandingMainItems(title = "Cras Augue", desc = "ababda w.. kkak lwlasdda. opreadmmawrae", image = painterResource(id = R.drawable.onboard_image_1), backgroundColor = MaterialTheme.colorScheme.primary, textColor = MaterialTheme.colorScheme.onPrimary )
+    OnBoardingMainItems(title = "Cras Augue", desc = "ababda w.. kkak lwlasdda. opreadmmawrae", image = painterResource(id = R.drawable.onboard_image_1), backgroundColor = MaterialTheme.colorScheme.primary, textColor = MaterialTheme.colorScheme.onPrimary )
 }

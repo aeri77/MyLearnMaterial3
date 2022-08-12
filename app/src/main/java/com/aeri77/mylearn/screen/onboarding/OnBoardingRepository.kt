@@ -1,4 +1,4 @@
-package com.aeri77.mylearn.screen.landing
+package com.aeri77.mylearn.screen.onboarding
 
 import android.content.Context
 import com.aeri77.mylearn.architecture.BaseRepository
@@ -7,10 +7,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LandingRepository @Inject constructor(
+class OnBoardingRepository @Inject constructor(
     @ApplicationContext context: Context
 ) : BaseRepository(
     context = context
-){
+) {
 
 }

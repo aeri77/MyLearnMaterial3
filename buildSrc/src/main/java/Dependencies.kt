@@ -21,6 +21,7 @@ object Deps {
     val composeMaterial3 by lazy { "androidx.compose.material3:material3:${Versions.composeMaterial3}" }
     val composeActivity by lazy { "androidx.activity:activity-compose:${Versions.composeActivity}" }
     val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.composeUi}" }
+    val composeIconsCore by lazy { "androidx.compose.material:material-icons-core:${Versions.composeCompiler}" }
     val composeIconsExtended by lazy { "androidx.compose.material:material-icons-extended:${Versions.composeCompiler}" }
     val navigationFragment by lazy { "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}" }
     val navigationUI by lazy { "androidx.navigation:navigation-ui-ktx:${Versions.navigation}" }

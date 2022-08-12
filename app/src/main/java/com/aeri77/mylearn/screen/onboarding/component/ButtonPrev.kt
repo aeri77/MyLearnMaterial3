@@ -1,4 +1,4 @@
-package com.aeri77.mylearn.screen.landing.component
+package com.aeri77.mylearn.screen.onboarding.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height

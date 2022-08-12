@@ -38,7 +38,7 @@ import kotlin.math.floor
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage(navController: NavHostController) {
+fun ShopsPage() {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Primary99

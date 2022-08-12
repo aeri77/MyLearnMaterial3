@@ -8,25 +8,58 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.aeri77.mylearn.component.AppBar
+import com.aeri77.mylearn.component.DefaultBackHandler
+import com.aeri77.mylearn.component.ExitDialog
+import com.aeri77.mylearn.component.NoRippleEffect
+import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.Home
+import com.aeri77.mylearn.screen.home.HomePageNavigation
+import com.aeri77.mylearn.screen.home.HomePages
+import com.aeri77.mylearn.screen.home.page.CheckoutPage
+import com.aeri77.mylearn.screen.home.page.MessagesPage
+import com.aeri77.mylearn.screen.home.page.ShopsPage
 import com.aeri77.mylearn.screen.landing.Landing
 import com.aeri77.mylearn.screen.landing.LandingViewModel
+import com.aeri77.mylearn.screen.onboarding.OnBoarding
 import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
 import com.aeri77.mylearn.ui.theme.MyLearnTheme
+import com.aeri77.mylearn.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @ExperimentalFoundationApi
@@ -41,51 +74,272 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-
         landingViewModel.initUserStore()
-
         setContent {
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
+            val scope = rememberCoroutineScope()
+            val systemUiController = rememberSystemUiController()
+            // icons to mimic drawer destinations
+            val items = listOf(HomePages.ShopsPage, HomePages.CheckoutPage, HomePages.MessagesPage)
+
+            val selectedItem = remember { mutableStateOf(items[0]) }
+
+            DefaultBackHandler(backNavElement = ExitDialog {
+
+            })
+
+            systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
-            val userStore by landingViewModel.userStore.observeAsState()
-            LaunchedEffect(userStore) {
-                if (userStore?.username?.isNotEmpty() == true) {
-                    navController.navigate(Navigation.HOME) {
-                        popUpTo(0)
-                    }
-                }
-            }
             MyLearnTheme {
-                // A surface container using the 'background' color from the theme
-                AnimatedNavHost(
-                    navController = navController,
-                    startDestination = Navigation.LANDING
-                ) {
-                    composable(Navigation.LANDING) { Landing(navController) }
-                    composable(Navigation.SIGN_IN, enterTransition = {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
-                    }, exitTransition = {
-                        Timber.d("initial state =${initialState.destination.route} ")
-                        when (initialState.destination.route) {
-                            Navigation.SIGN_IN -> {
-                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        ConstraintLayout(
+                            modifier = Modifier
+                                .background(MaterialTheme.colorScheme.secondary)
+                                .height(132.dp)
+                                .fillMaxWidth()
+                        ) {
+                            val (image, nameColumn) = createRefs()
+                            Box(modifier = Modifier
+                                .padding(start = 32.dp)
+                                .clip(CircleShape)
+                                .size(72.dp)
+                                .background(Color.White)
+                                .constrainAs(image) {
+                                    start.linkTo(parent.start)
+                                    end.linkTo(nameColumn.start)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                }) {
+                                Image(
+                                    modifier = Modifier.align(Alignment.Center),
+                                    imageVector = Icons.Filled.Person,
+                                    contentDescription = "Profile picture"
+                                )
                             }
-                            else -> null
-                        }
-                    }) { SignIn(navController, landingViewModel = landingViewModel) }
-                    composable(Navigation.SIGN_UP, enterTransition = {
-                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
-                    }, exitTransition = {
-                        when (initialState.destination.route) {
-                            Navigation.SIGN_UP -> {
-                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                            Column(modifier = Modifier
+                                .padding(start = 18.dp)
+                                .constrainAs(nameColumn) {
+                                    start.linkTo(image.end)
+                                    end.linkTo(parent.end)
+                                    top.linkTo(image.top)
+                                    bottom.linkTo(image.bottom)
+                                    width = Dimension.fillToConstraints
+                                }) {
+                                Text(
+                                    text = "Full Name",
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.W600,
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        modifier = Modifier.size(12.dp),
+                                        imageVector = Icons.Filled.Favorite,
+                                        contentDescription = "wishlist",
+                                        tint = Color.Red
+                                    )
+                                    Spacer(Modifier.size(4.dp))
+                                    Text(
+                                        text = "20 Wish List >",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSecondary,
+                                        fontStyle = FontStyle.Italic
+                                    )
+                                }
                             }
-                            else -> null
                         }
-                    }) { SignUp(navController) }
-                    composable(Navigation.HOME, enterTransition = {
-                        fadeIn()
-                    }) { Home(navController) }
-                }
+
+                        CompositionLocalProvider(
+                            LocalRippleTheme provides NoRippleEffect
+                        ) {
+                            NavigationDrawerItem(
+                                label = { Text("Navigation") },
+                                selected = false,
+                                onClick = { /*TODO*/ },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                            )
+                        }
+                        items.forEach { item ->
+                            Spacer(modifier = Modifier.size(12.dp))
+                            NavigationDrawerItem(
+                                icon = { Icon(item.image, contentDescription = null) },
+                                label = { Text(item.title) },
+                                selected = item == selectedItem.value,
+                                onClick = {
+                                    scope.launch {
+                                        navController.navigate(item.route) {
+                                            // Pop up to the start destination of the graph to
+                                            // avoid building up a large stack of destinations
+                                            // on the back stack as users select items
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            // Avoid multiple copies of the same destination when
+                                            // reselecting the same item
+                                            launchSingleTop = true
+                                            // Restore state when reselecting a previously selected item
+                                            restoreState = true
+                                        }
+                                        drawerState.close()
+                                    }
+                                    selectedItem.value = item
+                                },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                            )
+                        }
+                        Spacer(
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Divider(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.Gray,
+                            thickness = .5.dp
+                        )
+                        CompositionLocalProvider(
+                            LocalRippleTheme provides NoRippleEffect
+                        ) {
+                            NavigationDrawerItem(
+                                label = { Text("Other") },
+                                selected = false,
+                                onClick = { },
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                            )
+                        }
+                        NavigationDrawerItem(
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Filled.ExitToApp,
+                                    contentDescription = "logout"
+                                )
+                            },
+                            onClick = {
+                                landingViewModel.clearUserStore()
+                                navController.navigate(Navigation.ONBOARD) {
+                                    popUpTo(0)
+                                }
+                            },
+                            label = { Text(text = "Logout") }, selected = false
+                        )
+
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 12.dp),
+                                text = "MyLearn ${BuildConfig.VERSION_NAME}"
+                            )
+                        }
+                    },
+                    content = {
+                        Scaffold(
+                            topBar = {
+                                AppBar(
+                                    title = "Home",
+                                    actions = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Menu,
+                                            contentDescription = "Menu",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    },
+                                    onActions = {
+                                        scope.launch {
+                                            drawerState.open()
+                                            Timber.d("drawer isOpen = ${drawerState.currentValue}")
+                                        }
+                                    },
+                                    topAppbar = TopAppBar.CenterAligned
+                                )
+                            }
+                        ) {
+                            Surface(
+                                modifier = Modifier
+                                    .padding(it)
+                                    .fillMaxSize()
+                            ) {
+                                // A surface container using the 'background' color from the theme
+                                AnimatedNavHost(
+                                    navController = navController,
+                                    startDestination = Navigation.LANDING
+                                ) {
+                                    composable(Navigation.LANDING) {
+                                        Landing(
+                                            navController,
+                                            landingViewModel
+                                        )
+                                    }
+                                    composable(Navigation.ONBOARD) { OnBoarding(navController) }
+                                    composable(Navigation.SIGN_IN, enterTransition = {
+                                        slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
+                                    }, exitTransition = {
+                                        Timber.d("initial state =${initialState.destination.route} ")
+                                        when (initialState.destination.route) {
+                                            Navigation.SIGN_IN -> {
+                                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                                            }
+                                            else -> null
+                                        }
+                                    }) {
+                                        SignIn(
+                                            navController,
+                                            landingViewModel = landingViewModel
+                                        )
+                                    }
+                                    composable(Navigation.SIGN_UP, enterTransition = {
+                                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
+                                    }, exitTransition = {
+                                        when (initialState.destination.route) {
+                                            Navigation.SIGN_UP -> {
+                                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                                            }
+                                            else -> null
+                                        }
+                                    }) { SignUp(navController) }
+                                    navigation(
+                                        startDestination = HomePageNavigation.SHOPS_PAGE,
+                                        route = Navigation.HOME
+                                    ) {
+                                        composable(HomePageNavigation.SHOPS_PAGE) {
+                                            ShopsPage()
+                                            selectedItem.value = items[0]
+                                        }
+                                        composable(
+                                            HomePageNavigation.CHECKOUT_PAGE,
+                                            enterTransition = {
+                                                slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
+                                            }) {
+                                            CheckoutPage()
+                                            selectedItem.value = items[1]
+                                        }
+
+                                        composable(
+                                            HomePageNavigation.MESSAGES_PAGE,
+                                            enterTransition = {
+                                                slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
+                                            },
+                                            exitTransition = {
+                                                when (initialState.destination.route) {
+                                                    Navigation.SIGN_UP -> {
+                                                        slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                                                    }
+                                                    else -> null
+                                                }
+                                            }) {
+                                            MessagesPage(navController)
+                                            selectedItem.value = items[2]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    })
             }
         }
     }

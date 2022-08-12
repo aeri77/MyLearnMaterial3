@@ -34,158 +34,151 @@ fun SignUp(navController: NavHostController) {
     val onMainColor = MaterialTheme.colorScheme.onPrimary
 
     systemUiController.setStatusBarColor(mainColor)
-
-    Scaffold(
-        topBar = {
-            AppBar(
-                actions = {
-                    Icon(
-                        modifier = Modifier.size(40.dp),
-                        imageVector = Icons.Filled.KeyboardArrowLeft,
-                        contentDescription = "Back to Landing",
-                        tint = onMainColor
-                    )
-                },
-                onActions = {
-                    navController.navigateUp()
-                },
-                title = "Sign Up"
-            )
-        }) {
-        Surface(
+//
+//    Scaffold(
+//        topBar = {
+//            AppBar(
+//                actions = {
+//                    Icon(
+//                        modifier = Modifier.size(40.dp),
+//                        imageVector = Icons.Filled.KeyboardArrowLeft,
+//                        contentDescription = "Back to Landing",
+//                        tint = onMainColor
+//                    )
+//                },
+//                onActions = {
+//                    navController.navigateUp()
+//                },
+//                title = "Sign Up"
+//            )
+//        }) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
+                .align(Alignment.TopCenter)
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
+            Text(
+                modifier = Modifier.padding(top = 32.dp),
+                text = "Welcome, Newcomer!",
+                fontSize = 28.sp,
+                fontWeight = W600
+            )
+            TextField(shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(), label = {
+                    Text("Full Names", color = Crayola)
+                }, value = "", colors = TextFieldDefaults.textFieldColors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                ), onValueChange = {
+
+                })
+            TextField(shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(), label = {
+                    Text("Enter Email", color = Crayola)
+                }, value = "",
+                colors = TextFieldDefaults.textFieldColors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                ), onValueChange = {
+
+                })
+            TextField(shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth(), label = {
+                    Text("Password", color = Crayola)
+                }, colors = TextFieldDefaults.textFieldColors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent
+                ), value = "", onValueChange = {
+
+                })
+            Button(
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+                onClick = {
+                    Timber.d("previous route = ${navController.previousBackStackEntry?.destination?.route}")
+                }) {
+                Text(text = "Sign Up", fontSize = 16.sp)
+            }
+
+            Text("or", fontSize = 16.sp)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    border = BorderStroke(
+                        1.dp,
+                        color = MaterialTheme.colorScheme.secondary
+                    ),
+                    shape = RoundedCornerShape(4.dp),
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(horizontal = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(18.dp)
-                ) {
-                    Text(
-                        modifier = Modifier.padding(top = 32.dp),
-                        text = "Welcome, Newcomer!",
-                        fontSize = 28.sp,
-                        fontWeight = W600
+                        .height(54.dp)
+                        .weight(0.5f),
+                    onClick = { /*TODO*/ }) {
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = Icons.Filled.AccountBox,
+                        contentDescription = null
                     )
-                    TextField(shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.fillMaxWidth(), label = {
-                            Text("Full Names", color = Crayola)
-                        }, value = "", colors = TextFieldDefaults.textFieldColors(
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent
-                        ), onValueChange = {
-
-                        })
-                    TextField(shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.fillMaxWidth(), label = {
-                            Text("Enter Email", color = Crayola)
-                        }, value = "",
-                        colors = TextFieldDefaults.textFieldColors(
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent
-                        ), onValueChange = {
-
-                        })
-                    TextField(shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.fillMaxWidth(), label = {
-                            Text("Password", color = Crayola)
-                        }, colors = TextFieldDefaults.textFieldColors(
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent
-                        ), value = "", onValueChange = {
-
-                        })
-                    Button(
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp),
-                        onClick = {
-                            Timber.d("previous route = ${navController.previousBackStackEntry?.destination?.route}")
-                        }) {
-                        Text(text = "Sign Up", fontSize = 16.sp)
-                    }
-
-                    Text("or", fontSize = 16.sp)
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        Button(
-                            colors = ButtonDefaults.outlinedButtonColors(),
-                            border = BorderStroke(
-                                1.dp,
-                                color = MaterialTheme.colorScheme.secondary
-                            ),
-                            shape = RoundedCornerShape(4.dp),
-                            modifier = Modifier
-                                .height(54.dp)
-                                .weight(0.5f),
-                            onClick = { /*TODO*/ }) {
-                            Image(
-                                modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Filled.AccountBox,
-                                contentDescription = null
-                            )
-                        }
-                        Button(
-                            colors = ButtonDefaults.outlinedButtonColors(),
-                            border = BorderStroke(
-                                1.dp,
-                                color = MaterialTheme.colorScheme.secondary
-                            ),
-                            shape = RoundedCornerShape(4.dp),
-                            modifier = Modifier
-                                .height(54.dp)
-                                .weight(0.5f),
-                            onClick = { /*TODO*/ }) {
-                            Image(
-                                modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Filled.ShoppingCart,
-                                contentDescription = null
-                            )
-                        }
-                        Button(
-                            colors = ButtonDefaults.outlinedButtonColors(),
-                            border = BorderStroke(
-                                1.dp,
-                                color = MaterialTheme.colorScheme.secondary
-                            ),
-                            shape = RoundedCornerShape(4.dp),
-                            modifier = Modifier
-                                .height(54.dp)
-                                .weight(0.5f),
-                            onClick = { /*TODO*/ }) {
-                            Image(
-                                modifier = Modifier.size(18.dp),
-                                imageVector = Icons.Filled.ThumbUp,
-                                contentDescription = null
-                            )
-                        }
-                    }
                 }
-                Row(
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    border = BorderStroke(
+                        1.dp,
+                        color = MaterialTheme.colorScheme.secondary
+                    ),
+                    shape = RoundedCornerShape(4.dp),
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 36.dp)
-                ) {
-                    Text(text = "Already have an account ?", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        modifier = Modifier.clickable {
-                            navController.navigate(Navigation.SIGN_IN)
-                        },
-                        text = "Sign In", style = TextStyle(
-                            textDecoration = TextDecoration.Underline
-                        ), color = MaterialTheme.colorScheme.tertiary, fontSize = 16.sp
+                        .height(54.dp)
+                        .weight(0.5f),
+                    onClick = { /*TODO*/ }) {
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = Icons.Filled.ShoppingCart,
+                        contentDescription = null
+                    )
+                }
+                Button(
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    border = BorderStroke(
+                        1.dp,
+                        color = MaterialTheme.colorScheme.secondary
+                    ),
+                    shape = RoundedCornerShape(4.dp),
+                    modifier = Modifier
+                        .height(54.dp)
+                        .weight(0.5f),
+                    onClick = { /*TODO*/ }) {
+                    Image(
+                        modifier = Modifier.size(18.dp),
+                        imageVector = Icons.Filled.ThumbUp,
+                        contentDescription = null
                     )
                 }
             }
+        }
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 36.dp)
+        ) {
+            Text(text = "Already have an account ?", fontSize = 16.sp)
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                modifier = Modifier.clickable {
+                    navController.navigate(Navigation.SIGN_IN)
+                },
+                text = "Sign In", style = TextStyle(
+                    textDecoration = TextDecoration.Underline
+                ), color = MaterialTheme.colorScheme.tertiary, fontSize = 16.sp
+            )
         }
     }
 }

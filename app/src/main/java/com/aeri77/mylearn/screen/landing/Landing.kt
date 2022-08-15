@@ -26,7 +26,7 @@ import kotlinx.coroutines.delay
 fun Landing(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
 
     val userStore by mainViewModel.userStore.observeAsState()
-    mainViewModel.setToolbar(true)
+    mainViewModel.setToolbar(false)
     
     LaunchedEffect(userStore) {
         delay(1700)

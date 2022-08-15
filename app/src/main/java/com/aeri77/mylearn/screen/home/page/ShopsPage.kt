@@ -1,5 +1,7 @@
 package com.aeri77.mylearn.screen.home.page
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -17,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -29,16 +32,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
+import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.R
 import com.aeri77.mylearn.ui.theme.*
+import timber.log.Timber
 import kotlin.math.floor
 
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage() {
+fun ShopsPage(mainViewModel: MainViewModel) {
+    mainViewModel.setToolbar(true)
+    val gridState = rememberLazyGridState()
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Primary99
@@ -52,46 +60,57 @@ fun ShopsPage() {
                         .fillMaxWidth()
                         .background(Primary95)
                 ) {
-                    Text(
-                        modifier = Modifier.padding(start = 12.dp),
-                        text = buildAnnotatedString {
-                            val offset = Offset(1f, 1f)
-                            val shadow = Shadow(Neutral90, offset, 2f)
-                            withStyle(style = ParagraphStyle(lineHeight = 32.sp)) {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Primary60,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 30.sp,
-                                        shadow = shadow
-                                    )
-                                ) {
-                                    append("Would you like\n")
-                                }
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontWeight = FontWeight.W400,
-                                        color = Neutral80,
-                                        fontSize = 30.sp,
-                                        shadow = shadow
-                                    )
-                                ) {
-                                    append("to taste\n")
-                                }
-                                withStyle(
-                                    style = SpanStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        color = Neutral10,
-                                        fontSize = 30.sp,
-                                        shadow = shadow
-                                    )
-                                ) {
-                                    append("it?")
+                    AnimatedVisibility(
+                        visible = gridState.firstVisibleItemIndex == 0,
+                        enter = slideInVertically() + expandVertically(
+                            // Expand from the top.
+                            expandFrom = Alignment.Top
+                        ) + fadeIn(
+                            // Fade in with the initial alpha of 0.3f.
+                            initialAlpha = 0.3f
+                        ), exit = slideOutVertically() + shrinkVertically() + fadeOut()
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(start = 12.dp),
+                            text = buildAnnotatedString {
+                                val offset = Offset(1f, 1f)
+                                val shadow = Shadow(Neutral90, offset, 2f)
+                                withStyle(style = ParagraphStyle(lineHeight = 32.sp)) {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            color = Primary60,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 30.sp,
+                                            shadow = shadow
+                                        )
+                                    ) {
+                                        append("Would you like\n")
+                                    }
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontWeight = FontWeight.W400,
+                                            color = Neutral80,
+                                            fontSize = 30.sp,
+                                            shadow = shadow
+                                        )
+                                    ) {
+                                        append("to taste\n")
+                                    }
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            color = Neutral10,
+                                            fontSize = 30.sp,
+                                            shadow = shadow
+                                        )
+                                    ) {
+                                        append("it?")
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
 
+                    }
                     Spacer(modifier = Modifier.size(12.dp))
 
                     Box(
@@ -134,6 +153,7 @@ fun ShopsPage() {
                 val count = 100
                 val height = floor((count * 240.0 / 2)).dp
                 LazyVerticalGrid(
+                    state = gridState,
                     modifier = Modifier
                         .height(height)
                         .background(Primary95), columns = GridCells.Fixed(2)
@@ -162,34 +182,47 @@ fun ShopsPage() {
                                 )
                                 Column(
                                     modifier = Modifier
-                                        .weight(0.3f)
+                                        .weight(0.35f)
                                         .fillMaxSize()
                                         .padding(12.dp)
                                 ) {
-                                    Text(text = "Cake Name")
                                     Text(
-                                        text = "Rp.20.000"
+                                        text = "Cake Name",
+                                        fontSize = 18.sp,
+                                        fontWeight = W700,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
-                                    Box(
-                                        Modifier.fillMaxSize(),
+                                    Text(
+                                        text = "Rp 20.000",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.size(12.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
                                     ) {
-                                        Button(
+                                        OutlinedButton(
                                             modifier = Modifier
-                                                .align(CenterEnd)
-                                                .padding(top = 8.dp),
-                                            onClick = {},
-                                            elevation = ButtonDefaults.elevatedButtonElevation(
-                                                4.dp
+                                                .fillMaxWidth()
+                                                .weight(0.7f),
+                                            onClick = { /*TODO*/ },
+                                            border = BorderStroke(
+                                                1.dp,
+                                                MaterialTheme.colorScheme.primary
                                             )
-
                                         ) {
-                                            Box(modifier = Modifier.fillMaxSize()) {
-                                                Icon(
-                                                    modifier = Modifier.align(Center),
-                                                    imageVector = Icons.Filled.ShoppingCart,
-                                                    contentDescription = "add to cart"
-                                                )
-                                            }
+                                            Text("BUY")
+                                        }
+                                        FilledIconButton(
+                                            modifier = Modifier.padding(start = 4.dp),
+                                            onClick = { /*TODO*/ }
+                                        ) {
+                                            Icon(
+                                                modifier = Modifier.size(14.dp),
+                                                imageVector = Icons.Filled.ShoppingCart,
+                                                contentDescription = "add to cart"
+                                            )
                                         }
                                     }
                                 }

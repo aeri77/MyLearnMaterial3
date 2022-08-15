@@ -56,6 +56,7 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -90,6 +91,7 @@ class MainActivity : ComponentActivity() {
             MyLearnTheme {
                 ModalNavigationDrawer(
                     drawerState = drawerState,
+                    gesturesEnabled = !isToolbarHidden,
                     drawerContent = {
                         ConstraintLayout(
                             modifier = Modifier
@@ -215,8 +217,11 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                }
                                 mainViewModel.clearUserStore()
-                                navController.navigate(Navigation.ONBOARD) {
+                                navController.navigate(Navigation.LANDING) {
                                     popUpTo(0)
                                 }
                             },
@@ -274,7 +279,7 @@ class MainActivity : ComponentActivity() {
                                             mainViewModel
                                         )
                                     }
-                                    composable(Navigation.ONBOARD) { OnBoarding(navController) }
+                                    composable(Navigation.ONBOARD) { OnBoarding(navController,mainViewModel = mainViewModel) }
                                     composable(Navigation.SIGN_IN, enterTransition = {
                                         slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                     }, exitTransition = {
@@ -306,16 +311,15 @@ class MainActivity : ComponentActivity() {
                                         route = Navigation.HOME
                                     ) {
                                         composable(HomePageNavigation.SHOPS_PAGE) {
-                                            ShopsPage()
+                                            ShopsPage(mainViewModel)
                                             selectedItem.value = items[0]
-                                            mainViewModel.setToolbar(false)
                                         }
                                         composable(
                                             HomePageNavigation.CHECKOUT_PAGE,
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
-                                            CheckoutPage()
+                                            CheckoutPage(mainViewModel)
                                             selectedItem.value = items[1]
                                         }
 
@@ -332,7 +336,7 @@ class MainActivity : ComponentActivity() {
                                                     else -> null
                                                 }
                                             }) {
-                                            MessagesPage(navController)
+                                            MessagesPage(navController, mainViewModel)
                                             selectedItem.value = items[2]
                                         }
                                     }

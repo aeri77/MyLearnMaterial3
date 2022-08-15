@@ -15,6 +15,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.R
 import com.aeri77.mylearn.component.DefaultBackHandler
 import com.aeri77.mylearn.component.ExitDialog
@@ -30,9 +31,10 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
-fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hiltViewModel()) {
+fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hiltViewModel(), mainViewModel: MainViewModel = hiltViewModel()) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
+    mainViewModel.setToolbar(false)
     ConstraintLayout(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.onPrimary)

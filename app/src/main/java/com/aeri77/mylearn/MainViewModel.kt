@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
 
     fun setToolbar(isHidden:Boolean) {
         viewModelScope.launch {
-            isToolbarHidden.value = isHidden
+            isToolbarHidden.value = !isHidden
         }
     }
 }

@@ -32,7 +32,7 @@ class OnBoardingViewModel @Inject constructor(
     fun setLoading(){
         viewModelScope.launch {
             loading = !loading
-            delay(5000)
+            delay(1200)
             isSuccess.postValue(true)
         }
     }

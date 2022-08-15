@@ -18,16 +18,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.navigation.Navigation
 import kotlinx.coroutines.delay
 
 @Composable
-fun Landing(navController: NavHostController, viewModel: LandingViewModel = hiltViewModel()) {
+fun Landing(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
 
-    val userStore by viewModel.userStore.observeAsState()
+    val userStore by mainViewModel.userStore.observeAsState()
+    mainViewModel.setToolbar(true)
     
     LaunchedEffect(userStore) {
-        delay(5000)
+        delay(1700)
         if (userStore?.username?.isNotEmpty() == true) {
             navController.navigate(Navigation.HOME) {
                 popUpTo(0)

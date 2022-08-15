@@ -16,21 +16,4 @@ class LandingViewModel @Inject constructor(
     private val repository : LandingRepository
 ) : ViewModel(){
 
-    private val _userStore = MutableLiveData<UserStore>()
-    val userStore : LiveData<UserStore> = _userStore
-
-
-    fun initUserStore(){
-        viewModelScope.launch(Dispatchers.IO){
-            repository.userStoreData.collectLatest {
-                _userStore.postValue(it)
-            }
-        }
-    }
-
-    fun clearUserStore (){
-        viewModelScope.launch {
-            repository.clearUserStore()
-        }
-    }
 }

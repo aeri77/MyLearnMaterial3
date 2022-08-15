@@ -22,13 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.aeri77.mylearn.component.AppBar
+import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.navigation.Navigation.HOME
-import com.aeri77.mylearn.screen.landing.LandingViewModel
-import com.aeri77.mylearn.screen.onboarding.OnBoardingViewModel
 import com.aeri77.mylearn.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -37,13 +34,14 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun SignIn(
     navController: NavHostController,
     viewModel: SignInViewModel = hiltViewModel(),
-    landingViewModel: LandingViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
     val onMainColor = MaterialTheme.colorScheme.onPrimary
-    val userStore by landingViewModel.userStore.observeAsState()
+    val userStore by mainViewModel.userStore.observeAsState()
     systemUiController.setStatusBarColor(mainColor)
+    mainViewModel.setToolbar(false)
 //
 //    Scaffold(
 //        topBar = {

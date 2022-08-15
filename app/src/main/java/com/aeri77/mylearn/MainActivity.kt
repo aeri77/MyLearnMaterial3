@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,14 +38,12 @@ import com.aeri77.mylearn.component.ExitDialog
 import com.aeri77.mylearn.component.NoRippleEffect
 import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
-import com.aeri77.mylearn.screen.home.Home
 import com.aeri77.mylearn.screen.home.HomePageNavigation
-import com.aeri77.mylearn.screen.home.HomePages
+import com.aeri77.mylearn.screen.home.Screens
 import com.aeri77.mylearn.screen.home.page.CheckoutPage
 import com.aeri77.mylearn.screen.home.page.MessagesPage
 import com.aeri77.mylearn.screen.home.page.ShopsPage
 import com.aeri77.mylearn.screen.landing.Landing
-import com.aeri77.mylearn.screen.landing.LandingViewModel
 import com.aeri77.mylearn.screen.onboarding.OnBoarding
 import com.aeri77.mylearn.screen.signin.SignIn
 import com.aeri77.mylearn.screen.signup.SignUp
@@ -68,20 +65,20 @@ import timber.log.Timber
 @ExperimentalPagerApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val landingViewModel: LandingViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        landingViewModel.initUserStore()
+        mainViewModel.initUserStore()
         setContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val scope = rememberCoroutineScope()
             val systemUiController = rememberSystemUiController()
             // icons to mimic drawer destinations
-            val items = listOf(HomePages.ShopsPage, HomePages.CheckoutPage, HomePages.MessagesPage)
-
+            val items = listOf(Screens.ShopsPage, Screens.CheckoutPage, Screens.MessagesPage)
+            val isToolbarHidden by mainViewModel.isToolbarHidden.collectAsState()
             val selectedItem = remember { mutableStateOf(items[0]) }
 
             DefaultBackHandler(backNavElement = ExitDialog {
@@ -166,7 +163,7 @@ class MainActivity : ComponentActivity() {
                         items.forEach { item ->
                             Spacer(modifier = Modifier.size(12.dp))
                             NavigationDrawerItem(
-                                icon = { Icon(item.image, contentDescription = null) },
+                                icon = { Icon(item.image!!, contentDescription = null) },
                                 label = { Text(item.title) },
                                 selected = item == selectedItem.value,
                                 onClick = {
@@ -218,7 +215,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             onClick = {
-                                landingViewModel.clearUserStore()
+                                mainViewModel.clearUserStore()
                                 navController.navigate(Navigation.ONBOARD) {
                                     popUpTo(0)
                                 }
@@ -240,23 +237,25 @@ class MainActivity : ComponentActivity() {
                     content = {
                         Scaffold(
                             topBar = {
-                                AppBar(
-                                    title = "Home",
-                                    actions = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Menu,
-                                            contentDescription = "Menu",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    },
-                                    onActions = {
-                                        scope.launch {
-                                            drawerState.open()
-                                            Timber.d("drawer isOpen = ${drawerState.currentValue}")
-                                        }
-                                    },
-                                    topAppbar = TopAppBar.CenterAligned
-                                )
+                                if(!isToolbarHidden) {
+                                    AppBar(
+                                        title = "Home",
+                                        actions = {
+                                            Icon(
+                                                imageVector = Icons.Filled.Menu,
+                                                contentDescription = "Menu",
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        },
+                                        onActions = {
+                                            scope.launch {
+                                                drawerState.open()
+                                                Timber.d("drawer isOpen = ${drawerState.currentValue}")
+                                            }
+                                        },
+                                        topAppbar = TopAppBar.CenterAligned
+                                    )
+                                }
                             }
                         ) {
                             Surface(
@@ -272,7 +271,7 @@ class MainActivity : ComponentActivity() {
                                     composable(Navigation.LANDING) {
                                         Landing(
                                             navController,
-                                            landingViewModel
+                                            mainViewModel
                                         )
                                     }
                                     composable(Navigation.ONBOARD) { OnBoarding(navController) }
@@ -289,7 +288,7 @@ class MainActivity : ComponentActivity() {
                                     }) {
                                         SignIn(
                                             navController,
-                                            landingViewModel = landingViewModel
+                                            mainViewModel = mainViewModel
                                         )
                                     }
                                     composable(Navigation.SIGN_UP, enterTransition = {
@@ -309,6 +308,7 @@ class MainActivity : ComponentActivity() {
                                         composable(HomePageNavigation.SHOPS_PAGE) {
                                             ShopsPage()
                                             selectedItem.value = items[0]
+                                            mainViewModel.setToolbar(false)
                                         }
                                         composable(
                                             HomePageNavigation.CHECKOUT_PAGE,

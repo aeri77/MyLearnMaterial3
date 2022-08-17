@@ -18,6 +18,7 @@ object Deps {
     val composeJUnit by lazy { "androidx.compose.ui:ui-test-junit4:${Versions.composeUi}" }
     val composeUITooling by lazy { "androidx.compose.ui:ui-tooling:${Versions.composeUi}" }
     val composeTestManifest by lazy { "androidx.compose.ui:ui-test-manifest:${Versions.composeUi}" }
+    val composeMaterial by lazy {"androidx.compose.material:material:${Versions.composeCompiler}"}
     val composeMaterial3 by lazy { "androidx.compose.material3:material3:${Versions.composeMaterial3}" }
     val composeActivity by lazy { "androidx.activity:activity-compose:${Versions.composeActivity}" }
     val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.composeUi}" }

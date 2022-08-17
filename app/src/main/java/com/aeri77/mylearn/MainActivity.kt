@@ -11,11 +11,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.ShoppingBasket
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,7 +39,7 @@ import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.screen.home.HomePageNavigation
 import com.aeri77.mylearn.screen.home.Screens
-import com.aeri77.mylearn.screen.home.page.CheckoutPage
+import com.aeri77.mylearn.screen.home.page.CartPage
 import com.aeri77.mylearn.screen.home.page.MessagesPage
 import com.aeri77.mylearn.screen.home.page.ShopsPage
 import com.aeri77.mylearn.screen.landing.Landing
@@ -56,7 +55,6 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -67,6 +65,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (BuildConfig.DEBUG) {
@@ -78,7 +77,7 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             val systemUiController = rememberSystemUiController()
             // icons to mimic drawer destinations
-            val items = listOf(Screens.ShopsPage, Screens.CheckoutPage, Screens.MessagesPage)
+            val items = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
             val isToolbarHidden by mainViewModel.isToolbarHidden.collectAsState()
             val selectedItem = remember { mutableStateOf(items[0]) }
 
@@ -244,7 +243,7 @@ class MainActivity : ComponentActivity() {
                             topBar = {
                                 if(!isToolbarHidden) {
                                     AppBar(
-                                        title = "Home",
+                                        title = selectedItem.value.title,
                                         actions = {
                                             Icon(
                                                 imageVector = Icons.Filled.Menu,
@@ -256,6 +255,22 @@ class MainActivity : ComponentActivity() {
                                             scope.launch {
                                                 drawerState.open()
                                                 Timber.d("drawer isOpen = ${drawerState.currentValue}")
+                                            }
+                                        },
+                                        trailingIcons = {
+                                                        Icon(
+                                                            imageVector = Icons.Outlined.ShoppingBasket,
+                                                            contentDescription = "cart",
+                                                            tint = MaterialTheme.colorScheme.primary
+                                                        )
+                                        },
+                                        trailingOnActions = {
+                                            navController.navigate(HomePageNavigation.CART_PAGE) {
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
                                             }
                                         },
                                         topAppbar = TopAppBar.CenterAligned
@@ -315,11 +330,11 @@ class MainActivity : ComponentActivity() {
                                             selectedItem.value = items[0]
                                         }
                                         composable(
-                                            HomePageNavigation.CHECKOUT_PAGE,
+                                            HomePageNavigation.CART_PAGE,
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
-                                            CheckoutPage(mainViewModel)
+                                            CartPage(mainViewModel)
                                             selectedItem.value = items[1]
                                         }
 

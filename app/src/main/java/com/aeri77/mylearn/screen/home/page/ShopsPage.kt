@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -49,7 +50,7 @@ fun ShopsPage(mainViewModel: MainViewModel) {
     val gridState = rememberLazyGridState()
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Primary99
+        color = Primary95
     ) {
         LazyColumn(
             modifier = Modifier
@@ -220,7 +221,7 @@ fun ShopsPage(mainViewModel: MainViewModel) {
                                         ) {
                                             Icon(
                                                 modifier = Modifier.size(14.dp),
-                                                imageVector = Icons.Filled.ShoppingCart,
+                                                imageVector = Icons.Outlined.AddShoppingCart,
                                                 contentDescription = "add to cart"
                                             )
                                         }

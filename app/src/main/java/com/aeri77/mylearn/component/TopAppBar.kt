@@ -31,6 +31,7 @@ fun AppBar(
     trailingIcons: @Composable BoxScope.() -> Unit = {
 
     },
+    trailingOnActions:() -> Unit = {},
     title: String = "",
     topAppbar: TopAppBar = TopAppBar.Large
 ) {
@@ -50,14 +51,16 @@ fun AppBar(
     ) {
         when (topAppbar) {
             TopAppBar.CenterAligned -> {
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)){
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)) {
                     Box(modifier = Modifier
                         .align(Alignment.CenterStart)
-                        .padding(horizontal = 4.dp)
                         .clip(CircleShape)
                         .clickable {
                             onActions()
-                        }) {
+                        }.padding(4.dp)
+                    ) {
                         actions()
                     }
                     Text(
@@ -70,7 +73,15 @@ fun AppBar(
                         fontSize = 18.sp,
                         textAlign = TextAlign.Center
                     )
-                    trailingIcons()
+                    Box(modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .clip(CircleShape)
+                        .clickable {
+                            trailingOnActions()
+                        }.padding(4.dp)
+                    ) {
+                        trailingIcons()
+                    }
                 }
             }
             TopAppBar.Large -> {

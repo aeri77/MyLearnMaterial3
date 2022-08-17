@@ -42,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.composeCompiler
+        kotlinCompilerExtensionVersion = "1.2.0"
     }
     packagingOptions {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -74,6 +74,7 @@ protobuf {
 dependencies {
     implementation(Deps.coreKTX)
     implementation(Deps.composeUI)
+    implementation(Deps.composeMaterial)
     implementation(Deps.composeMaterial3)
     implementation(Deps.composeToolingPreview)
     implementation(Deps.composeActivity)

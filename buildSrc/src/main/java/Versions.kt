@@ -1,7 +1,7 @@
 object Versions {
 
     const val coreKTX = "1.8.0"
-    const val composeCompiler = "1.2.0"
+    const val composeCompiler = "1.3.0-alpha03"
     const val composeUi = "1.3.0-alpha01"
     const val jUnit = "4.13.2"
     const val navigation = "2.5.0"

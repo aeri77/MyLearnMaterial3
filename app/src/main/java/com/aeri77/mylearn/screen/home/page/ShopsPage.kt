@@ -151,7 +151,7 @@ fun ShopsPage(mainViewModel: MainViewModel) {
                 }
             }
             item {
-                val count = 100
+                val count = 20
                 val height = floor((count * 240.0 / 2)).dp
                 LazyVerticalGrid(
                     state = gridState,

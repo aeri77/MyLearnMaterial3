@@ -325,7 +325,10 @@ class MainActivity : ComponentActivity() {
                                         startDestination = HomePageNavigation.SHOPS_PAGE,
                                         route = Navigation.HOME
                                     ) {
-                                        composable(HomePageNavigation.SHOPS_PAGE) {
+                                        composable(HomePageNavigation.SHOPS_PAGE,
+                                            enterTransition = {
+                                                slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
+                                            }) {
                                             ShopsPage(mainViewModel)
                                             selectedItem.value = items[0]
                                         }

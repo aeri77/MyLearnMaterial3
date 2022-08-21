@@ -13,6 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,7 +28,12 @@ import kotlinx.coroutines.delay
 fun Landing(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
 
     val userStore by mainViewModel.userStore.observeAsState()
-    mainViewModel.setToolbar(false)
+
+    mainViewModel.setToolbar(
+        isHidden = true,
+        isActive = false,
+        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+    )
     
     LaunchedEffect(userStore) {
         delay(1700)

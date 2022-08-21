@@ -16,7 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +43,11 @@ fun SignIn(
     val onMainColor = MaterialTheme.colorScheme.onPrimary
     val userStore by mainViewModel.userStore.observeAsState()
     systemUiController.setStatusBarColor(mainColor)
-    mainViewModel.setToolbar(false)
+    mainViewModel.setToolbar(
+        isHidden = false,
+        isActive = false,
+        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+    )
 //
 //    Scaffold(
 //        topBar = {

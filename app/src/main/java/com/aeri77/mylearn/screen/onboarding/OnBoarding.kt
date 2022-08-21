@@ -8,6 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -34,7 +36,13 @@ import kotlinx.coroutines.launch
 fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hiltViewModel(), mainViewModel: MainViewModel = hiltViewModel()) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
-    mainViewModel.setToolbar(false)
+
+    mainViewModel.setToolbar(
+        isHidden = true,
+        isActive = false,
+        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+    )
+
     ConstraintLayout(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.onPrimary)

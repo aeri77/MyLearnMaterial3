@@ -17,22 +17,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.NavHostController
 import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.R
+import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.ui.theme.*
 import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @Composable
-fun CartPage(mainViewModel: MainViewModel) {
-    mainViewModel.setToolbar(true)
+fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
+    mainViewModel.setToolbar(
+        isHidden = false,
+        isActive = true,
+        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+    )
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Primary95
@@ -153,9 +161,11 @@ fun CartPage(mainViewModel: MainViewModel) {
                                         tint = NeutralVariant40
                                     )
                                 }
-                                Text(text = "10",
+                                Text(
+                                    text = "10",
                                     fontWeight = W600,
-                                    color = NeutralVariant40)
+                                    color = NeutralVariant40
+                                )
                                 Box(
                                     Modifier
                                         .clip(CircleShape)
@@ -199,7 +209,9 @@ fun CartPage(mainViewModel: MainViewModel) {
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-                Button(onClick = { /*TODO*/ }, shape = RoundedCornerShape(4.dp)) {
+                Button(onClick = {
+                    navController.navigate(Navigation.CHECKOUT)
+                }, shape = RoundedCornerShape(4.dp)) {
                     Text(text = "CHECKOUT")
                 }
             }

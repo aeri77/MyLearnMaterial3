@@ -18,7 +18,8 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val isToolbarHidden = MutableStateFlow(true)
-
+    val isSideDrawerActive = MutableStateFlow(false)
+    val toolbarTitle = MutableStateFlow("")
     private val _userStore = MutableLiveData<UserStore>()
     val userStore : LiveData<UserStore> = _userStore
 
@@ -37,9 +38,24 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun setToolbar(isHidden:Boolean) {
+    fun setToolbarHidden(isHidden:Boolean) {
         viewModelScope.launch {
-            isToolbarHidden.value = !isHidden
+            isToolbarHidden.value = isHidden
         }
+    }
+    fun setSideDrawerActive(isActive: Boolean){
+        viewModelScope.launch {
+            isSideDrawerActive.value = isActive
+        }
+    }
+    fun setToolbarTitle(title: String){
+        viewModelScope.launch {
+            toolbarTitle.value = title
+        }
+    }
+    fun setToolbar(isHidden: Boolean, isActive:Boolean, title: String){
+        setToolbarHidden(isHidden)
+        setSideDrawerActive(isActive)
+        setToolbarTitle(title)
     }
 }

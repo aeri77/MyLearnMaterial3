@@ -10,43 +10,41 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ParagraphStyle
-import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
+import androidx.compose.ui.text.intl.Locale
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.R
 import com.aeri77.mylearn.ui.theme.*
-import timber.log.Timber
 import kotlin.math.floor
 
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage(mainViewModel: MainViewModel) {
-    mainViewModel.setToolbar(true)
+fun ShopsPage(navController:NavHostController,mainViewModel: MainViewModel = hiltViewModel()) {
+    mainViewModel.setToolbar(
+        isHidden = false,
+        isActive = true,
+        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+    )
     val gridState = rememberLazyGridState()
     Surface(
         modifier = Modifier.fillMaxSize(),

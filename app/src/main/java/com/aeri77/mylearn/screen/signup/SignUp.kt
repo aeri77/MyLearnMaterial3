@@ -13,14 +13,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.aeri77.mylearn.component.AppBar
+import com.aeri77.mylearn.MainViewModel
 import com.aeri77.mylearn.navigation.Navigation
 import com.aeri77.mylearn.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -28,12 +31,17 @@ import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @Composable
-fun SignUp(navController: NavHostController) {
+fun SignUp(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
     val onMainColor = MaterialTheme.colorScheme.onPrimary
 
     systemUiController.setStatusBarColor(mainColor)
+    mainViewModel.setToolbar(
+        isHidden = false,
+        isActive = false,
+        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+    )
 //
 //    Scaffold(
 //        topBar = {

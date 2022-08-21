@@ -11,7 +11,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.ShoppingBasket
@@ -22,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +37,7 @@ import com.aeri77.mylearn.component.ExitDialog
 import com.aeri77.mylearn.component.NoRippleEffect
 import com.aeri77.mylearn.component.enums.TopAppBar
 import com.aeri77.mylearn.navigation.Navigation
+import com.aeri77.mylearn.screen.checkout.Checkout
 import com.aeri77.mylearn.screen.home.HomePageNavigation
 import com.aeri77.mylearn.screen.home.Screens
 import com.aeri77.mylearn.screen.home.page.CartPage
@@ -57,6 +58,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -79,18 +81,20 @@ class MainActivity : ComponentActivity() {
             // icons to mimic drawer destinations
             val items = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
             val isToolbarHidden by mainViewModel.isToolbarHidden.collectAsState()
+            val isSideDrawerActive by mainViewModel.isSideDrawerActive.collectAsState()
+            val toolbarTitle by mainViewModel.toolbarTitle.collectAsState()
             val selectedItem = remember { mutableStateOf(items[0]) }
 
             DefaultBackHandler(backNavElement = ExitDialog {
 
             })
-
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
+
             MyLearnTheme {
                 ModalNavigationDrawer(
                     drawerState = drawerState,
-                    gesturesEnabled = !isToolbarHidden,
+                    gesturesEnabled = isSideDrawerActive,
                     drawerContent = {
                         ConstraintLayout(
                             modifier = Modifier
@@ -241,36 +245,52 @@ class MainActivity : ComponentActivity() {
                     content = {
                         Scaffold(
                             topBar = {
-                                if(!isToolbarHidden) {
+                                if (!isToolbarHidden) {
                                     AppBar(
-                                        title = selectedItem.value.title,
+                                        title = toolbarTitle,
                                         actions = {
-                                            Icon(
-                                                imageVector = Icons.Filled.Menu,
-                                                contentDescription = "Menu",
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        },
-                                        onActions = {
-                                            scope.launch {
-                                                drawerState.open()
-                                                Timber.d("drawer isOpen = ${drawerState.currentValue}")
+                                            if (navController.currentDestination?.route == selectedItem.value.route) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Menu,
+                                                    contentDescription = "Menu",
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
+                                            } else {
+                                                Icon(
+                                                    imageVector = Icons.Filled.ChevronLeft,
+                                                    contentDescription = "Back",
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
                                             }
                                         },
+                                        onActions = {
+                                            if (navController.currentDestination?.route == selectedItem.value.route) {
+                                                scope.launch {
+                                                    drawerState.open()
+                                                }
+                                            } else {
+                                                navController.navigateUp()
+                                            }
+
+                                        },
                                         trailingIcons = {
-                                                        Icon(
-                                                            imageVector = Icons.Outlined.ShoppingBasket,
-                                                            contentDescription = "cart",
-                                                            tint = MaterialTheme.colorScheme.primary
-                                                        )
+                                            if (navController.currentDestination?.parent?.route == Navigation.HOME) {
+                                                Icon(
+                                                    imageVector = Icons.Outlined.ShoppingBasket,
+                                                    contentDescription = "cart",
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
                                         },
                                         trailingOnActions = {
-                                            navController.navigate(HomePageNavigation.CART_PAGE) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
+                                            if (navController.currentDestination?.parent?.route == Navigation.HOME) {
+                                                navController.navigate(HomePageNavigation.CART_PAGE) {
+                                                    popUpTo(navController.graph.findStartDestination().id) {
+                                                        saveState = true
+                                                    }
+                                                    launchSingleTop = true
+                                                    restoreState = true
                                                 }
-                                                launchSingleTop = true
-                                                restoreState = true
                                             }
                                         },
                                         topAppbar = TopAppBar.CenterAligned
@@ -294,7 +314,12 @@ class MainActivity : ComponentActivity() {
                                             mainViewModel
                                         )
                                     }
-                                    composable(Navigation.ONBOARD) { OnBoarding(navController,mainViewModel = mainViewModel) }
+                                    composable(Navigation.ONBOARD) {
+                                        OnBoarding(
+                                            navController,
+                                            mainViewModel = mainViewModel
+                                        )
+                                    }
                                     composable(Navigation.SIGN_IN, enterTransition = {
                                         slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                     }, exitTransition = {
@@ -320,7 +345,17 @@ class MainActivity : ComponentActivity() {
                                             }
                                             else -> null
                                         }
-                                    }) { SignUp(navController) }
+                                    }) { SignUp(navController, mainViewModel) }
+                                    composable(Navigation.CHECKOUT, enterTransition = {
+                                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
+                                    }, exitTransition = {
+                                        when (initialState.destination.route) {
+                                            Navigation.SIGN_UP -> {
+                                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                                            }
+                                            else -> null
+                                        }
+                                    }) { Checkout(navController, mainViewModel = mainViewModel) }
                                     navigation(
                                         startDestination = HomePageNavigation.SHOPS_PAGE,
                                         route = Navigation.HOME
@@ -329,7 +364,7 @@ class MainActivity : ComponentActivity() {
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
-                                            ShopsPage(mainViewModel)
+                                            ShopsPage(navController = navController, mainViewModel)
                                             selectedItem.value = items[0]
                                         }
                                         composable(
@@ -337,7 +372,7 @@ class MainActivity : ComponentActivity() {
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
-                                            CartPage(mainViewModel)
+                                            CartPage(navController, mainViewModel)
                                             selectedItem.value = items[1]
                                         }
 

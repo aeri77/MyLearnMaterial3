@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.BaseRepository
+import com.ayomicakes.app.datastore.serializer.UserStore
 import dagger.Provides
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,8 +23,8 @@ class MainViewModel @Inject constructor(
     val isToolbarHidden = MutableStateFlow(true)
     val isSideDrawerActive = MutableStateFlow(false)
     val toolbarTitle = MutableStateFlow("")
-    private val _userStore = MutableLiveData<com.ayomicakes.app.datastore.serializer.UserStore>()
-    val userStore : LiveData<com.ayomicakes.app.datastore.serializer.UserStore> = _userStore
+    private val _userStore = MutableLiveData<UserStore>()
+    val userStore : LiveData<UserStore> = _userStore
 
     fun initUserStore(){
         viewModelScope.launch(Dispatchers.IO){

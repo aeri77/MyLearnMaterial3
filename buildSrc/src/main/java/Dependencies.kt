@@ -18,7 +18,7 @@ object Deps {
     val composeJUnit by lazy { "androidx.compose.ui:ui-test-junit4:${Versions.composeUi}" }
     val composeUITooling by lazy { "androidx.compose.ui:ui-tooling:${Versions.composeUi}" }
     val composeTestManifest by lazy { "androidx.compose.ui:ui-test-manifest:${Versions.composeUi}" }
-    val composeMaterial by lazy {"androidx.compose.material:material:${Versions.composeCompiler}"}
+    val composeMaterial by lazy { "androidx.compose.material:material:${Versions.composeCompiler}" }
     val composeMaterial3 by lazy { "androidx.compose.material3:material3:${Versions.composeMaterial3}" }
     val composeActivity by lazy { "androidx.activity:activity-compose:${Versions.composeActivity}" }
     val composeRuntimeLiveData by lazy { "androidx.compose.runtime:runtime-livedata:${Versions.composeUi}" }
@@ -43,6 +43,10 @@ object Deps {
         val flowLayout by lazy { "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist.version}" }
     }
 
+    object AndroidX {
+        val security by lazy { "androidx.security:security-crypto:1.0.0" }
+    }
+
     object Hilt {
         val hilt by lazy { "com.google.dagger:hilt-android:${Versions.hilt}" }
         val hiltGoogleCompiler by lazy { "com.google.dagger:hilt-android-compiler:${Versions.hilt}" }
@@ -52,6 +56,9 @@ object Deps {
 
     object Google {
         val protobuf by lazy { "com.google.protobuf:protobuf-javalite:${Versions.Google.javaLiteVersion}" }
+        val crypto by lazy { "com.google.crypto.tink:tink-android:1.6.1" }
+        val mapsCompose by lazy { "com.google.maps.android:maps-compose:2.5.3" }
+        val playService by lazy { "com.google.android.gms:play-services-maps:18.0.2" }
     }
 
     object DataStore {
@@ -74,6 +81,11 @@ object Deps {
         val retrofit by lazy { "com.squareup.retrofit2:retrofit:${Versions.SquareUp.version}" }
         val gsonConverter by lazy { "com.squareup.retrofit2:converter-gson:${Versions.SquareUp.version}" }
         val httpLogging by lazy { "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.3" }
+    }
+
+    object KotlinX {
+        val serializationJson by lazy { "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KotlinX.serializationVer}" }
+        val serializationProtobuf by lazy { "org.jetbrains.kotlinx:kotlinx-serialization-protobuf:${Versions.KotlinX.serializationVer}" }
     }
 
     object JakeWharton {

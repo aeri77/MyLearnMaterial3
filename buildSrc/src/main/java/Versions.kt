@@ -29,6 +29,9 @@ object Versions {
     object KTX {
         const val version = "1.5.0"
     }
+    object KotlinX {
+        const val serializationVer = "1.4.0"
+    }
 
     object SquareUp {
         const val version = "2.9.0"

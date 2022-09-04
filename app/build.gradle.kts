@@ -7,14 +7,15 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     id("com.google.protobuf") version "0.8.12"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 android {
     compileSdk = ConfigData.compileSdkVersion
 
     defaultConfig {
-        applicationId = "com.aeri77.mylearn"
-        minSdk = 21
+        applicationId = "com.ayomicakes.app"
+        minSdk = 23
         targetSdk = 32
         versionCode = 1
         versionName = "1.0"
@@ -84,6 +85,7 @@ dependencies {
     implementation(Deps.Lifecycle.composeViewModel)
     implementation(Deps.Lifecycle.lifecycleRuntime)
     implementation(Deps.Lifecycle.lifeCycleViewModel)
+    implementation(Deps.AndroidX.security)
     implementation(Deps.Hilt.hilt)
     implementation(Deps.Hilt.hiltGoogleCompiler)
     implementation(Deps.navigationDynamic)
@@ -101,11 +103,16 @@ dependencies {
     implementation(Deps.DataStore.datastore)
     implementation(Deps.KTX.activity)
     implementation(Deps.KTX.fragment)
+    implementation(Deps.KotlinX.serializationJson)
+    implementation(Deps.KotlinX.serializationProtobuf)
     implementation(Deps.SquareUp.retrofit)
     implementation(Deps.SquareUp.gsonConverter)
     implementation(Deps.SquareUp.httpLogging)
     implementation(Deps.JakeWharton.timber)
     implementation(Deps.Google.protobuf)
+    implementation(Deps.Google.crypto)
+    implementation(Deps.Google.mapsCompose)
+    implementation(Deps.Google.playService)
     kapt(Deps.Hilt.hiltCompiler)
     testImplementation(Deps.junit)
     androidTestImplementation(Deps.testJUnit)

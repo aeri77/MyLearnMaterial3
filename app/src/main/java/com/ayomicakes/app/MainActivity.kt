@@ -44,6 +44,7 @@ import com.ayomicakes.app.screen.home.page.MessagesPage
 import com.ayomicakes.app.screen.home.page.ShopsPage
 import com.ayomicakes.app.screen.landing.Landing
 import com.ayomicakes.app.screen.onboarding.OnBoarding
+import com.ayomicakes.app.screen.register.RegisterForm
 import com.ayomicakes.app.screen.signin.SignIn
 import com.ayomicakes.app.screen.signup.SignUp
 import com.ayomicakes.app.ui.theme.MyLearnTheme
@@ -344,6 +345,16 @@ class MainActivity : ComponentActivity() {
                                             else -> null
                                         }
                                     }) { SignUp(navController, mainViewModel) }
+                                    composable(Navigation.REGISTER_FORM, enterTransition = {
+                                        slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
+                                    }, exitTransition = {
+                                        when (initialState.destination.route) {
+                                            Navigation.REGISTER_FORM -> {
+                                                slideOutOfContainer(AnimatedContentScope.SlideDirection.Left)
+                                            }
+                                            else -> null
+                                        }
+                                    }) { RegisterForm(navController) }
                                     composable(Navigation.CHECKOUT, enterTransition = {
                                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                                     }, exitTransition = {

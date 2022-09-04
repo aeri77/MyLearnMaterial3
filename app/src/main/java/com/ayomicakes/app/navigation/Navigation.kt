@@ -7,4 +7,5 @@ object Navigation {
     const val SIGN_IN = "Login"
     const val SIGN_UP = "register"
     const val CHECKOUT = "checkout"
+    const val REGISTER_FORM = "register_form"
 }

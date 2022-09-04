@@ -48,24 +48,6 @@ fun SignIn(
         isActive = false,
         title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
     )
-//
-//    Scaffold(
-//        topBar = {
-//            AppBar(
-//                actions = {
-//                    Icon(
-//                        modifier = Modifier.size(40.dp),
-//                        imageVector = Icons.Filled.KeyboardArrowLeft,
-//                        contentDescription = "Back to Sign Up",
-//                        tint = onMainColor
-//                    )
-//                },
-//                onActions = {
-//                    navController.navigateUp()
-//                },
-//                title = "Sign In"
-//            )
-//        }) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier

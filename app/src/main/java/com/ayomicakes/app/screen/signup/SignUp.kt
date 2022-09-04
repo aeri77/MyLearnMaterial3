@@ -42,24 +42,6 @@ fun SignUp(navController: NavHostController, mainViewModel: MainViewModel = hilt
         isActive = false,
         title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
     )
-//
-//    Scaffold(
-//        topBar = {
-//            AppBar(
-//                actions = {
-//                    Icon(
-//                        modifier = Modifier.size(40.dp),
-//                        imageVector = Icons.Filled.KeyboardArrowLeft,
-//                        contentDescription = "Back to Landing",
-//                        tint = onMainColor
-//                    )
-//                },
-//                onActions = {
-//                    navController.navigateUp()
-//                },
-//                title = "Sign Up"
-//            )
-//        }) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -108,7 +90,9 @@ fun SignUp(navController: NavHostController, mainViewModel: MainViewModel = hilt
                     .fillMaxWidth()
                     .height(54.dp),
                 onClick = {
-                    Timber.d("previous route = ${navController.previousBackStackEntry?.destination?.route}")
+                    navController.navigate(Navigation.REGISTER_FORM) {
+                    popUpTo(0)
+                }
                 }) {
                 Text(text = "Sign Up", fontSize = 16.sp)
             }

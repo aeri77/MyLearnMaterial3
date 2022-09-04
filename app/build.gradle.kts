@@ -8,6 +8,8 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("com.google.protobuf") version "0.8.12"
     kotlin("plugin.serialization") version "1.7.10"
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+
 }
 
 android {

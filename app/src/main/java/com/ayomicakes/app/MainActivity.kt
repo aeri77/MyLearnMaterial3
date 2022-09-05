@@ -54,11 +54,16 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+@ExperimentalPermissionsApi
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @ExperimentalMaterial3Api
@@ -69,6 +74,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
@@ -354,7 +360,7 @@ class MainActivity : ComponentActivity() {
                                             }
                                             else -> null
                                         }
-                                    }) { RegisterForm(navController) }
+                                    }) { RegisterForm(navController, mainViewModel) }
                                     composable(Navigation.CHECKOUT, enterTransition = {
                                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                                     }, exitTransition = {

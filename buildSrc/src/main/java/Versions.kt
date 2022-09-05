@@ -12,7 +12,7 @@ object Versions {
     const val constraint = "1.0.0-beta02"
 
     object Accompanist {
-        const val version = "0.24.13-rc"
+        const val version = "0.26.2-beta"
     }
 
     object Datastore {

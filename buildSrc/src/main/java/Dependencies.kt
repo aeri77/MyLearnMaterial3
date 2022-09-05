@@ -41,6 +41,7 @@ object Deps {
         val systemUIController by lazy { "com.google.accompanist:accompanist-systemuicontroller:${Versions.Accompanist.version}" }
         val navigationAnimation by lazy { "com.google.accompanist:accompanist-navigation-animation:${Versions.Accompanist.version}" }
         val flowLayout by lazy { "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist.version}" }
+        val permissions by lazy { "com.google.accompanist:accompanist-permissions:${Versions.Accompanist.version}" }
     }
 
     object AndroidX {
@@ -59,6 +60,7 @@ object Deps {
         val crypto by lazy { "com.google.crypto.tink:tink-android:1.6.1" }
         val mapsCompose by lazy { "com.google.maps.android:maps-compose:2.5.3" }
         val playService by lazy { "com.google.android.gms:play-services-maps:18.0.2" }
+        val locationServices by lazy { "com.google.android.gms:play-services-location:20.0.0" }
     }
 
     object DataStore {

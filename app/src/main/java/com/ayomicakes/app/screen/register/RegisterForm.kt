@@ -2,6 +2,7 @@ package com.ayomicakes.app.screen.register
 
 import android.content.Context
 import android.location.Location
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -112,12 +113,18 @@ fun RegisterForm(
     }
     val userMarker = "user_marker"
     val position by mainViewModel.getLocation().collectAsState()
+    val bounds = BoundsLocation(getBogorBound())
     val markerState = rememberMarkerState(
         userMarker
     )
     LaunchedEffect(position) {
         Timber.d("position current = $position")
         markerState.position = position
+        if(bounds.isInBounds(position)){
+            Timber.d("You are in of Bounds")
+        } else {
+            Timber.d("You are out of Bounds")
+        }
     }
     DisposableEffect(mainViewModel.locationCallback) {
         mainViewModel.startLocationUpdate(mainViewModel.locationCallback, context)
@@ -260,5 +267,32 @@ object MapConfig {
             LatLng(-6.576423978912431, 106.83641429333927),
             LatLng(-6.571118244972, 106.84066269560928),
         )
+    }
+}
+
+class BoundsLocation(bounds: List<LatLng>) {
+    var maxLat: Double
+    var minLat: Double
+    var maxLng: Double
+    var minLng: Double
+
+    init {
+        val listLat = bounds.map {
+            it.latitude
+        }
+        val listLng = bounds.map {
+            it.longitude
+        }
+        maxLat = listLat.max()
+        minLat = listLat.min()
+        maxLng = listLng.max()
+        minLng = listLng.min()
+    }
+
+    fun isInBounds(position: LatLng): Boolean {
+        return position.latitude < maxLat
+                && position.longitude > minLat
+                && position.longitude < maxLng
+                && position.longitude > minLng
     }
 }

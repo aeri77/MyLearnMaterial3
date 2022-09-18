@@ -3,10 +3,6 @@ package com.ayomicakes.app
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
-import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.datastore.core.DataStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,13 +13,11 @@ import com.ayomicakes.app.helper.LocationHelper
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
-import dagger.Provides
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,9 +30,7 @@ class MainViewModel @Inject constructor(
     val isSideDrawerActive = MutableStateFlow(false)
     val toolbarTitle = MutableStateFlow("")
     private var location: MutableStateFlow<LatLng> = MutableStateFlow(
-        LatLng(
-            0.0, 0.0
-        )
+        LatLng (0.0, 0.0)
     )
     private val _userStore = MutableLiveData<UserStore>()
     val userStore: LiveData<UserStore> = _userStore
@@ -46,7 +38,8 @@ class MainViewModel @Inject constructor(
     val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
-            location.value = LatLng(result.lastLocation?.latitude ?: 0.0, result.lastLocation?.longitude ?: 0.0)
+            location.value =
+                LatLng(result.lastLocation?.latitude ?: 0.0, result.lastLocation?.longitude ?: 0.0)
         }
     }
 
@@ -93,10 +86,21 @@ class MainViewModel @Inject constructor(
         locationHelper = LocationHelper(context, locationCallback = locationCallback)
         locationHelper?.startLocationUpdate()
     }
+
     fun stopLocationUpdate() {
         locationHelper?.stopLocationUpdate()
     }
-    fun getLocation(): MutableStateFlow<LatLng> {
+
+    fun getLiveLocation(): MutableStateFlow<LatLng> {
         return location
+    }
+
+    fun getLocation(){
+        viewModelScope.launch {
+            val lastLocation = locationHelper?.fusedLocationClient?.lastLocation
+            if(lastLocation?.isComplete == true){
+                location.value = LatLng(lastLocation.result.latitude, lastLocation.result.longitude)
+            }
+        }
     }
 }

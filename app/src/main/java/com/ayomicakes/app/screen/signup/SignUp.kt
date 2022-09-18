@@ -31,16 +31,20 @@ import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @Composable
-fun SignUp(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
+fun SignUp(
+    navController: NavHostController,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: SignUpViewModel = hiltViewModel()
+) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
     val onMainColor = MaterialTheme.colorScheme.onPrimary
-
     systemUiController.setStatusBarColor(mainColor)
     mainViewModel.setToolbar(
         isHidden = false,
         isActive = false,
-        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route?.split("_")?.get(0)
+            ?.capitalize(Locale.current) ?: ""
     )
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -90,9 +94,10 @@ fun SignUp(navController: NavHostController, mainViewModel: MainViewModel = hilt
                     .fillMaxWidth()
                     .height(54.dp),
                 onClick = {
+//                    viewModel.signUp()
                     navController.navigate(Navigation.REGISTER_FORM) {
-                    popUpTo(0)
-                }
+                        popUpTo(0)
+                    }
                 }) {
                 Text(text = "Sign Up", fontSize = 16.sp)
             }

@@ -1,6 +1,11 @@
 package com.ayomicakes.app
 
+import android.location.Address
+import android.location.Geocoder.GeocodeListener
 import android.os.Bundle
+import android.os.Handler
+import android.os.ResultReceiver
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -30,10 +35,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.ayomicakes.app.component.AppBar
-import com.ayomicakes.app.component.DefaultBackHandler
-import com.ayomicakes.app.component.ExitDialog
-import com.ayomicakes.app.component.NoRippleEffect
+import com.ayomicakes.app.component.*
 import com.ayomicakes.app.component.enums.TopAppBar
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.screen.checkout.Checkout
@@ -69,12 +71,11 @@ import timber.log.Timber
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(){
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
@@ -89,16 +90,28 @@ class MainActivity : ComponentActivity() {
             val isSideDrawerActive by mainViewModel.isSideDrawerActive.collectAsState()
             val toolbarTitle by mainViewModel.toolbarTitle.collectAsState()
             val selectedItem = remember { mutableStateOf(items[0]) }
-
-            DefaultBackHandler(backNavElement = ExitDialog {
-
-            })
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
 
+
+
+            when (navController.currentDestination?.route) {
+                Navigation.REGISTER_FORM -> {
+                    DefaultBackHandler(backNavElement = RegisterExitDialog {
+                        navController.navigate(Navigation.HOME){
+                            popUpTo(0)
+                        }
+                    })
+                }
+                else -> {
+                    DefaultBackHandler(backNavElement = ExitDialog {
+
+                    })
+                }
+            }
+
             MyLearnTheme {
-                ModalNavigationDrawer(
-                    drawerState = drawerState,
+                ModalNavigationDrawer(drawerState = drawerState,
                     gesturesEnabled = isSideDrawerActive,
                     drawerContent = {
                         ConstraintLayout(
@@ -125,15 +138,16 @@ class MainActivity : ComponentActivity() {
                                     contentDescription = "Profile picture"
                                 )
                             }
-                            Column(modifier = Modifier
-                                .padding(start = 18.dp)
-                                .constrainAs(nameColumn) {
-                                    start.linkTo(image.end)
-                                    end.linkTo(parent.end)
-                                    top.linkTo(image.top)
-                                    bottom.linkTo(image.bottom)
-                                    width = Dimension.fillToConstraints
-                                }) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(start = 18.dp)
+                                    .constrainAs(nameColumn) {
+                                        start.linkTo(image.end)
+                                        end.linkTo(parent.end)
+                                        top.linkTo(image.top)
+                                        bottom.linkTo(image.bottom)
+                                        width = Dimension.fillToConstraints
+                                    }) {
                                 Text(
                                     text = "Full Name",
                                     fontSize = 28.sp,
@@ -163,8 +177,7 @@ class MainActivity : ComponentActivity() {
                         CompositionLocalProvider(
                             LocalRippleTheme provides NoRippleEffect
                         ) {
-                            NavigationDrawerItem(
-                                label = { Text("Navigation") },
+                            NavigationDrawerItem(label = { Text("Navigation") },
                                 selected = false,
                                 onClick = { /*TODO*/ },
                                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -172,8 +185,12 @@ class MainActivity : ComponentActivity() {
                         }
                         items.forEach { item ->
                             Spacer(modifier = Modifier.size(12.dp))
-                            NavigationDrawerItem(
-                                icon = { Icon(item.image!!, contentDescription = null) },
+                            NavigationDrawerItem(icon = {
+                                Icon(
+                                    item.image!!,
+                                    contentDescription = null
+                                )
+                            },
                                 label = { Text(item.title) },
                                 selected = item == selectedItem.value,
                                 onClick = {
@@ -209,8 +226,7 @@ class MainActivity : ComponentActivity() {
                         CompositionLocalProvider(
                             LocalRippleTheme provides NoRippleEffect
                         ) {
-                            NavigationDrawerItem(
-                                label = { Text("Other") },
+                            NavigationDrawerItem(label = { Text("Other") },
                                 selected = false,
                                 onClick = { },
                                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -233,7 +249,8 @@ class MainActivity : ComponentActivity() {
                                     popUpTo(0)
                                 }
                             },
-                            label = { Text(text = "Logout") }, selected = false
+                            label = { Text(text = "Logout") },
+                            selected = false
                         )
 
                         Box(
@@ -248,61 +265,58 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     content = {
-                        Scaffold(
-                            topBar = {
-                                if (!isToolbarHidden) {
-                                    AppBar(
-                                        title = toolbarTitle,
-                                        actions = {
-                                            if (navController.currentDestination?.route == selectedItem.value.route) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Menu,
-                                                    contentDescription = "Menu",
-                                                    tint = MaterialTheme.colorScheme.primary
-                                                )
-                                            } else {
-                                                Icon(
-                                                    imageVector = Icons.Filled.ChevronLeft,
-                                                    contentDescription = "Back",
-                                                    tint = MaterialTheme.colorScheme.primary
-                                                )
+                        Scaffold(topBar = {
+                            if (!isToolbarHidden) {
+                                AppBar(title = toolbarTitle, actions = {
+                                    if (navController.currentDestination?.route == selectedItem.value.route) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Menu,
+                                            contentDescription = "Menu",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.Filled.ChevronLeft,
+                                            contentDescription = "Back",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }, onActions = {
+                                    when (navController.currentDestination?.route) {
+                                        selectedItem.value.route -> {
+                                            scope.launch {
+                                                drawerState.open()
                                             }
-                                        },
-                                        onActions = {
-                                            if (navController.currentDestination?.route == selectedItem.value.route) {
-                                                scope.launch {
-                                                    drawerState.open()
-                                                }
-                                            } else {
-                                                navController.navigateUp()
+                                        }
+                                        Navigation.REGISTER_FORM -> {
+                                            onBackPressedDispatcher.onBackPressed()
+                                        }
+                                        else -> {
+                                            navController.navigateUp()
+                                        }
+                                    }
+                                }, trailingIcons = {
+                                    if (navController.currentDestination?.parent?.route == Navigation.HOME) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.ShoppingBasket,
+                                            contentDescription = "cart",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }, trailingOnActions = {
+                                    if (navController.currentDestination?.parent?.route == Navigation.HOME) {
+                                        navController.navigate(HomePageNavigation.CART_PAGE) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
                                             }
-
-                                        },
-                                        trailingIcons = {
-                                            if (navController.currentDestination?.parent?.route == Navigation.HOME) {
-                                                Icon(
-                                                    imageVector = Icons.Outlined.ShoppingBasket,
-                                                    contentDescription = "cart",
-                                                    tint = MaterialTheme.colorScheme.primary
-                                                )
-                                            }
-                                        },
-                                        trailingOnActions = {
-                                            if (navController.currentDestination?.parent?.route == Navigation.HOME) {
-                                                navController.navigate(HomePageNavigation.CART_PAGE) {
-                                                    popUpTo(navController.graph.findStartDestination().id) {
-                                                        saveState = true
-                                                    }
-                                                    launchSingleTop = true
-                                                    restoreState = true
-                                                }
-                                            }
-                                        },
-                                        topAppbar = TopAppBar.CenterAligned
-                                    )
-                                }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    }
+                                }, topAppbar = TopAppBar.CenterAligned
+                                )
                             }
-                        ) {
+                        }) {
                             Surface(
                                 modifier = Modifier
                                     .padding(it)
@@ -315,14 +329,12 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     composable(Navigation.LANDING) {
                                         Landing(
-                                            navController,
-                                            mainViewModel
+                                            navController, mainViewModel
                                         )
                                     }
                                     composable(Navigation.ONBOARD) {
                                         OnBoarding(
-                                            navController,
-                                            mainViewModel = mainViewModel
+                                            navController, mainViewModel = mainViewModel
                                         )
                                     }
                                     composable(Navigation.SIGN_IN, enterTransition = {
@@ -337,8 +349,7 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }) {
                                         SignIn(
-                                            navController,
-                                            mainViewModel = mainViewModel
+                                            navController, mainViewModel = mainViewModel
                                         )
                                     }
                                     composable(Navigation.SIGN_UP, enterTransition = {
@@ -375,24 +386,22 @@ class MainActivity : ComponentActivity() {
                                         startDestination = HomePageNavigation.SHOPS_PAGE,
                                         route = Navigation.HOME
                                     ) {
-                                        composable(HomePageNavigation.SHOPS_PAGE,
+                                        composable(
+                                            HomePageNavigation.SHOPS_PAGE,
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
                                             ShopsPage(navController = navController, mainViewModel)
                                             selectedItem.value = items[0]
                                         }
-                                        composable(
-                                            HomePageNavigation.CART_PAGE,
-                                            enterTransition = {
-                                                slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
-                                            }) {
+                                        composable(HomePageNavigation.CART_PAGE, enterTransition = {
+                                            slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
+                                        }) {
                                             CartPage(navController, mainViewModel)
                                             selectedItem.value = items[1]
                                         }
 
-                                        composable(
-                                            HomePageNavigation.MESSAGES_PAGE,
+                                        composable(HomePageNavigation.MESSAGES_PAGE,
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                                             },

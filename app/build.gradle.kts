@@ -1,6 +1,8 @@
 import com.google.protobuf.gradle.*
 import org.apache.tools.ant.util.JavaEnvUtils.JAVA_11
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
+val mapKey: String = gradleLocalProperties(rootDir).getProperty("MAPS_API_KEY")
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -93,6 +95,7 @@ dependencies {
     implementation(Deps.SquareUp.gsonConverter)
     implementation(Deps.SquareUp.httpLogging)
     implementation(Deps.JakeWharton.timber)
+    implementation(Deps.JakeWharton.serializerConverter)
     implementation(Deps.Google.protobuf)
     implementation(Deps.Google.crypto)
     implementation(Deps.Google.mapsCompose)

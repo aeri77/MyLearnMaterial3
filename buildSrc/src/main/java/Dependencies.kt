@@ -92,5 +92,6 @@ object Deps {
 
     object JakeWharton {
         val timber by lazy { "com.jakewharton.timber:timber:${Versions.JakeWharton.timber}" }
+        val serializerConverter by lazy { "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:${Versions.JakeWharton.converter}" }
     }
 }

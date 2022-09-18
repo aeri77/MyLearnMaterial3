@@ -1,30 +1,42 @@
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+    ExperimentalAnimationApi::class, ExperimentalAnimationApi::class,
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
+    ExperimentalPagerApi::class
+)
+
 package com.ayomicakes.app.screen.register
 
 import android.content.Context
-import android.location.Location
-import android.widget.Toast
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.screen.register.MapConfig.DOT
 import com.ayomicakes.app.screen.register.MapConfig.GAP
 import com.ayomicakes.app.screen.register.MapConfig.getBogorBound
+import com.ayomicakes.app.screen.register.component.FormRegister
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
-import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
@@ -34,7 +46,8 @@ import timber.log.Timber
 @Composable
 fun RegisterForm(
     navController: NavHostController,
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+    viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
@@ -47,122 +60,142 @@ fun RegisterForm(
 //        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
 //    )
     val defaultLoc = LatLng(-6.598268, 106.799374)
+    val listAddress by viewModel.addressList.observeAsState()
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(defaultLoc, 12f)
     }
     val context: Context = LocalContext.current
-    val coarseLocationPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACCESS_COARSE_LOCATION
-
-    )
-    val fineLocationPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-
-    )
-    when (fineLocationPermissionState.status) {
-        // If the camera permission is granted, then show screen with the feature enabled
-        PermissionStatus.Granted -> {
-            Text("Camera permission Granted")
-        }
-        is PermissionStatus.Denied -> {
-            Column {
-                val textToShow =
-                    if ((fineLocationPermissionState.status as PermissionStatus.Denied).shouldShowRationale) {
-                        // If the user has denied the permission but the rationale can be shown,
-                        // then gently explain why the app requires this permission
-                        "The camera is important for this app. Please grant the permission."
-                    } else {
-                        // If it's the first time the user lands on this feature, or the user
-                        // doesn't want to be asked again for this permission, explain that the
-                        // permission is required
-                        "Camera permission required for this feature to be available. " +
-                                "Please grant the permission"
-                    }
-                Text(textToShow)
-                Button(onClick = { fineLocationPermissionState.launchPermissionRequest() }) {
-                    Text("Request permission")
-                }
-            }
-        }
-    }
-    when (coarseLocationPermissionState.status) {
-        // If the camera permission is granted, then show screen with the feature enabled
-        PermissionStatus.Granted -> {
-            Text("Camera permission Granted")
-        }
-        is PermissionStatus.Denied -> {
-            Column {
-                val textToShow =
-                    if ((fineLocationPermissionState.status as PermissionStatus.Denied).shouldShowRationale) {
-                        // If the user has denied the permission but the rationale can be shown,
-                        // then gently explain why the app requires this permission
-                        "The camera is important for this app. Please grant the permission."
-                    } else {
-                        // If it's the first time the user lands on this feature, or the user
-                        // doesn't want to be asked again for this permission, explain that the
-                        // permission is required
-                        "Camera permission required for this feature to be available. " +
-                                "Please grant the permission"
-                    }
-                Text(textToShow)
-                Button(onClick = { fineLocationPermissionState.launchPermissionRequest() }) {
-                    Text("Request permission")
-                }
-            }
-        }
-    }
-    val userMarker = "user_marker"
-    val position by mainViewModel.getLocation().collectAsState()
-    val bounds = BoundsLocation(getBogorBound())
-    val markerState = rememberMarkerState(
-        userMarker
-    )
-    LaunchedEffect(position) {
-        Timber.d("position current = $position")
-        markerState.position = position
-        if(bounds.isInBounds(position)){
-            Timber.d("You are in of Bounds")
-        } else {
-            Timber.d("You are out of Bounds")
-        }
-    }
-    DisposableEffect(mainViewModel.locationCallback) {
-        mainViewModel.startLocationUpdate(mainViewModel.locationCallback, context)
-        onDispose {
-            mainViewModel.stopLocationUpdate()
-        }
-    }
-
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
-    ) {
-        LaunchedEffect(markerState) {
-            markerState.showInfoWindow()
-        }
-
-        MarkerInfoWindow(
-            visible = true,
-            state = markerState,
-            content = {
-                Button(onClick = { /*TODO*/ }) {
-                    Text("Set Location")
-                }
-            }
+    val permissions = rememberMultiplePermissionsState(
+        permissions =
+        listOf(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
         )
+    )
+    LaunchedEffect(listAddress){
+        Timber.d("Address: ${listAddress?.get(0)}")
+    }
+    permissions.permissions.forEach {
+        when (it.status) {
+            is PermissionStatus.Denied -> {
+                val textToShow =
+                    if ((it.status as PermissionStatus.Denied).shouldShowRationale) {
+                        "The Location is important for this app. Please grant the permission."
+                    } else {
+                        "Location permission required for this feature to be available. " +
+                                "Please grant the permission"
+                    }
+                AlertDialog(onDismissRequest = { }, buttons = {
+                    Button(onClick = { permissions.launchMultiplePermissionRequest() }) {
+                        Text("Request permission")
+                    }
+                }, title = {
+                    Text(text = "${it.permission} Denied")
+                }, text = {
+                    Text(text = textToShow)
+                })
+            }
+            else -> {
+                val scope = rememberCoroutineScope()
+                scope.launch {
+                    mainViewModel.getLocation()
+                }
+                DisposableEffect(mainViewModel.locationCallback) {
+                    mainViewModel.startLocationUpdate(mainViewModel.locationCallback, context)
+                    onDispose {
+                        mainViewModel.stopLocationUpdate()
+                    }
+                }
+            }
+        }
+
+    }
+
+    LazyColumn() {
+        item {
+            val userMarker = "user_marker"
+            val position by mainViewModel.getLiveLocation().collectAsState()
+            val bounds = BoundsLocation(getBogorBound())
+            val markerState = rememberMarkerState(
+                userMarker
+            )
+            LaunchedEffect(position) {
+                Timber.d("position current = $position")
+                cameraPositionState.animate(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.fromLatLngZoom(
+                            position,
+                            12f
+                        )
+                    )
+                )
+                markerState.position = position
+                if (bounds.isInBounds(position)) {
+                    Timber.d("You are in of Bounds")
+                } else {
+                    Timber.d("You are out of Bounds")
+                }
+            }
+            var isMapExpanded by remember {
+                mutableStateOf(false)
+            }
+            val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 400.dp)
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(mapHeight),
+                cameraPositionState = cameraPositionState
+            ) {
+                LaunchedEffect(markerState) {
+                    markerState.showInfoWindow()
+                }
+
+                MarkerInfoWindow(
+                    visible = true,
+                    state = markerState,
+                    content = {
+                        ElevatedButton(
+                            elevation = ButtonDefaults.buttonElevation(8.dp),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(40.dp))
+                                .padding(12.dp), onClick = {},
+                            colors = ButtonDefaults.elevatedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            Text("Set Location", color = MaterialTheme.colorScheme.onPrimary)
+                        }
+                    }, onInfoWindowClick = {
+//                        isMapExpanded = !isMapExpanded
+//                        viewModel.getAddressByLatLng(position)
+                        viewModel.getAddressByLatLng(context, position)
+                    }
+                )
 
 //        Circle(center = defaultLoc, radius = 4.7 * 1000, strokeColor = Color.Green.copy(alpha = 0.6f), visible = true, fillColor =  Color.Green.copy(alpha = 0.2f))
-        Polygon(
-            points = getBogorBound(),
-            strokeColor = Color(
-                182,
-                115,
-                135
-            ),
-            strokePattern = listOf(
-                GAP, DOT
-            )
-        )
+                Polygon(
+                    points = getBogorBound(),
+                    strokeColor = Color(
+                        182,
+                        115,
+                        135
+                    ),
+                    strokePattern = listOf(
+                        GAP, DOT
+                    )
+                )
+            }
+        }
+        item {
+            Column(
+                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FormRegister()
+            }
+        }
     }
 }
 

@@ -37,6 +37,40 @@ fun ExitDialog(onNavIconClicked: () -> Unit): BackNavElement {
             dismissButton = {}
         )
     }
+    return defaultBackHandler
+}
 
+@Composable
+fun RegisterExitDialog(onNavIconClicked: () -> Unit): BackNavElement {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val defaultBackHandler = BackNavElement.needsProcessing {
+        if (!showDialog) {
+            showDialog = true
+            BackNavElement.Result.CANNOT_GO_BACK
+        } else {
+            BackNavElement.Result.CAN_GO_BACK
+        }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(text = "Confirm the Exit")
+            },
+            text = {
+                Text(text = "Are you sure want to Exit? You can input your form later") },
+            confirmButton = {
+                Button(onClick = {
+                    onNavIconClicked()
+                    showDialog = false
+                }) {
+                    Text("Back")
+                }
+            },
+            dismissButton = {}
+        )
+    }
     return defaultBackHandler
 }

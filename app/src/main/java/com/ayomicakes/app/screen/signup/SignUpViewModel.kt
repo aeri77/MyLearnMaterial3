@@ -1,26 +1,18 @@
-package com.ayomicakes.app.screen.signin
+package com.ayomicakes.app.screen.signup
 
-import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.BaseRepository
 import com.ayomicakes.app.datastore.serializer.UserStore
-import com.ayomicakes.app.model.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.io.IOException
 import javax.inject.Inject
 
-
 @HiltViewModel
-class SignInViewModel @Inject constructor(
+class SignUpViewModel @Inject constructor(
     private val repository: BaseRepository
 ) : ViewModel() {
-
-    fun signIn(){
+    fun signUp() {
         viewModelScope.launch {
             repository.updateUserStore(
                 UserStore(

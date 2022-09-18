@@ -2,8 +2,14 @@ package com.ayomicakes.app.helper
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import android.os.Looper
+import androidx.annotation.RequiresApi
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.model.LatLng
+import timber.log.Timber
 
 class LocationHelper(private val context: Context, private val locationCallback: LocationCallback) {
     internal var fusedLocationClient: FusedLocationProviderClient? = null
@@ -13,7 +19,6 @@ class LocationHelper(private val context: Context, private val locationCallback:
         fusedLocationClient?.requestLocationUpdates(createLocationRequest(), locationCallback,
             Looper.getMainLooper())
     }
-
 
     fun stopLocationUpdate() {
         fusedLocationClient?.removeLocationUpdates(locationCallback)

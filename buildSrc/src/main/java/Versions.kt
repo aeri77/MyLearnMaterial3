@@ -39,5 +39,6 @@ object Versions {
 
     object JakeWharton {
         const val timber = "5.0.1"
+        const val converter = "0.8.0"
     }
 }

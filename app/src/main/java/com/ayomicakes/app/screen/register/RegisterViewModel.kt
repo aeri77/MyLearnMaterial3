@@ -11,6 +11,7 @@ import com.ayomicakes.app.architecture.BaseRepository
 import com.ayomicakes.app.network.responses.GeoCodeResponse
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -22,10 +23,11 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _geoCodeResponse = MutableSharedFlow<GeoCodeResponse>()
-    private val _addressList = MutableLiveData<List<Address>>()
+    private val _addressList = MutableSharedFlow<List<Address>?>()
+    val isLoading = MutableLiveData(false)
 
     val geoCodeResponse: SharedFlow<GeoCodeResponse> = _geoCodeResponse
-    val addressList: LiveData<List<Address>> = _addressList
+    val addressList: SharedFlow<List<Address>?> = _addressList
 
     fun getAddressByLatLng(latLng: LatLng) {
         viewModelScope.launch {
@@ -44,12 +46,19 @@ class RegisterViewModel @Inject constructor(
      * Deprecation on API 33
      **/
     @Suppress("DEPRECATION")
-    fun getAddressByLatLng(context: Context, latLng: LatLng) {
+    fun getAddressByLatLng(context: Context, latLng: LatLng?) {
+        isLoading.postValue(true)
         val geocoder = Geocoder(context)
         try {
-          _addressList.postValue(geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1))
-        } catch(e :Exception){
+            val address = geocoder.getFromLocation(latLng?.latitude ?: 0.0, latLng?.longitude ?: 0.0, 1)?.toList()
+            viewModelScope.launch {
+                delay(5000)
+                _addressList.emit(address)
+                isLoading.postValue(false)
+            }
+        } catch (e: Exception) {
             Timber.e(e.message)
+            isLoading.postValue(false)
         }
     }
 }

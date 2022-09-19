@@ -9,18 +9,30 @@ import android.os.Looper
 import androidx.annotation.RequiresApi
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class LocationHelper(private val context: Context, private val locationCallback: LocationCallback) {
+@Singleton
+class LocationHelper @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     internal var fusedLocationClient: FusedLocationProviderClient? = null
-    @SuppressLint("MissingPermission")
-    fun startLocationUpdate() {
+
+    init {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        fusedLocationClient?.requestLocationUpdates(createLocationRequest(), locationCallback,
-            Looper.getMainLooper())
     }
 
-    fun stopLocationUpdate() {
+    @SuppressLint("MissingPermission")
+    fun startLocationUpdate(locationCallback: LocationCallback) {
+        fusedLocationClient?.requestLocationUpdates(
+            createLocationRequest(), locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    fun stopLocationUpdate(locationCallback: LocationCallback) {
         fusedLocationClient?.removeLocationUpdates(locationCallback)
     }
 

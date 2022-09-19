@@ -15,31 +15,37 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val repository: BaseRepository
+    private val repository: BaseRepository,
+    private var locationHelper: LocationHelper
 ) : ViewModel() {
 
-    private var locationHelper: LocationHelper? = null
     val isToolbarHidden = MutableStateFlow(true)
     val isSideDrawerActive = MutableStateFlow(false)
     val toolbarTitle = MutableStateFlow("")
-    private var location: MutableStateFlow<LatLng> = MutableStateFlow(
-        LatLng (0.0, 0.0)
-    )
+    private var location: MutableSharedFlow<LatLng> = MutableSharedFlow()
     private val _userStore = MutableLiveData<UserStore>()
     val userStore: LiveData<UserStore> = _userStore
 
     val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
-            location.value =
-                LatLng(result.lastLocation?.latitude ?: 0.0, result.lastLocation?.longitude ?: 0.0)
+            viewModelScope.launch {
+                location.emit(
+                    LatLng(
+                        result.lastLocation?.latitude ?: 0.0,
+                        result.lastLocation?.longitude ?: 0.0
+                    )
+                )
+            }
         }
     }
 
@@ -82,24 +88,22 @@ class MainViewModel @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    fun startLocationUpdate(locationCallback: LocationCallback, context: Context) {
-        locationHelper = LocationHelper(context, locationCallback = locationCallback)
-        locationHelper?.startLocationUpdate()
+    fun startLocationUpdate(locationCallback: LocationCallback) {
+        locationHelper.startLocationUpdate(locationCallback)
     }
 
-    fun stopLocationUpdate() {
-        locationHelper?.stopLocationUpdate()
+    fun stopLocationUpdate(locationCallback: LocationCallback) {
+        locationHelper.stopLocationUpdate(locationCallback)
     }
 
-    fun getLiveLocation(): MutableStateFlow<LatLng> {
+    fun getLiveLocation(): MutableSharedFlow<LatLng> {
         return location
     }
 
-    fun getLocation(){
-        viewModelScope.launch {
-            val lastLocation = locationHelper?.fusedLocationClient?.lastLocation
-            if(lastLocation?.isComplete == true){
-                location.value = LatLng(lastLocation.result.latitude, lastLocation.result.longitude)
+    fun getLocation() {
+        locationHelper.fusedLocationClient?.lastLocation?.addOnSuccessListener {
+            viewModelScope.launch {
+                location.emit(LatLng(it.latitude, it.longitude))
             }
         }
     }

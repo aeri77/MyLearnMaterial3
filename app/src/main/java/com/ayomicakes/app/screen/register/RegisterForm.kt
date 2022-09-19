@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+@file:OptIn(
+    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
     ExperimentalAnimationApi::class, ExperimentalAnimationApi::class,
     ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
     ExperimentalPagerApi::class
@@ -7,20 +8,26 @@
 package com.ayomicakes.app.screen.register
 
 import android.content.Context
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoMode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -51,7 +58,11 @@ fun RegisterForm(
 ) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
-    val onMainColor = MaterialTheme.colorScheme.onPrimary
+    val context = LocalContext.current
+    val shouldDialogShow = remember { mutableStateOf(false) }
+    val position by mainViewModel.getLiveLocation().collectAsState(null)
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
 
     systemUiController.setStatusBarColor(mainColor)
 //    mainViewModel.setToolbar(
@@ -59,12 +70,8 @@ fun RegisterForm(
 //        isActive = false,
 //        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
 //    )
-    val defaultLoc = LatLng(-6.598268, 106.799374)
-    val listAddress by viewModel.addressList.observeAsState()
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(defaultLoc, 12f)
-    }
-    val context: Context = LocalContext.current
+    val listAddress by viewModel.addressList.collectAsState(null)
+
     val permissions = rememberMultiplePermissionsState(
         permissions =
         listOf(
@@ -72,8 +79,22 @@ fun RegisterForm(
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         )
     )
-    LaunchedEffect(listAddress){
-        Timber.d("Address: ${listAddress?.get(0)}")
+    if (isPressed) {
+        DisposableEffect(Unit) {
+            onDispose {
+            }
+        }
+    }
+
+
+    LaunchedEffect(position, isPressed) {
+        if (!isPressed) {
+            Timber.d("address position $isPressed :$position")
+            viewModel.getAddressByLatLng(context = context, position)
+        }
+    }
+    LaunchedEffect(listAddress) {
+        Timber.d("address :$listAddress")
     }
     permissions.permissions.forEach {
         when (it.status) {
@@ -85,115 +106,82 @@ fun RegisterForm(
                         "Location permission required for this feature to be available. " +
                                 "Please grant the permission"
                     }
-                AlertDialog(onDismissRequest = { }, buttons = {
-                    Button(onClick = { permissions.launchMultiplePermissionRequest() }) {
-                        Text("Request permission")
-                    }
-                }, title = {
-                    Text(text = "${it.permission} Denied")
-                }, text = {
-                    Text(text = textToShow)
-                })
+                if (shouldDialogShow.value) {
+                    AlertDialog(onDismissRequest = { shouldDialogShow.value = false }, buttons = {
+                        Button(onClick = {
+                            permissions.launchMultiplePermissionRequest()
+                        }) {
+                            Text("Request permission")
+                        }
+                    }, title = {
+                        Text(text = "${it.permission} Denied")
+                    }, text = {
+                        Text(text = textToShow)
+                    })
+                }
             }
             else -> {
                 val scope = rememberCoroutineScope()
                 scope.launch {
-                    mainViewModel.getLocation()
-                }
-                DisposableEffect(mainViewModel.locationCallback) {
-                    mainViewModel.startLocationUpdate(mainViewModel.locationCallback, context)
-                    onDispose {
-                        mainViewModel.stopLocationUpdate()
+                    if (shouldDialogShow.value) {
+                        mainViewModel.getLocation()
                     }
                 }
+//                DisposableEffect(mainViewModel.locationCallback) {
+//                    mainViewModel.startLocationUpdate(mainViewModel.locationCallback, context)
+//                    onDispose {
+//                        mainViewModel.stopLocationUpdate()
+//                    }
+//                }
             }
         }
 
     }
 
-    LazyColumn() {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         item {
-            val userMarker = "user_marker"
-            val position by mainViewModel.getLiveLocation().collectAsState()
-            val bounds = BoundsLocation(getBogorBound())
-            val markerState = rememberMarkerState(
-                userMarker
+
+            val isLoading by viewModel.isLoading.observeAsState()
+            val infiniteTransition = rememberInfiniteTransition()
+            val angle by infiniteTransition.animateFloat(
+                initialValue = 0F,
+                targetValue = 360F,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(2000, easing = LinearEasing),
+                )
             )
-            LaunchedEffect(position) {
-                Timber.d("position current = $position")
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.fromLatLngZoom(
-                            position,
-                            12f
-                        )
-                    )
-                )
-                markerState.position = position
-                if (bounds.isInBounds(position)) {
-                    Timber.d("You are in of Bounds")
-                } else {
-                    Timber.d("You are out of Bounds")
-                }
-            }
-            var isMapExpanded by remember {
-                mutableStateOf(false)
-            }
-            val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 400.dp)
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(mapHeight),
-                cameraPositionState = cameraPositionState
-            ) {
-                LaunchedEffect(markerState) {
-                    markerState.showInfoWindow()
-                }
-
-                MarkerInfoWindow(
-                    visible = true,
-                    state = markerState,
-                    content = {
-                        ElevatedButton(
-                            elevation = ButtonDefaults.buttonElevation(8.dp),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(40.dp))
-                                .padding(12.dp), onClick = {},
-                            colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Text("Set Location", color = MaterialTheme.colorScheme.onPrimary)
+            Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd),
+                    interactionSource = interactionSource, onClick = {
+                        shouldDialogShow.value = true
+                        if (permissions.allPermissionsGranted) {
+                            mainViewModel.getLocation()
                         }
-                    }, onInfoWindowClick = {
-//                        isMapExpanded = !isMapExpanded
-//                        viewModel.getAddressByLatLng(position)
-                        viewModel.getAddressByLatLng(context, position)
-                    }
-                )
-
-//        Circle(center = defaultLoc, radius = 4.7 * 1000, strokeColor = Color.Green.copy(alpha = 0.6f), visible = true, fillColor =  Color.Green.copy(alpha = 0.2f))
-                Polygon(
-                    points = getBogorBound(),
-                    strokeColor = Color(
-                        182,
-                        115,
-                        135
-                    ),
-                    strokePattern = listOf(
-                        GAP, DOT
+                    }, enabled = isLoading == false
+                ) {
+                    Icon(
+                        modifier = Modifier.rotate(if(isLoading == false) 0f else angle),
+                        imageVector = Icons.Filled.AutoMode,
+                        contentDescription = null
                     )
-                )
+                    Spacer(modifier = Modifier.size(width = 8.dp, height = 0.dp))
+                    Text("Isi Alamat Otomatis")
+                }
             }
         }
         item {
             Column(
-                modifier = Modifier.wrapContentHeight().fillMaxWidth(),
+                modifier = Modifier
+                    .wrapContentHeight()
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FormRegister()
+                FormRegister(listAddress = listAddress)
             }
         }
     }
@@ -300,6 +288,85 @@ object MapConfig {
             LatLng(-6.576423978912431, 106.83641429333927),
             LatLng(-6.571118244972, 106.84066269560928),
         )
+    }
+}
+
+@Composable
+fun MapScreen(
+    mainViewModel: MainViewModel = hiltViewModel(),
+    defaultLoc: LatLng = LatLng(-6.598268, 106.799374),
+    position: LatLng = defaultLoc,
+    viewModel: RegisterViewModel = hiltViewModel(),
+    isMapExpanded: Boolean = false
+) {
+    val cameraPositionState = rememberCameraPositionState {
+        this.position = CameraPosition.fromLatLngZoom(defaultLoc, 12f)
+    }
+    val context = LocalContext.current
+    val userMarker = "user_marker"
+    val bounds = BoundsLocation(getBogorBound())
+    val isInbounds = remember { mutableStateOf(false) }
+    val markerState = rememberMarkerState(
+        userMarker
+    )
+    LaunchedEffect(position) {
+        cameraPositionState.animate(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.fromLatLngZoom(
+                    position,
+                    12f
+                )
+            )
+        )
+        markerState.position = position
+        isInbounds.value = bounds.isInBounds(position)
+    }
+    val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 400.dp)
+    Crossfade(isInbounds.value) {
+        if (it) {
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(mapHeight),
+                cameraPositionState = cameraPositionState
+            ) {
+                LaunchedEffect(markerState) {
+                    markerState.showInfoWindow()
+                }
+
+                MarkerInfoWindow(
+                    visible = true,
+                    state = markerState,
+                    content = {
+                        ElevatedButton(
+                            elevation = ButtonDefaults.buttonElevation(8.dp),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(40.dp))
+                                .padding(12.dp), onClick = {},
+                            colors = ButtonDefaults.elevatedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            Text("Set Location", color = MaterialTheme.colorScheme.onPrimary)
+                        }
+                    }, onInfoWindowClick = {
+                        viewModel.getAddressByLatLng(context, position)
+                    }
+                )
+                Polygon(
+                    points = getBogorBound(),
+                    strokeColor = Color(
+                        182,
+                        115,
+                        135
+                    ),
+                    strokePattern = listOf(
+                        GAP, DOT
+                    )
+                )
+            }
+        }
     }
 }
 

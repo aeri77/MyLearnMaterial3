@@ -95,16 +95,4 @@ class MainViewModel @Inject constructor(
     fun stopLocationUpdate(locationCallback: LocationCallback) {
         locationHelper.stopLocationUpdate(locationCallback)
     }
-
-    fun getLiveLocation(): MutableSharedFlow<LatLng> {
-        return location
-    }
-
-    fun getLocation() {
-        locationHelper.fusedLocationClient?.lastLocation?.addOnSuccessListener {
-            viewModelScope.launch {
-                location.emit(LatLng(it.latitude, it.longitude))
-            }
-        }
-    }
 }

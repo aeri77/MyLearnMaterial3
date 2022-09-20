@@ -93,8 +93,6 @@ class MainActivity : ComponentActivity(){
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
 
-
-
             when (navController.currentDestination?.route) {
                 Navigation.REGISTER_FORM -> {
                     DefaultBackHandler(backNavElement = RegisterExitDialog {
@@ -371,7 +369,7 @@ class MainActivity : ComponentActivity(){
                                             }
                                             else -> null
                                         }
-                                    }) { RegisterForm(navController, mainViewModel) }
+                                    }) { RegisterForm(navController) }
                                     composable(Navigation.CHECKOUT, enterTransition = {
                                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                                     }, exitTransition = {

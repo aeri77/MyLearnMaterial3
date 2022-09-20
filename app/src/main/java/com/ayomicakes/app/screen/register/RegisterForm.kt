@@ -7,10 +7,10 @@
 
 package com.ayomicakes.app.screen.register
 
-import android.content.Context
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ayomicakes.app.MainViewModel
+import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.screen.register.MapConfig.DOT
 import com.ayomicakes.app.screen.register.MapConfig.GAP
 import com.ayomicakes.app.screen.register.MapConfig.getBogorBound
@@ -53,14 +54,13 @@ import timber.log.Timber
 @Composable
 fun RegisterForm(
     navController: NavHostController,
-    mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
     val context = LocalContext.current
+    val isLoading by viewModel.isLoading.observeAsState()
     val shouldDialogShow = remember { mutableStateOf(false) }
-    val position by mainViewModel.getLiveLocation().collectAsState(null)
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -71,7 +71,6 @@ fun RegisterForm(
 //        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
 //    )
     val listAddress by viewModel.addressList.collectAsState(null)
-
     val permissions = rememberMultiplePermissionsState(
         permissions =
         listOf(
@@ -86,16 +85,6 @@ fun RegisterForm(
         }
     }
 
-
-    LaunchedEffect(position, isPressed) {
-        if (!isPressed) {
-            Timber.d("address position $isPressed :$position")
-            viewModel.getAddressByLatLng(context = context, position)
-        }
-    }
-    LaunchedEffect(listAddress) {
-        Timber.d("address :$listAddress")
-    }
     permissions.permissions.forEach {
         when (it.status) {
             is PermissionStatus.Denied -> {
@@ -124,7 +113,7 @@ fun RegisterForm(
                 val scope = rememberCoroutineScope()
                 scope.launch {
                     if (shouldDialogShow.value) {
-                        mainViewModel.getLocation()
+                        viewModel.getLocation(context)
                     }
                 }
 //                DisposableEffect(mainViewModel.locationCallback) {
@@ -139,32 +128,39 @@ fun RegisterForm(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-
-            val isLoading by viewModel.isLoading.observeAsState()
             val infiniteTransition = rememberInfiniteTransition()
             val angle by infiniteTransition.animateFloat(
                 initialValue = 0F,
                 targetValue = 360F,
                 animationSpec = infiniteRepeatable(
-                    animation = tween(2000, easing = LinearEasing),
+                    animation = tween(1000, easing = LinearEasing),
                 )
             )
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Timber.d("address is loading $isLoading")
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp)) {
                 OutlinedButton(
                     modifier = Modifier
                         .align(Alignment.CenterEnd),
                     interactionSource = interactionSource, onClick = {
                         shouldDialogShow.value = true
                         if (permissions.allPermissionsGranted) {
-                            mainViewModel.getLocation()
+                            viewModel.getLocation(context = context)
                         }
-                    }, enabled = isLoading == false
+                    }, enabled = isLoading == false,
+                    border = BorderStroke(0.dp, color = Color.Transparent)
                 ) {
                     Icon(
-                        modifier = Modifier.rotate(if(isLoading == false) 0f else angle),
+                        modifier = Modifier
+                            .size(14.dp)
+                            .rotate(if (isLoading == false) 0f else angle),
                         imageVector = Icons.Filled.AutoMode,
                         contentDescription = null
                     )
@@ -182,6 +178,17 @@ fun RegisterForm(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FormRegister(listAddress = listAddress)
+            }
+        }
+        item {
+            Box(modifier = Modifier.padding(28.dp)){
+                Button(onClick = {
+                    navController.navigate(Navigation.HOME) {
+                        popUpTo(0)
+                    }
+                }) {
+                    Text("Save & Continue")
+                }
             }
         }
     }

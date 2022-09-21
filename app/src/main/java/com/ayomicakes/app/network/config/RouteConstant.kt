@@ -1,0 +1,8 @@
+package com.ayomicakes.app.network.config
+
+
+object RouteConstant {
+    const val SIGN_IN = "signin"
+    const val SIGN_UP = "signup"
+    const val REFRESH_TOKEN = "refresh-token"
+}

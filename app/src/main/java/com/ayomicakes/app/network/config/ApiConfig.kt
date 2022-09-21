@@ -22,7 +22,7 @@ class ApiConfig {
 
         private const val GOOGLE_MAP_URL =
             "https://maps.googleapis.com/maps/api/"
-        private const val MAIN_APP_URL = "https://apimobile.ptncs.com/php/apps_service/"
+        private const val MAIN_APP_URL = "https://ayomicake-api.herokuapp.com/"
 
 
         fun getAppServices(): AyomiCakeServices {

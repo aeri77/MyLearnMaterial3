@@ -24,6 +24,7 @@ object Versions {
 
     object Google {
         const val javaLiteVersion = "3.18.0"
+        const val playServices = "18.0.2"
     }
 
     object KTX {

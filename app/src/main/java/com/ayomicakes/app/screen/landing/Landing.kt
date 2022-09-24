@@ -38,8 +38,8 @@ fun Landing(navController: NavHostController, mainViewModel: MainViewModel = hil
     
     LaunchedEffect(userStore) {
         delay(1700)
-        Timber.d("userStorew = ${userStore?.username}")
-        if (userStore?.username?.isNotEmpty() == true) {
+        Timber.d("userStorew = ${userStore?.userId}")
+        if (userStore?.userId?.toString()?.isNotBlank() == true) {
             navController.navigate(Navigation.HOME) {
                 popUpTo(0)
             }

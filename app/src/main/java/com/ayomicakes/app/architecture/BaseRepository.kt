@@ -4,7 +4,10 @@ import androidx.datastore.core.DataStore
 import com.ayomicakes.app.BuildConfig
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.config.ApiConfig
-import com.ayomicakes.app.network.responses.GeoCodeResponse
+import com.ayomicakes.app.network.requests.AuthRequest
+import com.ayomicakes.app.network.requests.CaptchaRequest
+import com.ayomicakes.app.network.responses.*
+import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.network.services.MapServices
 import com.google.android.gms.maps.model.LatLng
 import dagger.Binds
@@ -23,12 +26,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface BaseRepository {
-    fun getUserStore(): Flow<UserStore>
+    fun getUserStore(): Flow<UserStore?>
 
     suspend fun updateUserStore(user: UserStore)
 
     suspend fun clearUserStore()
     suspend fun getAddressByLatLng(latLng: LatLng): Flow<GeoCodeResponse>
+    suspend fun signUp(authRequest: AuthRequest): Flow<Response>
+    suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
+    suspend fun sendCaptcha(captchaRequest: CaptchaRequest) : Flow<FullResponse<CaptchaResponse>>
 
 }
 
@@ -38,6 +44,7 @@ class BaseRepositoryImpl @Inject constructor(
 ) : BaseRepository {
 
     private val mapApi: MapServices = ApiConfig.getMapServices()
+    private val mainApi : AyomiCakeServices = ApiConfig.getAppServices()
     override suspend fun getAddressByLatLng(latLng: LatLng): Flow<GeoCodeResponse> {
         val flowData = flow {
             val res = mapApi.getGeocode(
@@ -49,6 +56,29 @@ class BaseRepositoryImpl @Inject constructor(
         return flowData.flowOn(Dispatchers.IO)
     }
 
+    override suspend fun signUp(authRequest: AuthRequest): Flow<Response> {
+        val flowData = flow {
+            val res = mainApi.postSignUp(authRequest).await()
+            emit(res)
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>> {
+        val flowData = flow {
+            val res = mainApi.postSignIn(authRequest).await()
+            emit(res)
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun sendCaptcha(captchaRequest: CaptchaRequest): Flow<FullResponse<CaptchaResponse>> {
+        val flowData = flow {
+            val res = mainApi.sendCaptcha(captchaRequest).await()
+            emit(res)
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
 
     override fun getUserStore(): Flow<UserStore> {
         return userStore.data.catch { exception ->
@@ -67,10 +97,9 @@ class BaseRepositoryImpl @Inject constructor(
     override suspend fun updateUserStore(user: UserStore) {
         userStore.updateData { store ->
             store.copy(
-                username = user.username,
-                address = user.address,
-                fullName = user.fullName,
-                phone = user.phone
+                userId = user.userId,
+                accessToken = user.accessToken,
+                refreshToken = user.refreshToken
             )
         }
     }

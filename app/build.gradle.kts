@@ -1,4 +1,3 @@
-import com.google.protobuf.gradle.*
 import org.apache.tools.ant.util.JavaEnvUtils.JAVA_11
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 
@@ -99,7 +98,8 @@ dependencies {
     implementation(Deps.Google.protobuf)
     implementation(Deps.Google.crypto)
     implementation(Deps.Google.mapsCompose)
-    implementation(Deps.Google.playService)
+    implementation(Deps.Google.maps)
+    implementation(Deps.Google.safetyNet)
     implementation(Deps.Google.locationServices)
     kapt(Deps.Hilt.hiltCompiler)
     testImplementation(Deps.junit)

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.IOException
+import java.util.*
 import javax.inject.Inject
 
 
@@ -24,10 +25,9 @@ class SignInViewModel @Inject constructor(
         viewModelScope.launch {
             repository.updateUserStore(
                 UserStore(
-                    "Aeri",
-                    "Aeri",
-                    "Bogor",
-                    "088219615853"
+                    UUID.randomUUID(),
+                    "adada231231",
+                    "d21312415415151"
                 )
             )
         }

@@ -59,7 +59,8 @@ object Deps {
         val protobuf by lazy { "com.google.protobuf:protobuf-javalite:${Versions.Google.javaLiteVersion}" }
         val crypto by lazy { "com.google.crypto.tink:tink-android:1.6.1" }
         val mapsCompose by lazy { "com.google.maps.android:maps-compose:2.5.3" }
-        val playService by lazy { "com.google.android.gms:play-services-maps:18.0.2" }
+        val maps by lazy { "com.google.android.gms:play-services-maps:${Versions.Google.playServices}" }
+        val safetyNet by lazy {"com.google.android.gms:play-services-safetynet:18.0.1"}
         val locationServices by lazy { "com.google.android.gms:play-services-location:20.0.0" }
     }
 

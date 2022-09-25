@@ -10,7 +10,7 @@ plugins {
     id("com.google.protobuf") version "0.8.12"
     kotlin("plugin.serialization") version "1.7.10"
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -101,6 +101,9 @@ dependencies {
     implementation(Deps.Google.maps)
     implementation(Deps.Google.safetyNet)
     implementation(Deps.Google.locationServices)
+    implementation(Deps.Google.auth)
+    implementation(platform(Deps.Google.Firebase.bom))
+    implementation(Deps.Google.Firebase.analytic)
     kapt(Deps.Hilt.hiltCompiler)
     testImplementation(Deps.junit)
     androidTestImplementation(Deps.testJUnit)

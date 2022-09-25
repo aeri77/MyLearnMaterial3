@@ -6,6 +6,7 @@ import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.config.ApiConfig
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
+import com.ayomicakes.app.network.requests.OAuthRequest
 import com.ayomicakes.app.network.responses.*
 import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.network.services.MapServices
@@ -35,6 +36,7 @@ interface BaseRepository {
     suspend fun signUp(authRequest: AuthRequest): Flow<Response>
     suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
     suspend fun sendCaptcha(captchaRequest: CaptchaRequest) : Flow<FullResponse<CaptchaResponse>>
+    suspend fun verifyOAuth(oAuthRequest: OAuthRequest) : Flow<FullResponse<AuthResponse>>
 
 }
 
@@ -75,6 +77,14 @@ class BaseRepositoryImpl @Inject constructor(
     override suspend fun sendCaptcha(captchaRequest: CaptchaRequest): Flow<FullResponse<CaptchaResponse>> {
         val flowData = flow {
             val res = mainApi.sendCaptcha(captchaRequest).await()
+            emit(res)
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun verifyOAuth(oAuthRequest: OAuthRequest): Flow<FullResponse<AuthResponse>> {
+        val flowData = flow {
+            val res = mainApi.verifyOAuth(oAuthRequest).await()
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)

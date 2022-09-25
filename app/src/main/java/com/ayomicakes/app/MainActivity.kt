@@ -1,11 +1,8 @@
 package com.ayomicakes.app
 
-import android.location.Address
-import android.location.Geocoder.GeocodeListener
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.ResultReceiver
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -38,6 +35,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.ayomicakes.app.component.*
 import com.ayomicakes.app.component.enums.TopAppBar
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.oauth.GoogleOauth
 import com.ayomicakes.app.screen.checkout.Checkout
 import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.Screens
@@ -58,13 +56,12 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.Executor
 
 @ExperimentalPermissionsApi
 @ExperimentalFoundationApi

@@ -3,6 +3,7 @@ package com.ayomicakes.app.network.services
 import com.ayomicakes.app.network.config.RouteConstant
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
+import com.ayomicakes.app.network.requests.OAuthRequest
 import com.ayomicakes.app.network.responses.AuthResponse
 import com.ayomicakes.app.network.responses.CaptchaResponse
 import com.ayomicakes.app.network.responses.FullResponse
@@ -25,4 +26,8 @@ interface AyomiCakeServices {
 
     @POST(RouteConstant.SEND_CAPTCHA)
     fun sendCaptcha(@Body captchaRequest: CaptchaRequest): Call<FullResponse<CaptchaResponse>>
+
+    @POST(RouteConstant.VERIFY_OAUTH)
+    fun verifyOAuth(@Body oAuthRequest: OAuthRequest): Call<FullResponse<AuthResponse>>
+
 }

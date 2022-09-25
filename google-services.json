@@ -1,0 +1,74 @@
+{
+  "project_info": {
+    "project_number": "755660969794",
+    "project_id": "ayomi-cakes",
+    "storage_bucket": "ayomi-cakes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755660969794:android:e3051bb6d70ae2bf2d9xadb",
+        "android_client_info": {
+          "package_name": "com.ayomicakes.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755660969794-13lsb43edjlsh0lkvd7rvbannu92abm1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQIIpBtfI3iCvHMagYCQXSbLi61x8w8RM"
+        },
+        {
+          "current_key": "AIzaSyCYA0RvWCow2FdFgD-q95fKPi6MdC5W_YI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755660969794-13lsb43edjlsh0lkvd7rvbannu92abm1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:755660969794:android:a5d251d6d6bd31f92d9adb",
+        "android_client_info": {
+          "package_name": "com.ayomicakes.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "755660969794-13lsb43edjlsh0lkvd7rvbannu92abm1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQIIpBtfI3iCvHMagYCQXSbLi61x8w8RM"
+        },
+        {
+          "current_key": "AIzaSyCYA0RvWCow2FdFgD-q95fKPi6MdC5W_YI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "755660969794-13lsb43edjlsh0lkvd7rvbannu92abm1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

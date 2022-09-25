@@ -1,6 +1,9 @@
 package com.ayomicakes.app.screen.signup
 
 import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -17,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
@@ -31,14 +35,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ayomicakes.app.MainViewModel
+import com.ayomicakes.app.R
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.oauth.GoogleOauth
 import com.ayomicakes.app.ui.theme.Crayola
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import timber.log.Timber
 import java.util.concurrent.Executor
 
@@ -63,6 +74,18 @@ fun SignUp(
     var captchaToken by remember { mutableStateOf<String?>(null) }
     var isCaptchaSuccess by remember { mutableStateOf<Boolean?>(null) }
     val captchaResponse by viewModel.captchaResponse.collectAsState(null)
+    val startForResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                if (result.data != null) {
+                    val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(intent)
+                    val authResult = GoogleOauth.handleSignInResult(task)
+                    viewModel.verifyOAuth(authResult?.idToken.toString())
+                }
+            }
+            Timber.d("sign in result code : ${result.resultCode}")
+        }
 
     systemUiController.setStatusBarColor(mainColor)
     mainViewModel.setToolbar(
@@ -72,13 +95,11 @@ fun SignUp(
             ?.capitalize(Locale.current) ?: ""
     )
     LaunchedEffect(captchaToken) {
-        Timber.d("captcha token : $captchaToken")
         if (captchaToken?.isNotBlank() == true) {
             viewModel.sendCaptcha(captchaToken)
         }
     }
     LaunchedEffect(captchaResponse) {
-        Timber.d("captcha response : $captchaResponse")
         if (captchaResponse?.result != null) {
             isCaptchaSuccess = captchaResponse?.result?.success
         }
@@ -213,47 +234,18 @@ fun SignUp(
                     shape = RoundedCornerShape(4.dp),
                     modifier = Modifier
                         .height(54.dp)
-                        .weight(0.5f),
-                    onClick = { /*TODO*/ }) {
+                        .fillMaxWidth(),
+                    onClick = {
+                        startForResult.launch(GoogleOauth.getGoogleLoginAuth(context).signInIntent)
+                    }) {
                     Image(
-                        modifier = Modifier.size(18.dp),
-                        imageVector = Icons.Filled.AccountBox,
-                        contentDescription = null
+                        modifier = Modifier
+                            .height(30.dp),
+                        painter = painterResource(id = R.drawable.ic_google_logo),
+                        contentDescription = ""
                     )
-                }
-                Button(
-                    colors = ButtonDefaults.outlinedButtonColors(),
-                    border = BorderStroke(
-                        1.dp,
-                        color = MaterialTheme.colorScheme.secondary
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier
-                        .height(54.dp)
-                        .weight(0.5f),
-                    onClick = { /*TODO*/ }) {
-                    Image(
-                        modifier = Modifier.size(18.dp),
-                        imageVector = Icons.Filled.ShoppingCart,
-                        contentDescription = null
-                    )
-                }
-                Button(
-                    colors = ButtonDefaults.outlinedButtonColors(),
-                    border = BorderStroke(
-                        1.dp,
-                        color = MaterialTheme.colorScheme.secondary
-                    ),
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier
-                        .height(54.dp)
-                        .weight(0.5f),
-                    onClick = { /*TODO*/ }) {
-                    Image(
-                        modifier = Modifier.size(18.dp),
-                        imageVector = Icons.Filled.ThumbUp,
-                        contentDescription = null
-                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Sign Up with Google")
                 }
             }
         }

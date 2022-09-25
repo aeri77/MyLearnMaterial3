@@ -62,6 +62,11 @@ object Deps {
         val maps by lazy { "com.google.android.gms:play-services-maps:${Versions.Google.playServices}" }
         val safetyNet by lazy {"com.google.android.gms:play-services-safetynet:18.0.1"}
         val locationServices by lazy { "com.google.android.gms:play-services-location:20.0.0" }
+        val auth by lazy { "com.google.android.gms:play-services-auth:20.3.0" }
+        object Firebase {
+            val bom by lazy {"com.google.firebase:firebase-bom:30.4.1"}
+            val analytic by lazy {"com.google.firebase:firebase-analytics-ktx"}
+        }
     }
 
     object DataStore {

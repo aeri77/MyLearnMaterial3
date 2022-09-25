@@ -6,6 +6,7 @@ buildscript {
     dependencies {
         classpath("com.google.dagger:hilt-android-gradle-plugin:${Versions.hilt}")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("com.google.gms:google-services:4.3.13")
     }
     repositories {
         mavenCentral()

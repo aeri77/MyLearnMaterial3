@@ -1,4 +1,4 @@
-package com.ayomicakes.app.screen.signup
+package com.ayomicakes.app.screen.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,22 +7,18 @@ import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
-import com.ayomicakes.app.network.responses.AuthResponse
 import com.ayomicakes.app.network.responses.CaptchaResponse
 import com.ayomicakes.app.network.responses.FullResponse
-import com.ayomicakes.app.network.responses.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.checkerframework.checker.units.qual.A
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
+class AuthViewModel @Inject constructor(
     private val repository: BaseRepository
 ) : ViewModel() {
 
@@ -32,10 +28,11 @@ class SignUpViewModel @Inject constructor(
         MutableSharedFlow()
     val captchaResponse: MutableSharedFlow<FullResponse<CaptchaResponse>?> = _captchaResponse
     val captchaLoading = MutableStateFlow(false)
-    val signUpLoading = MutableStateFlow(false)
+    val signLoading = MutableStateFlow(false)
+    val oauthLoading = MutableStateFlow(false)
     fun signUp(username: String, password: String) {
         viewModelScope.launch {
-            signUpLoading.emit(true)
+            signLoading.emit(true)
             try {
                 val authRequest = AuthRequest(
                     username,
@@ -50,14 +47,14 @@ class SignUpViewModel @Inject constructor(
                                 refreshToken = it.result.refreshToken
                             )
                         )
-                        signUpLoading.emit(false)
+                        signLoading.emit(false)
                     }
                 }
             } catch (e: Exception) {
                 Timber.d("sign Up error : ${e.message}")
-                signUpLoading.emit(false)
+                signLoading.emit(false)
             } finally {
-                signUpLoading.emit(false)
+                signLoading.emit(false)
             }
         }
     }
@@ -79,8 +76,35 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
+    fun signIn(username: String, password: String) {
+        val authRequest = AuthRequest(
+            username,
+            password
+        )
+        viewModelScope.launch {
+            signLoading.emit(true)
+            try {
+                repository.signIn(authRequest).collectLatest {
+                    repository.updateUserStore(
+                        user = UserStore(
+                            userId = it.result.userId,
+                            accessToken = it.result.accessToken,
+                            refreshToken = it.result.refreshToken
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.e(e.message)
+                signLoading.emit(false)
+            } finally {
+                signLoading.emit(false)
+            }
+        }
+    }
+
     fun verifyOAuth(idToken: String) {
         viewModelScope.launch {
+            oauthLoading.emit(true)
             try {
                 repository.verifyOAuth(OAuthRequest(idToken)).collectLatest {
                     repository.updateUserStore(
@@ -90,11 +114,13 @@ class SignUpViewModel @Inject constructor(
                             refreshToken = it.result.refreshToken
                         )
                     )
-                    captchaLoading.emit(false)
+                    oauthLoading.emit(false)
                 }
             } catch (e: Exception) {
                 Timber.e(e.message)
+                oauthLoading.emit(false)
             } finally {
+                oauthLoading.emit(false)
             }
         }
     }

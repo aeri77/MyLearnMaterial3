@@ -4,12 +4,14 @@ import com.ayomicakes.app.network.config.RouteConstant
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
+import com.ayomicakes.app.network.requests.RegisterFormRequest
 import com.ayomicakes.app.network.responses.AuthResponse
 import com.ayomicakes.app.network.responses.CaptchaResponse
 import com.ayomicakes.app.network.responses.FullResponse
 import com.ayomicakes.app.network.responses.Response
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AyomiCakeServices {
@@ -29,5 +31,8 @@ interface AyomiCakeServices {
 
     @POST(RouteConstant.VERIFY_OAUTH)
     fun verifyOAuth(@Body oAuthRequest: OAuthRequest): Call<FullResponse<AuthResponse>>
+
+    @POST(RouteConstant.REGISTER_FORM)
+    fun postRegisterForm(@Header("Authorization") authHeader: String, @Body registerFormRequest: RegisterFormRequest): Call<Response>
 
 }

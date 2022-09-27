@@ -10,7 +10,13 @@ data class RegisterFormRequest(
 
     @SerialName("userId")
     @Serializable(with = UUIDSerializer::class)
-    val userId: UUID,
+    val userId: UUID?,
+
+    @SerialName("fullName")
+    val fullName: String,
+
+    @SerialName("phone")
+    val phone: String,
 
     @SerialName("address")
     val address: String,
@@ -22,23 +28,21 @@ data class RegisterFormRequest(
     val subAdminArea: String,
 
     @SerialName("adminArea")
-    val adminArea: String,
+    val adminArea: String? = null,
 
     @SerialName("countryName")
-    val countryName: String,
+    val countryName: String? = null,
 
     @SerialName("countryID")
-    val countryID: String,
+    val countryID: String? = null,
 
     @SerialName("postalCode")
     val postalCode: String,
 
     @SerialName("latitude")
-    val latitude: Double,
+    val latitude: Double? = null,
 
     @SerialName("longitude")
-    val longitude: Double,
+    val longitude: Double? = null
 
-    @SerialName("phone")
-    val phone: String
 )

@@ -7,6 +7,7 @@ import com.ayomicakes.app.network.config.ApiConfig
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
+import com.ayomicakes.app.network.requests.RegisterFormRequest
 import com.ayomicakes.app.network.responses.*
 import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.network.services.MapServices
@@ -37,6 +38,8 @@ interface BaseRepository {
     suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
     suspend fun sendCaptcha(captchaRequest: CaptchaRequest) : Flow<FullResponse<CaptchaResponse>>
     suspend fun verifyOAuth(oAuthRequest: OAuthRequest) : Flow<FullResponse<AuthResponse>>
+
+    suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest) : Flow<Response>
 
 }
 
@@ -85,6 +88,14 @@ class BaseRepositoryImpl @Inject constructor(
     override suspend fun verifyOAuth(oAuthRequest: OAuthRequest): Flow<FullResponse<AuthResponse>> {
         val flowData = flow {
             val res = mainApi.verifyOAuth(oAuthRequest).await()
+            emit(res)
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest): Flow<Response> {
+        val flowData = flow {
+            val res = mainApi.postRegisterForm(authHeader,registerFormRequest).await()
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)

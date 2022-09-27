@@ -7,4 +7,6 @@ object RouteConstant {
     const val REFRESH_TOKEN = "refresh-token"
     const val SEND_CAPTCHA = "send-captcha"
     const val VERIFY_OAUTH = "verify-oauth"
+    const val REGISTER_FORM = "register-form"
+    const val PROFILE = "profile"
 }

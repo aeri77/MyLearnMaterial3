@@ -1,7 +1,5 @@
 package com.ayomicakes.app
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,8 +44,8 @@ import com.ayomicakes.app.screen.home.page.ShopsPage
 import com.ayomicakes.app.screen.landing.Landing
 import com.ayomicakes.app.screen.onboarding.OnBoarding
 import com.ayomicakes.app.screen.register.RegisterForm
-import com.ayomicakes.app.screen.signin.SignIn
-import com.ayomicakes.app.screen.signup.SignUp
+import com.ayomicakes.app.screen.auth.signin.SignIn
+import com.ayomicakes.app.screen.auth.singup.SignUp
 import com.ayomicakes.app.ui.theme.MyLearnTheme
 import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -57,8 +56,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.tasks.Task
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -81,12 +78,14 @@ class MainActivity : ComponentActivity(){
         setContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val scope = rememberCoroutineScope()
+            val context = LocalContext.current
             val systemUiController = rememberSystemUiController()
             // icons to mimic drawer destinations
             val items = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
             val isToolbarHidden by mainViewModel.isToolbarHidden.collectAsState()
             val isSideDrawerActive by mainViewModel.isSideDrawerActive.collectAsState()
             val toolbarTitle by mainViewModel.toolbarTitle.collectAsState()
+            val account = GoogleSignIn.getLastSignedInAccount(context)
             val selectedItem = remember { mutableStateOf(items[0]) }
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
@@ -239,6 +238,15 @@ class MainActivity : ComponentActivity(){
                             onClick = {
                                 scope.launch {
                                     drawerState.close()
+                                }
+                                if(account != null){
+                                    GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
+                                        mainViewModel.clearUserStore()
+                                        navController.navigate(Navigation.LANDING) {
+                                            popUpTo(0)
+                                        }
+                                        return@addOnSuccessListener
+                                    }
                                 }
                                 mainViewModel.clearUserStore()
                                 navController.navigate(Navigation.LANDING) {

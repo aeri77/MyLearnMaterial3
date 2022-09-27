@@ -38,7 +38,8 @@ import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.screen.register.MapConfig.DOT
 import com.ayomicakes.app.screen.register.MapConfig.GAP
 import com.ayomicakes.app.screen.register.MapConfig.getBogorBound
-import com.ayomicakes.app.screen.register.component.FormRegister
+import com.ayomicakes.app.screen.register.component.AddressForm
+import com.ayomicakes.app.screen.register.component.UserForm
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
@@ -62,14 +63,24 @@ fun RegisterForm(
     val isLoading by viewModel.isLoading.observeAsState()
     val shouldDialogShow = remember { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
+    val address = remember { mutableStateOf("") }
+    val locality = remember { mutableStateOf("") }
+    val subAdmin = remember { mutableStateOf("") }
+    val fullName = remember { mutableStateOf("") }
+    val phone = remember { mutableStateOf("") }
+    val postalCode = remember { mutableStateOf("") }
     val isPressed by interactionSource.collectIsPressedAsState()
+    val registerResponse by viewModel.registerResponse.collectAsState(initial = null)
+
+    LaunchedEffect(registerResponse) {
+        if (registerResponse != null) {
+            navController.navigate(Navigation.HOME) {
+                popUpTo(0)
+            }
+        }
+    }
 
     systemUiController.setStatusBarColor(mainColor)
-//    mainViewModel.setToolbar(
-//        isHidden = false,
-//        isActive = false,
-//        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
-//    )
     val listAddress by viewModel.addressList.collectAsState(null)
     val permissions = rememberMultiplePermissionsState(
         permissions =
@@ -129,10 +140,13 @@ fun RegisterForm(
 
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = PaddingValues(32.dp)
     ) {
+        item {
+            UserForm(viewModel, fullName, phone)
+        }
         item {
             val infiniteTransition = rememberInfiniteTransition()
             val angle by infiniteTransition.animateFloat(
@@ -143,9 +157,11 @@ fun RegisterForm(
                 )
             )
             Timber.d("address is loading $isLoading")
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 16.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 16.dp)
+            ) {
                 OutlinedButton(
                     modifier = Modifier
                         .align(Alignment.CenterEnd),
@@ -177,16 +193,31 @@ fun RegisterForm(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FormRegister(listAddress = listAddress)
+                AddressForm(
+                    listAddress = listAddress,
+                    address = address,
+                    locality = locality,
+                    subAdmin = subAdmin,
+                    postalCode = postalCode
+                )
             }
         }
         item {
-            Box(modifier = Modifier.padding(28.dp)){
-                Button(onClick = {
-                    navController.navigate(Navigation.HOME) {
-                        popUpTo(0)
-                    }
-                }) {
+            Box(modifier = Modifier.padding(28.dp)) {
+                Button(
+                    enabled = address.value.isNotBlank() && locality.value.isNotBlank() && subAdmin.value.isNotBlank() && fullName.value.isNotBlank()
+                            && phone.value.isNotBlank() && postalCode.value.isNotBlank(),
+                    onClick = {
+                        viewModel.postRegisterForm(
+                            address.value,
+                            locality.value,
+                            subAdmin.value,
+                            fullName.value,
+                            phone.value,
+                            postalCode.value,
+                            listAddress = listAddress
+                        )
+                    }) {
                     Text("Save & Continue")
                 }
             }

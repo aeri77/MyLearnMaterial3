@@ -2,7 +2,6 @@ package com.ayomicakes.app.screen.register.component
 
 import android.location.Address
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -18,7 +17,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -27,8 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ayomicakes.app.screen.register.RegisterViewModel
-import com.ayomicakes.app.ui.theme.Tertiary50
-import com.ayomicakes.app.ui.theme.Tertiary60
 import com.ayomicakes.app.ui.theme.Tertiary70
 import timber.log.Timber
 
@@ -38,7 +34,7 @@ fun FormRegisterPreview() {
 //    Column(modifier = Modifier.fillMaxSize().background(Primary95)) {
     LazyColumn() {
         item {
-            FormRegister()
+            AddressForm()
         }
     }
 }
@@ -49,17 +45,16 @@ enum class AutoTextColor {
 }
 
 @Composable
-fun FormRegister(
+fun AddressForm(
     listAddress: List<Address>? = null,
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: RegisterViewModel = hiltViewModel(),
+    address: MutableState<String> = remember { mutableStateOf("") },
+    locality: MutableState<String> = remember { mutableStateOf("") },
+    subAdmin: MutableState<String> = remember { mutableStateOf("") },
+    postalCode: MutableState<String> = remember { mutableStateOf("") }
 ) {
-    Timber.d("address created : $listAddress")
     val firstIndexAddress = if (listAddress?.isNotEmpty() == true) listAddress[0] else null
-    val address = remember { mutableStateOf("") }
-    val locality = remember { mutableStateOf("") }
-    val subAdmin = remember { mutableStateOf("") }
     val autoTextColor by viewModel.autoTextColor.observeAsState()
-    val postalCode = remember { mutableStateOf("") }
     val colorAnim by animateColorAsState(
         targetValue =
         if (autoTextColor == AutoTextColor.NONE) {
@@ -107,7 +102,6 @@ fun FormRegister(
         textValue = postalCode,
         borderColor = if (postalCode.value.isNotBlank()) colorAnim else Color.Black
     )
-    FormTextField("Nomor Handphone", "08xxxxxxx", maxLines = 1)
 }
 
 @Composable

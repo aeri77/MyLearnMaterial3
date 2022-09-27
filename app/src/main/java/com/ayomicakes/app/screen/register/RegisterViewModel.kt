@@ -8,7 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.BaseRepository
 import com.ayomicakes.app.helper.LocationHelper
-import com.ayomicakes.app.network.responses.GeoCodeResponse
+import com.ayomicakes.app.network.requests.RegisterFormRequest
+import com.ayomicakes.app.network.responses.Response
 import com.ayomicakes.app.screen.register.component.AutoTextColor
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,26 +25,12 @@ class RegisterViewModel @Inject constructor(
     private var locationHelper: LocationHelper
 ) : ViewModel() {
 
-    private val _geoCodeResponse = MutableSharedFlow<GeoCodeResponse>()
     private val _addressList = MutableSharedFlow<List<Address>?>()
+    private val _registerResponse = MutableSharedFlow<Response>()
+    val registerResponse: SharedFlow<Response> = _registerResponse
     val isLoading = MutableLiveData(false)
     val autoTextColor = MutableLiveData(AutoTextColor.NONE)
-
-    val geoCodeResponse: SharedFlow<GeoCodeResponse> = _geoCodeResponse
     val addressList: SharedFlow<List<Address>?> = _addressList
-
-    fun getAddressByLatLng(latLng: LatLng) {
-        viewModelScope.launch {
-            try {
-                Timber.d("okhttp latlng = $latLng.")
-                repository.getAddressByLatLng(latLng).collectLatest {
-                    _geoCodeResponse.emit(it)
-                }
-            } catch (e: Exception) {
-                Timber.e(e.message)
-            }
-        }
-    }
 
     /**
      * Deprecation on API 33
@@ -70,11 +57,44 @@ class RegisterViewModel @Inject constructor(
             autoTextColor.postValue(AutoTextColor.NONE)
         }
     }
+
     fun getLocation(context: Context) {
         isLoading.postValue(true)
         locationHelper.fusedLocationClient?.lastLocation?.addOnSuccessListener {
             viewModelScope.launch {
                 getAddressByLatLng(context, LatLng(it.latitude, it.longitude))
+            }
+        }
+    }
+
+    fun postRegisterForm(
+        address: String,
+        locality: String,
+        subAdmin: String,
+        fullName: String,
+        phone: String,
+        postalCode: String,
+        listAddress: List<Address>?,
+        ) {
+        viewModelScope.launch {
+            repository.getUserStore().collectLatest {
+                val registerForm = RegisterFormRequest(
+                    userId = it?.userId,
+                    address = address,
+                    locality = locality,
+                    subAdminArea = subAdmin,
+                    phone = phone,
+                    fullName = fullName,
+                    postalCode = postalCode,
+                    adminArea = listAddress?.get(0)?.adminArea,
+                    countryID = listAddress?.get(0)?.countryCode,
+                    countryName = listAddress?.get(0)?.countryName,
+                    latitude = listAddress?.get(0)?.latitude,
+                    longitude = listAddress?.get(0)?.longitude
+                )
+                repository.postRegisterForm("Bearer ${it?.accessToken}" , registerForm).collectLatest {res ->
+                    _registerResponse.emit(res)
+                }
             }
         }
     }

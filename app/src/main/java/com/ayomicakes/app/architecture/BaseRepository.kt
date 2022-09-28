@@ -2,6 +2,7 @@ package com.ayomicakes.app.architecture
 
 import androidx.datastore.core.DataStore
 import com.ayomicakes.app.BuildConfig
+import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.config.ApiConfig
 import com.ayomicakes.app.network.requests.AuthRequest
@@ -24,28 +25,30 @@ import kotlinx.coroutines.flow.flowOn
 import retrofit2.await
 import timber.log.Timber
 import java.io.IOException
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface BaseRepository {
     fun getUserStore(): Flow<UserStore?>
-
+    fun getProfileStore(): Flow<ProfileStore?>
     suspend fun updateUserStore(user: UserStore)
-
-    suspend fun clearUserStore()
+    suspend fun updateProfileStore(profile: ProfileStore)
+    suspend fun clearStore()
     suspend fun getAddressByLatLng(latLng: LatLng): Flow<GeoCodeResponse>
     suspend fun signUp(authRequest: AuthRequest): Flow<Response>
     suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
     suspend fun sendCaptcha(captchaRequest: CaptchaRequest) : Flow<FullResponse<CaptchaResponse>>
     suspend fun verifyOAuth(oAuthRequest: OAuthRequest) : Flow<FullResponse<AuthResponse>>
-
     suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest) : Flow<Response>
+    suspend fun getProfile(authHeader: String, userId : UUID?) : Flow<FullResponse<ProfileStore>>
 
 }
 
 @Singleton
 class BaseRepositoryImpl @Inject constructor(
     private val userStore: DataStore<UserStore>,
+    private val profileStore: DataStore<ProfileStore>,
 ) : BaseRepository {
 
     private val mapApi: MapServices = ApiConfig.getMapServices()
@@ -101,12 +104,34 @@ class BaseRepositoryImpl @Inject constructor(
         return flowData.flowOn(Dispatchers.IO)
     }
 
-    override fun getUserStore(): Flow<UserStore> {
+    override suspend fun getProfile(authHeader: String, userId: UUID?): Flow<FullResponse<ProfileStore>> {
+        val flowData = flow {
+            val res = mainApi.getProfile(authHeader,userId).await()
+            emit(res)
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
+    override fun getUserStore(): Flow<UserStore?> {
         return userStore.data.catch { exception ->
             when (exception) {
                 is IOException -> {
                     Timber.e("Error reading store. ", exception)
                     emit(UserStore())
+                }
+                else -> {
+                    throw exception
+                }
+            }
+        }
+    }
+
+    override fun getProfileStore(): Flow<ProfileStore?> {
+        return profileStore.data.catch { exception ->
+            when (exception) {
+                is IOException -> {
+                    Timber.e("Error reading store. ", exception)
+                    emit(ProfileStore())
                 }
                 else -> {
                     throw exception
@@ -125,9 +150,23 @@ class BaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun clearUserStore() {
+    override suspend fun updateProfileStore(profile: ProfileStore) {
+        profileStore.updateData {
+            profile.copy(
+                userId = profile.userId,
+                fullName = profile.fullName,
+                addresses = profile.addresses
+            )
+        }
+    }
+
+    override suspend fun clearStore() {
         userStore.updateData {
             UserStore()
+        }
+
+        profileStore.updateData {
+            ProfileStore()
         }
     }
 

@@ -1,16 +1,21 @@
 package com.ayomicakes.app.datastore.serializer
 
+import com.ayomicakes.app.network.responses.AddressResponse
 import com.ayomicakes.app.utils.UUIDSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.*
 
-@Serializable
-data class UserStore(
 
+@Serializable
+data class ProfileStore(
     @SerialName("userId")
     @Serializable(with = UUIDSerializer::class)
     val userId: UUID? = null,
-    @SerialName("accessToken") val accessToken : String? = null,
-    @SerialName("refreshToken") val refreshToken : String? = null,
+
+    @SerialName("fullName")
+    val fullName: String? = null,
+
+    @SerialName("addresses")
+    val addresses : List<AddressResponse>? = null
 )

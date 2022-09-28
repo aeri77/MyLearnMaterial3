@@ -1,18 +1,16 @@
 package com.ayomicakes.app.network.services
 
+import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.network.config.RouteConstant
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
 import com.ayomicakes.app.network.requests.RegisterFormRequest
-import com.ayomicakes.app.network.responses.AuthResponse
-import com.ayomicakes.app.network.responses.CaptchaResponse
-import com.ayomicakes.app.network.responses.FullResponse
-import com.ayomicakes.app.network.responses.Response
+import com.ayomicakes.app.network.responses.*
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.Header
-import retrofit2.http.POST
+import retrofit2.http.*
+import java.util.UUID
+
 
 interface AyomiCakeServices {
 
@@ -34,5 +32,8 @@ interface AyomiCakeServices {
 
     @POST(RouteConstant.REGISTER_FORM)
     fun postRegisterForm(@Header("Authorization") authHeader: String, @Body registerFormRequest: RegisterFormRequest): Call<Response>
+
+    @GET(RouteConstant.PROFILE + "/{idx}")
+    fun getProfile(@Header("Authorization") authHeader: String, @Path("idx") idx: UUID?): Call<FullResponse<ProfileStore>>
 
 }

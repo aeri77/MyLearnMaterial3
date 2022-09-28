@@ -1,19 +1,24 @@
 package com.ayomicakes.app.screen.auth
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.BaseRepository
 import com.ayomicakes.app.datastore.serializer.UserStore
+import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
 import com.ayomicakes.app.network.responses.CaptchaResponse
 import com.ayomicakes.app.network.responses.FullResponse
+import com.ayomicakes.app.oauth.GoogleOauth
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -102,7 +107,8 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun verifyOAuth(idToken: String) {
+    fun verifyOAuth(idToken: String , context : Context) {
+        val account = GoogleSignIn.getLastSignedInAccount(context)
         viewModelScope.launch {
             oauthLoading.emit(true)
             try {
@@ -117,7 +123,13 @@ class AuthViewModel @Inject constructor(
                     oauthLoading.emit(false)
                 }
             } catch (e: Exception) {
-                Timber.e(e.message)
+                if(e is HttpException){
+                    if(account != null){
+                        GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
+                            return@addOnSuccessListener
+                        }
+                    }
+                }
                 oauthLoading.emit(false)
             } finally {
                 oauthLoading.emit(false)

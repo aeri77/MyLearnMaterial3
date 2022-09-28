@@ -1,15 +1,15 @@
 package com.ayomicakes.app
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.BaseRepository
+import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.helper.LocationHelper
+import com.ayomicakes.app.utils.StringUtils.getBearer
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
@@ -33,7 +33,9 @@ class MainViewModel @Inject constructor(
     val toolbarTitle = MutableStateFlow("")
     private var location: MutableSharedFlow<LatLng> = MutableSharedFlow()
     private val _userStore = MutableLiveData<UserStore>()
+    private val _profileStore = MutableLiveData<ProfileStore>()
     val userStore: LiveData<UserStore> = _userStore
+    val profileStore: LiveData<ProfileStore> = _profileStore
 
     val locationCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -49,6 +51,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun getProfile(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getUserStore().collectLatest {
+                if(it?.accessToken != null){
+                    repository.getProfile(it.accessToken.getBearer(), it.userId).collectLatest { res ->
+                        repository.updateProfileStore(res.result)
+                    }
+                }
+            }
+        }
+    }
+
     fun initUserStore() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getUserStore().collectLatest {
@@ -57,9 +71,17 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun clearUserStore() {
+    fun initProfileStore(){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.getProfileStore().collectLatest {
+                _profileStore.postValue(it)
+            }
+        }
+    }
+
+    fun clearStore() {
         viewModelScope.launch {
-            repository.clearUserStore()
+            repository.clearStore()
         }
     }
 

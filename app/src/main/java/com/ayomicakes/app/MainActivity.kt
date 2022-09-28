@@ -17,6 +17,7 @@ import androidx.compose.material.icons.outlined.ShoppingBasket
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +32,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ayomicakes.app.component.*
 import com.ayomicakes.app.component.enums.TopAppBar
 import com.ayomicakes.app.navigation.Navigation
@@ -74,7 +76,10 @@ class MainActivity : ComponentActivity(){
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+
         mainViewModel.initUserStore()
+        mainViewModel.initProfileStore()
+
         setContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val scope = rememberCoroutineScope()
@@ -89,6 +94,9 @@ class MainActivity : ComponentActivity(){
             val selectedItem = remember { mutableStateOf(items[0]) }
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val profileStore by mainViewModel.profileStore.observeAsState()
+
 
             when (navController.currentDestination?.route) {
                 Navigation.REGISTER_FORM -> {
@@ -103,6 +111,18 @@ class MainActivity : ComponentActivity(){
 
                     })
                 }
+            }
+
+            LaunchedEffect(navBackStackEntry?.destination?.parent?.route){
+                Timber.d("${navBackStackEntry?.destination?.parent?.route}")
+                when(navBackStackEntry?.destination?.parent?.route){
+                    Navigation.HOME -> {
+                        mainViewModel.getProfile()
+                    }
+                }
+            }
+            LaunchedEffect(profileStore){
+                Timber.d("profile store : ${profileStore?.fullName}")
             }
 
             MyLearnTheme {
@@ -144,7 +164,7 @@ class MainActivity : ComponentActivity(){
                                         width = Dimension.fillToConstraints
                                     }) {
                                 Text(
-                                    text = "Full Name",
+                                    text = profileStore?.fullName ?: "",
                                     fontSize = 28.sp,
                                     fontWeight = FontWeight.W600,
                                     color = MaterialTheme.colorScheme.onSecondary
@@ -241,14 +261,14 @@ class MainActivity : ComponentActivity(){
                                 }
                                 if(account != null){
                                     GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
-                                        mainViewModel.clearUserStore()
+                                        mainViewModel.clearStore()
                                         navController.navigate(Navigation.LANDING) {
                                             popUpTo(0)
                                         }
                                         return@addOnSuccessListener
                                     }
                                 }
-                                mainViewModel.clearUserStore()
+                                mainViewModel.clearStore()
                                 navController.navigate(Navigation.LANDING) {
                                     popUpTo(0)
                                 }

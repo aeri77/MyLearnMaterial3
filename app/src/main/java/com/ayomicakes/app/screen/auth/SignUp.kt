@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
@@ -38,6 +39,7 @@ fun SignUp(
     mainViewModel: MainViewModel = hiltViewModel(),
     viewModel: AuthViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
     val username = remember { mutableStateOf("") }
@@ -134,7 +136,7 @@ fun SignUp(
             Crossfade(targetState = oauthLoading) {
                 if(!it){
                     SignWithGoogle("Sign Up With Google") { authResult ->
-                        viewModel.verifyOAuth(authResult?.idToken.toString())
+                        viewModel.verifyOAuth(authResult?.idToken.toString(), context)
                     }
                 }
                 else CircularProgressIndicator()

@@ -11,6 +11,7 @@ import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.requests.RegisterFormRequest
 import com.ayomicakes.app.network.responses.Response
 import com.ayomicakes.app.screen.register.component.AutoTextColor
+import com.ayomicakes.app.utils.StringUtils.getBearer
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -77,25 +78,29 @@ class RegisterViewModel @Inject constructor(
         listAddress: List<Address>?,
         ) {
         viewModelScope.launch {
-            repository.getUserStore().collectLatest {
-                val registerForm = RegisterFormRequest(
-                    userId = it?.userId,
-                    address = address,
-                    locality = locality,
-                    subAdminArea = subAdmin,
-                    phone = phone,
-                    fullName = fullName,
-                    postalCode = postalCode,
-                    adminArea = listAddress?.get(0)?.adminArea,
-                    countryID = listAddress?.get(0)?.countryCode,
-                    countryName = listAddress?.get(0)?.countryName,
-                    latitude = listAddress?.get(0)?.latitude,
-                    longitude = listAddress?.get(0)?.longitude
-                )
-                repository.postRegisterForm("Bearer ${it?.accessToken}" , registerForm).collectLatest {res ->
-                    _registerResponse.emit(res)
-                }
-            }
+           try {
+               repository.getUserStore().collectLatest {
+                   val registerForm = RegisterFormRequest(
+                       userId = it?.userId,
+                       address = address,
+                       locality = locality,
+                       subAdminArea = subAdmin,
+                       phone = phone,
+                       fullName = fullName,
+                       postalCode = postalCode,
+                       adminArea = listAddress?.get(0)?.adminArea,
+                       countryID = listAddress?.get(0)?.countryCode,
+                       countryName = listAddress?.get(0)?.countryName,
+                       latitude = listAddress?.get(0)?.latitude,
+                       longitude = listAddress?.get(0)?.longitude
+                   )
+                   repository.postRegisterForm(it?.accessToken?.getBearer() ?: "", registerForm).collectLatest { res ->
+                       _registerResponse.emit(res)
+                   }
+               }
+           } catch (e : Exception){
+               Timber.e(e.message)
+           }
         }
     }
 }

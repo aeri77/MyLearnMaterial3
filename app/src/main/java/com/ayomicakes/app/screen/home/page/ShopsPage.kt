@@ -16,6 +16,9 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -33,13 +36,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.R
+import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.*
 import kotlin.math.floor
+import com.ayomicakes.app.utils.Result
 
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage(navController:NavHostController,mainViewModel: MainViewModel = hiltViewModel()) {
+fun ShopsPage(navController:NavHostController,mainViewModel: MainViewModel = hiltViewModel(), homeViewModel: HomeViewModel = hiltViewModel()) {
     mainViewModel.setToolbar(
         isHidden = false,
         isActive = true,
@@ -149,79 +154,91 @@ fun ShopsPage(navController:NavHostController,mainViewModel: MainViewModel = hil
                 }
             }
             item {
+
+                val cakesResponse by homeViewModel.cakeResponse.collectAsState(initial = null)
+
+                LaunchedEffect(true){
+                    homeViewModel.getCakes()
+                }
+
                 val count = 20
                 val height = floor((count * 240.0 / 2)).dp
-                LazyVerticalGrid(
-                    state = gridState,
-                    modifier = Modifier
-                        .height(height)
-                        .background(Primary95), columns = GridCells.Fixed(2)
-                ) {
-                    items(count) {
-                        Box(
-                            Modifier
-                                .width(240.dp)
-                                .height(380.dp)
+
+                Crossfade(targetState = cakesResponse) {res ->
+                    if(res is Result.Success){
+                        LazyVerticalGrid(
+                            state = gridState,
+                            modifier = Modifier
+                                .height(height)
+                                .background(Primary95), columns = GridCells.Fixed(2)
                         ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(12.dp),
-                                shape = RoundedCornerShape(20.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                                )
-                            ) {
-                                Image(
-                                    modifier = Modifier
-                                        .weight(0.7f)
-                                        .fillMaxWidth(),
-                                    painter = painterResource(id = R.drawable.image_sample_0),
-                                    contentDescription = ""
-                                )
-                                Column(
-                                    modifier = Modifier
-                                        .weight(0.35f)
-                                        .fillMaxSize()
-                                        .padding(12.dp)
+                            items(res.data.result.perPage ?: 0) { index ->
+                                Box(
+                                    Modifier
+                                        .width(240.dp)
+                                        .height(380.dp)
                                 ) {
-                                    Text(
-                                        text = "Cake Name",
-                                        fontSize = 18.sp,
-                                        fontWeight = W700,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Text(
-                                        text = "Rp 20.000",
-                                        fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Spacer(modifier = Modifier.size(12.dp))
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(12.dp),
+                                        shape = RoundedCornerShape(20.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                                        )
                                     ) {
-                                        OutlinedButton(
+                                        Image(
                                             modifier = Modifier
-                                                .fillMaxWidth()
-                                                .weight(0.7f),
-                                            onClick = { /*TODO*/ },
-                                            border = BorderStroke(
-                                                1.dp,
-                                                MaterialTheme.colorScheme.primary
-                                            )
+                                                .weight(0.7f)
+                                                .fillMaxWidth(),
+                                            painter = painterResource(id = R.drawable.image_sample_0),
+                                            contentDescription = ""
+                                        )
+                                        Column(
+                                            modifier = Modifier
+                                                .weight(0.35f)
+                                                .fillMaxSize()
+                                                .padding(12.dp)
                                         ) {
-                                            Text("BUY")
-                                        }
-                                        FilledIconButton(
-                                            modifier = Modifier.padding(start = 4.dp),
-                                            onClick = { /*TODO*/ }
-                                        ) {
-                                            Icon(
-                                                modifier = Modifier.size(14.dp),
-                                                imageVector = Icons.Outlined.AddShoppingCart,
-                                                contentDescription = "add to cart"
+                                            Text(
+                                                text = res.data.result.result?.get(index)?.cakeName ?: "",
+                                                fontSize = 18.sp,
+                                                fontWeight = W700,
+                                                color = MaterialTheme.colorScheme.primary
                                             )
+                                            Text(
+                                                text = "Rp${res.data.result.result?.get(index)?.price ?: ""}",
+                                                fontSize = 12.sp,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                            Spacer(modifier = Modifier.size(12.dp))
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                            ) {
+                                                OutlinedButton(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .weight(0.7f),
+                                                    onClick = { /*TODO*/ },
+                                                    border = BorderStroke(
+                                                        1.dp,
+                                                        MaterialTheme.colorScheme.primary
+                                                    )
+                                                ) {
+                                                    Text("BUY")
+                                                }
+                                                FilledIconButton(
+                                                    modifier = Modifier.padding(start = 4.dp),
+                                                    onClick = { /*TODO*/ }
+                                                ) {
+                                                    Icon(
+                                                        modifier = Modifier.size(14.dp),
+                                                        imageVector = Icons.Outlined.AddShoppingCart,
+                                                        contentDescription = "add to cart"
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

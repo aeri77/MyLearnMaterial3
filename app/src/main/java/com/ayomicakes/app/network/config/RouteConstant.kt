@@ -9,4 +9,5 @@ object RouteConstant {
     const val VERIFY_OAUTH = "verify-oauth"
     const val REGISTER_FORM = "register-form"
     const val PROFILE = "profile"
+    const val CAKES = "cakes"
 }

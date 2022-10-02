@@ -28,6 +28,7 @@ import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.ayomicakes.app.utils.Result
 
 interface BaseRepository {
     fun getUserStore(): Flow<UserStore?>
@@ -40,8 +41,9 @@ interface BaseRepository {
     suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
     suspend fun sendCaptcha(captchaRequest: CaptchaRequest) : Flow<FullResponse<CaptchaResponse>>
     suspend fun verifyOAuth(oAuthRequest: OAuthRequest) : Flow<FullResponse<AuthResponse>>
-    suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest) : Flow<Response>
+    suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest) : Flow<Result<Response>>
     suspend fun getProfile(authHeader: String, userId : UUID?) : Flow<FullResponse<ProfileStore>>
+    suspend fun getCakes(authHeader: String?) : Flow<Result<FullResponse<PageModel<CakeItem>>>>
 
 }
 
@@ -66,7 +68,7 @@ class BaseRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(authRequest: AuthRequest): Flow<Response> {
         val flowData = flow {
-            val res = mainApi.postSignUp(authRequest).await()
+            val res = mainApi.postSignUp(authRequest)
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)
@@ -74,7 +76,7 @@ class BaseRepositoryImpl @Inject constructor(
 
     override suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>> {
         val flowData = flow {
-            val res = mainApi.postSignIn(authRequest).await()
+            val res = mainApi.postSignIn(authRequest)
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)
@@ -82,7 +84,7 @@ class BaseRepositoryImpl @Inject constructor(
 
     override suspend fun sendCaptcha(captchaRequest: CaptchaRequest): Flow<FullResponse<CaptchaResponse>> {
         val flowData = flow {
-            val res = mainApi.sendCaptcha(captchaRequest).await()
+            val res = mainApi.sendCaptcha(captchaRequest)
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)
@@ -90,26 +92,34 @@ class BaseRepositoryImpl @Inject constructor(
 
     override suspend fun verifyOAuth(oAuthRequest: OAuthRequest): Flow<FullResponse<AuthResponse>> {
         val flowData = flow {
-            val res = mainApi.verifyOAuth(oAuthRequest).await()
+            val res = mainApi.verifyOAuth(oAuthRequest)
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest): Flow<Response> {
+    override suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest): Flow<Result<Response>> {
         val flowData = flow {
-            val res = mainApi.postRegisterForm(authHeader,registerFormRequest).await()
-            emit(res)
+            val res = mainApi.postRegisterForm(authHeader,registerFormRequest)
+            emit(Result.Success(res))
         }
         return flowData.flowOn(Dispatchers.IO)
     }
 
     override suspend fun getProfile(authHeader: String, userId: UUID?): Flow<FullResponse<ProfileStore>> {
         val flowData = flow {
-            val res = mainApi.getProfile(authHeader,userId).await()
+            val res = mainApi.getProfile(authHeader,userId)
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun getCakes(authHeader: String?): Flow<Result<FullResponse<PageModel<CakeItem>>>> {
+        val flowData = flow {
+            val res = mainApi.getCakes(authHeader)
+            emit(Result.Success(res))
+        }
+        return flowData
     }
 
     override fun getUserStore(): Flow<UserStore?> {

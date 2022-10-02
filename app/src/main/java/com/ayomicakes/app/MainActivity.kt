@@ -48,6 +48,7 @@ import com.ayomicakes.app.screen.onboarding.OnBoarding
 import com.ayomicakes.app.screen.register.RegisterForm
 import com.ayomicakes.app.screen.auth.signin.SignIn
 import com.ayomicakes.app.screen.auth.singup.SignUp
+import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.MyLearnTheme
 import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -70,6 +71,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
     private val mainViewModel: MainViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -415,7 +417,7 @@ class MainActivity : ComponentActivity(){
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
-                                            ShopsPage(navController = navController, mainViewModel)
+                                            ShopsPage(navController = navController, mainViewModel, homeViewModel)
                                             selectedItem.value = items[0]
                                         }
                                         composable(HomePageNavigation.CART_PAGE, enterTransition = {

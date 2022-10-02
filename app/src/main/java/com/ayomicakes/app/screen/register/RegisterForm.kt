@@ -1,8 +1,5 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
-    ExperimentalAnimationApi::class, ExperimentalAnimationApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
-    ExperimentalPagerApi::class
+    ExperimentalAnimationApi::class, ExperimentalAnimationApi::class
 )
 
 package com.ayomicakes.app.screen.register
@@ -50,6 +47,7 @@ import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.ayomicakes.app.utils.Result
 
 @ExperimentalPermissionsApi
 @Composable
@@ -73,7 +71,7 @@ fun RegisterForm(
     val registerResponse by viewModel.registerResponse.collectAsState(initial = null)
 
     LaunchedEffect(registerResponse) {
-        if (registerResponse != null) {
+        if (registerResponse is Result.Success) {
             navController.navigate(Navigation.HOME) {
                 popUpTo(0)
             }
@@ -204,21 +202,27 @@ fun RegisterForm(
         }
         item {
             Box(modifier = Modifier.padding(28.dp)) {
-                Button(
-                    enabled = address.value.isNotBlank() && locality.value.isNotBlank() && subAdmin.value.isNotBlank() && fullName.value.isNotBlank()
-                            && phone.value.isNotBlank() && postalCode.value.isNotBlank(),
-                    onClick = {
-                        viewModel.postRegisterForm(
-                            address.value,
-                            locality.value,
-                            subAdmin.value,
-                            fullName.value,
-                            phone.value,
-                            postalCode.value,
-                            listAddress = listAddress
-                        )
-                    }) {
-                    Text("Save & Continue")
+                Crossfade(targetState = registerResponse) {
+                    if(it is Result.Loading){
+                        CircularProgressIndicator()
+                        return@Crossfade
+                    }
+                    Button(
+                        enabled = address.value.isNotBlank() && locality.value.isNotBlank() && subAdmin.value.isNotBlank() && fullName.value.isNotBlank()
+                                && phone.value.isNotBlank() && postalCode.value.isNotBlank(),
+                        onClick = {
+                            viewModel.postRegisterForm(
+                                address.value,
+                                locality.value,
+                                subAdmin.value,
+                                fullName.value,
+                                phone.value,
+                                postalCode.value,
+                                listAddress = listAddress
+                            )
+                        }) {
+                        Text("Save & Continue")
+                    }
                 }
             }
         }

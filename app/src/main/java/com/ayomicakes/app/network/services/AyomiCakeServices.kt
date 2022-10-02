@@ -15,25 +15,28 @@ import java.util.UUID
 interface AyomiCakeServices {
 
     @POST(RouteConstant.SIGN_IN)
-    fun postSignIn(
+    suspend fun postSignIn(
         @Body authRequest: AuthRequest
-    ): Call<FullResponse<AuthResponse>>
+    ): FullResponse<AuthResponse>
 
     @POST(RouteConstant.SIGN_UP)
-    fun postSignUp(
+    suspend fun postSignUp(
         @Body authRequest: AuthRequest
-    ): Call<Response>
+    ): Response
 
     @POST(RouteConstant.SEND_CAPTCHA)
-    fun sendCaptcha(@Body captchaRequest: CaptchaRequest): Call<FullResponse<CaptchaResponse>>
+    suspend fun sendCaptcha(@Body captchaRequest: CaptchaRequest): FullResponse<CaptchaResponse>
 
     @POST(RouteConstant.VERIFY_OAUTH)
-    fun verifyOAuth(@Body oAuthRequest: OAuthRequest): Call<FullResponse<AuthResponse>>
+    suspend fun verifyOAuth(@Body oAuthRequest: OAuthRequest): FullResponse<AuthResponse>
 
     @POST(RouteConstant.REGISTER_FORM)
-    fun postRegisterForm(@Header("Authorization") authHeader: String, @Body registerFormRequest: RegisterFormRequest): Call<Response>
+    suspend fun postRegisterForm(@Header("Authorization") authHeader: String, @Body registerFormRequest: RegisterFormRequest): Response
 
     @GET(RouteConstant.PROFILE + "/{idx}")
-    fun getProfile(@Header("Authorization") authHeader: String, @Path("idx") idx: UUID?): Call<FullResponse<ProfileStore>>
+    suspend fun getProfile(@Header("Authorization") authHeader: String, @Path("idx") idx: UUID?): FullResponse<ProfileStore>
+
+    @GET(RouteConstant.CAKES)
+    suspend fun getCakes(@Header("Authorization") authHeader: String?) :FullResponse<PageModel<CakeItem>>
 
 }

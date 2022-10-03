@@ -98,6 +98,7 @@ class MainActivity : ComponentActivity(){
             val navController = rememberAnimatedNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val profileStore by mainViewModel.profileStore.observeAsState()
+            val userStore by mainViewModel.userStore.observeAsState()
 
 
             when (navController.currentDestination?.route) {
@@ -126,7 +127,13 @@ class MainActivity : ComponentActivity(){
             LaunchedEffect(profileStore){
                 Timber.d("profile store : ${profileStore?.fullName}")
             }
-
+            LaunchedEffect(userStore){
+                if(userStore == null) {
+                    navController.navigate(Navigation.LANDING) {
+                        popUpTo(0)
+                    }
+                }
+            }
             MyLearnTheme {
                 ModalNavigationDrawer(drawerState = drawerState,
                     gesturesEnabled = isSideDrawerActive,
@@ -264,9 +271,6 @@ class MainActivity : ComponentActivity(){
                                 if(account != null){
                                     GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
                                         mainViewModel.clearStore()
-                                        navController.navigate(Navigation.LANDING) {
-                                            popUpTo(0)
-                                        }
                                         return@addOnSuccessListener
                                     }
                                 }

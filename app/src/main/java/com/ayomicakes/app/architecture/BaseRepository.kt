@@ -29,6 +29,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.ayomicakes.app.utils.Result
+import retrofit2.HttpException
 
 interface BaseRepository {
     fun getUserStore(): Flow<UserStore?>
@@ -39,11 +40,15 @@ interface BaseRepository {
     suspend fun getAddressByLatLng(latLng: LatLng): Flow<GeoCodeResponse>
     suspend fun signUp(authRequest: AuthRequest): Flow<Response>
     suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
-    suspend fun sendCaptcha(captchaRequest: CaptchaRequest) : Flow<FullResponse<CaptchaResponse>>
-    suspend fun verifyOAuth(oAuthRequest: OAuthRequest) : Flow<FullResponse<AuthResponse>>
-    suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest) : Flow<Result<Response>>
-    suspend fun getProfile(authHeader: String, userId : UUID?) : Flow<FullResponse<ProfileStore>>
-    suspend fun getCakes(authHeader: String?) : Flow<Result<FullResponse<PageModel<CakeItem>>>>
+    suspend fun sendCaptcha(captchaRequest: CaptchaRequest): Flow<FullResponse<CaptchaResponse>>
+    suspend fun verifyOAuth(oAuthRequest: OAuthRequest): Flow<FullResponse<AuthResponse>>
+    suspend fun postRegisterForm(
+        authHeader: String,
+        registerFormRequest: RegisterFormRequest
+    ): Flow<Result<Response>>
+
+    suspend fun getProfile(authHeader: String, userId: UUID?): Flow<FullResponse<ProfileStore>>
+    suspend fun getCakes(authHeader: String?): Flow<Result<FullResponse<PageModel<CakeItem>>>>
 
 }
 
@@ -54,7 +59,7 @@ class BaseRepositoryImpl @Inject constructor(
 ) : BaseRepository {
 
     private val mapApi: MapServices = ApiConfig.getMapServices()
-    private val mainApi : AyomiCakeServices = ApiConfig.getAppServices()
+    private val mainApi: AyomiCakeServices = ApiConfig.getAppServices()
     override suspend fun getAddressByLatLng(latLng: LatLng): Flow<GeoCodeResponse> {
         val flowData = flow {
             val res = mapApi.getGeocode(
@@ -98,17 +103,23 @@ class BaseRepositoryImpl @Inject constructor(
         return flowData.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun postRegisterForm(authHeader:String, registerFormRequest: RegisterFormRequest): Flow<Result<Response>> {
+    override suspend fun postRegisterForm(
+        authHeader: String,
+        registerFormRequest: RegisterFormRequest
+    ): Flow<Result<Response>> {
         val flowData = flow {
-            val res = mainApi.postRegisterForm(authHeader,registerFormRequest)
+            val res = mainApi.postRegisterForm(authHeader, registerFormRequest)
             emit(Result.Success(res))
         }
         return flowData.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getProfile(authHeader: String, userId: UUID?): Flow<FullResponse<ProfileStore>> {
+    override suspend fun getProfile(
+        authHeader: String,
+        userId: UUID?
+    ): Flow<FullResponse<ProfileStore>> {
         val flowData = flow {
-            val res = mainApi.getProfile(authHeader,userId)
+            val res = mainApi.getProfile(authHeader, userId)
             emit(res)
         }
         return flowData.flowOn(Dispatchers.IO)
@@ -116,8 +127,16 @@ class BaseRepositoryImpl @Inject constructor(
 
     override suspend fun getCakes(authHeader: String?): Flow<Result<FullResponse<PageModel<CakeItem>>>> {
         val flowData = flow {
-            val res = mainApi.getCakes(authHeader)
-            emit(Result.Success(res))
+            try {
+                val res = mainApi.getCakes(authHeader)
+                emit(Result.Success(res))
+            } catch (e: Exception) {
+                if (e is HttpException) {
+                    when (e.code()) {
+                        401 -> clearStore()
+                    }
+                }
+            }
         }
         return flowData
     }

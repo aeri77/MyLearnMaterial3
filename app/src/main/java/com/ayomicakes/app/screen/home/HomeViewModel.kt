@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.ayomicakes.app.utils.Result
 import kotlinx.coroutines.flow.SharedFlow
+import retrofit2.HttpException
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -30,6 +31,7 @@ class HomeViewModel @Inject constructor(
                     _cakeResponse.emit(res)
                 }
             }
+
         }
     }
 }

@@ -35,6 +35,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ayomicakes.app.component.*
 import com.ayomicakes.app.component.enums.TopAppBar
+import com.ayomicakes.app.component.snackbar.MainSnackBar
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.oauth.GoogleOauth
 import com.ayomicakes.app.screen.checkout.Checkout
@@ -51,6 +52,7 @@ import com.ayomicakes.app.screen.auth.singup.SignUp
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.MyLearnTheme
 import com.ayomicakes.app.ui.theme.Primary95
+import com.ayomicakes.app.utils.Result
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
@@ -70,7 +72,7 @@ import timber.log.Timber
 @ExperimentalPagerApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(){
-    private val mainViewModel: MainViewModel by viewModels()
+//    private val mainViewModel: MainViewModel by viewModels()
     private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,8 +81,8 @@ class MainActivity : ComponentActivity(){
             Timber.plant(Timber.DebugTree())
         }
 
-        mainViewModel.initUserStore()
-        mainViewModel.initProfileStore()
+        homeViewModel.initUserStore()
+        homeViewModel.initProfileStore()
 
         setContent {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -89,16 +91,16 @@ class MainActivity : ComponentActivity(){
             val systemUiController = rememberSystemUiController()
             // icons to mimic drawer destinations
             val items = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
-            val isToolbarHidden by mainViewModel.isToolbarHidden.collectAsState()
-            val isSideDrawerActive by mainViewModel.isSideDrawerActive.collectAsState()
-            val toolbarTitle by mainViewModel.toolbarTitle.collectAsState()
+            val isToolbarHidden by homeViewModel.isToolbarHidden.collectAsState()
+            val isSideDrawerActive by homeViewModel.isSideDrawerActive.collectAsState()
+            val toolbarTitle by homeViewModel.toolbarTitle.collectAsState()
             val account = GoogleSignIn.getLastSignedInAccount(context)
             val selectedItem = remember { mutableStateOf(items[0]) }
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val profileStore by mainViewModel.profileStore.observeAsState()
-            val userStore by mainViewModel.userStore.observeAsState()
+            val profileStore by homeViewModel.profileStore.observeAsState()
+            val userStore by homeViewModel.userStore.observeAsState()
 
 
             when (navController.currentDestination?.route) {
@@ -120,7 +122,7 @@ class MainActivity : ComponentActivity(){
                 Timber.d("${navBackStackEntry?.destination?.parent?.route}")
                 when(navBackStackEntry?.destination?.parent?.route){
                     Navigation.HOME -> {
-                        mainViewModel.getProfile()
+                        homeViewModel.getProfile()
                     }
                 }
             }
@@ -128,7 +130,7 @@ class MainActivity : ComponentActivity(){
                 Timber.d("profile store : ${profileStore?.fullName}")
             }
             LaunchedEffect(userStore){
-                if(userStore == null) {
+                if(userStore?.userId == null) {
                     navController.navigate(Navigation.LANDING) {
                         popUpTo(0)
                     }
@@ -270,11 +272,11 @@ class MainActivity : ComponentActivity(){
                                 }
                                 if(account != null){
                                     GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
-                                        mainViewModel.clearStore()
+                                        homeViewModel.clearStore()
                                         return@addOnSuccessListener
                                     }
                                 }
-                                mainViewModel.clearStore()
+                                homeViewModel.clearStore()
                                 navController.navigate(Navigation.LANDING) {
                                     popUpTo(0)
                                 }
@@ -346,6 +348,9 @@ class MainActivity : ComponentActivity(){
                                 }, topAppbar = TopAppBar.CenterAligned
                                 )
                             }
+                        },
+                        snackbarHost = {
+                            MainSnackBar(homeViewModel)
                         }) {
                             Surface(
                                 modifier = Modifier
@@ -359,12 +364,12 @@ class MainActivity : ComponentActivity(){
                                 ) {
                                     composable(Navigation.LANDING) {
                                         Landing(
-                                            navController, mainViewModel
+                                            navController, homeViewModel
                                         )
                                     }
                                     composable(Navigation.ONBOARD) {
                                         OnBoarding(
-                                            navController, mainViewModel = mainViewModel
+                                            navController, mainViewModel = homeViewModel
                                         )
                                     }
                                     composable(Navigation.SIGN_IN, enterTransition = {
@@ -379,7 +384,7 @@ class MainActivity : ComponentActivity(){
                                         }
                                     }) {
                                         SignIn(
-                                            navController, mainViewModel = mainViewModel
+                                            navController, mainViewModel = homeViewModel
                                         )
                                     }
                                     composable(Navigation.SIGN_UP, enterTransition = {
@@ -391,7 +396,7 @@ class MainActivity : ComponentActivity(){
                                             }
                                             else -> null
                                         }
-                                    }) { SignUp(navController, mainViewModel) }
+                                    }) { SignUp(navController, homeViewModel) }
                                     composable(Navigation.REGISTER_FORM, enterTransition = {
                                         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
                                     }, exitTransition = {
@@ -411,7 +416,7 @@ class MainActivity : ComponentActivity(){
                                             }
                                             else -> null
                                         }
-                                    }) { Checkout(navController, mainViewModel = mainViewModel) }
+                                    }) { Checkout(navController, mainViewModel = homeViewModel) }
                                     navigation(
                                         startDestination = HomePageNavigation.SHOPS_PAGE,
                                         route = Navigation.HOME
@@ -421,13 +426,13 @@ class MainActivity : ComponentActivity(){
                                             enterTransition = {
                                                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                             }) {
-                                            ShopsPage(navController = navController, mainViewModel, homeViewModel)
+                                            ShopsPage(navController = navController, homeViewModel)
                                             selectedItem.value = items[0]
                                         }
                                         composable(HomePageNavigation.CART_PAGE, enterTransition = {
                                             slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
                                         }) {
-                                            CartPage(navController, mainViewModel)
+                                            CartPage(navController, homeViewModel)
                                             selectedItem.value = items[1]
                                         }
 
@@ -443,7 +448,7 @@ class MainActivity : ComponentActivity(){
                                                     else -> null
                                                 }
                                             }) {
-                                            MessagesPage(navController, mainViewModel)
+                                            MessagesPage(navController, homeViewModel)
                                             selectedItem.value = items[2]
                                         }
                                     }

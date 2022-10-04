@@ -1,11 +1,9 @@
 package com.ayomicakes.app.network.services
 
 import com.ayomicakes.app.datastore.serializer.ProfileStore
+import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.config.RouteConstant
-import com.ayomicakes.app.network.requests.AuthRequest
-import com.ayomicakes.app.network.requests.CaptchaRequest
-import com.ayomicakes.app.network.requests.OAuthRequest
-import com.ayomicakes.app.network.requests.RegisterFormRequest
+import com.ayomicakes.app.network.requests.*
 import com.ayomicakes.app.network.responses.*
 import retrofit2.Call
 import retrofit2.http.*
@@ -38,5 +36,8 @@ interface AyomiCakeServices {
 
     @GET(RouteConstant.CAKES)
     suspend fun getCakes(@Header("Authorization") authHeader: String?) :FullResponse<PageModel<CakeItem>>
+
+    @POST(RouteConstant.REFRESH_TOKEN)
+    suspend fun postRefreshToken(@Header("Authorization") authHeader: String?, @Body refreshRequest: RefreshRequest): FullResponse<UserStore>
 
 }

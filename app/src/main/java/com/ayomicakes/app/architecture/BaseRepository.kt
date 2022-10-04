@@ -5,10 +5,7 @@ import com.ayomicakes.app.BuildConfig
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.config.ApiConfig
-import com.ayomicakes.app.network.requests.AuthRequest
-import com.ayomicakes.app.network.requests.CaptchaRequest
-import com.ayomicakes.app.network.requests.OAuthRequest
-import com.ayomicakes.app.network.requests.RegisterFormRequest
+import com.ayomicakes.app.network.requests.*
 import com.ayomicakes.app.network.responses.*
 import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.network.services.MapServices
@@ -18,10 +15,6 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import retrofit2.await
 import timber.log.Timber
 import java.io.IOException
@@ -29,6 +22,8 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import com.ayomicakes.app.utils.Result
+import com.ayomicakes.app.utils.StringUtils.getBearer
+import kotlinx.coroutines.flow.*
 import retrofit2.HttpException
 
 interface BaseRepository {
@@ -42,13 +37,18 @@ interface BaseRepository {
     suspend fun signIn(authRequest: AuthRequest): Flow<FullResponse<AuthResponse>>
     suspend fun sendCaptcha(captchaRequest: CaptchaRequest): Flow<FullResponse<CaptchaResponse>>
     suspend fun verifyOAuth(oAuthRequest: OAuthRequest): Flow<FullResponse<AuthResponse>>
+    suspend fun postRefreshToken(
+       userStore: UserStore?,
+        refreshRequest: RefreshRequest
+    ): Flow<Result<FullResponse<UserStore>>>
+
     suspend fun postRegisterForm(
         authHeader: String,
         registerFormRequest: RegisterFormRequest
     ): Flow<Result<Response>>
 
     suspend fun getProfile(authHeader: String, userId: UUID?): Flow<FullResponse<ProfileStore>>
-    suspend fun getCakes(authHeader: String?): Flow<Result<FullResponse<PageModel<CakeItem>>>>
+    suspend fun getCakes(userStore: UserStore?): Flow<Result<FullResponse<PageModel<CakeItem>>>>
 
 }
 
@@ -103,6 +103,17 @@ class BaseRepositoryImpl @Inject constructor(
         return flowData.flowOn(Dispatchers.IO)
     }
 
+    override suspend fun postRefreshToken(
+       userStore: UserStore?,
+        refreshRequest: RefreshRequest
+    ): Flow<Result<FullResponse<UserStore>>> {
+        val flowData = flow {
+            val res = mainApi.postRefreshToken(userStore?.refreshToken?.getBearer(), refreshRequest)
+            emit(Result.Success(res))
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
     override suspend fun postRegisterForm(
         authHeader: String,
         registerFormRequest: RegisterFormRequest
@@ -125,20 +136,14 @@ class BaseRepositoryImpl @Inject constructor(
         return flowData.flowOn(Dispatchers.IO)
     }
 
-    override suspend fun getCakes(authHeader: String?): Flow<Result<FullResponse<PageModel<CakeItem>>>> {
+    override suspend fun getCakes(userStore: UserStore?): Flow<Result<FullResponse<PageModel<CakeItem>>>> {
         val flowData = flow {
-            try {
-                val res = mainApi.getCakes(authHeader)
-                emit(Result.Success(res))
-            } catch (e: Exception) {
-                if (e is HttpException) {
-                    when (e.code()) {
-                        401 -> clearStore()
-                    }
-                }
+            handlingError {
+                val res = mainApi.getCakes(userStore?.accessToken?.getBearer())
+                it.emit(Result.Success(res))
             }
         }
-        return flowData
+        return flowData.flowOn(Dispatchers.IO)
     }
 
     override fun getUserStore(): Flow<UserStore?> {
@@ -198,7 +203,17 @@ class BaseRepositoryImpl @Inject constructor(
             ProfileStore()
         }
     }
+    private suspend inline fun <T> FlowCollector<Result<T>>.handlingError(invoke: (FlowCollector<Result<T>>) -> Unit) {
+        try {
+            invoke(this)
+        } catch (e: Exception) {
+            when (e) {
+                is HttpException -> emit(Result.Error(e.message.toString(), e.code()))
+                else -> emit(Result.Error(e.message.toString()))
+            }
 
+        }
+    }
 }
 
 @Module

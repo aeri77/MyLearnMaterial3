@@ -34,7 +34,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.intl.Locale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.R
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.*
@@ -44,8 +43,8 @@ import com.ayomicakes.app.utils.Result
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage(navController:NavHostController,mainViewModel: MainViewModel = hiltViewModel(), homeViewModel: HomeViewModel = hiltViewModel()) {
-    mainViewModel.setToolbar(
+fun ShopsPage(navController:NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
+    viewModel.setToolbar(
         isHidden = false,
         isActive = true,
         title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
@@ -155,10 +154,10 @@ fun ShopsPage(navController:NavHostController,mainViewModel: MainViewModel = hil
             }
             item {
 
-                val cakesResponse by homeViewModel.cakeResponse.collectAsState(initial = null)
+                val cakesResponse by viewModel.cakeResponse.collectAsState(initial = null)
 
                 LaunchedEffect(true){
-                    homeViewModel.getCakes()
+                    viewModel.getCakes()
                 }
 
                 val count = 20

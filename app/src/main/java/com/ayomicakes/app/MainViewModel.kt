@@ -9,6 +9,7 @@ import com.ayomicakes.app.architecture.BaseRepository
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.helper.LocationHelper
+import com.ayomicakes.app.network.requests.RefreshRequest
 import com.ayomicakes.app.utils.StringUtils.getBearer
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
@@ -19,11 +20,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
+import com.ayomicakes.app.utils.Result
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+open class MainViewModel @Inject constructor(
     private val repository: BaseRepository,
     private var locationHelper: LocationHelper
 ) : ViewModel() {
@@ -34,6 +35,7 @@ class MainViewModel @Inject constructor(
     private var location: MutableSharedFlow<LatLng> = MutableSharedFlow()
     private val _userStore = MutableLiveData<UserStore>()
     private val _profileStore = MutableLiveData<ProfileStore>()
+    val isAuthenticated = MutableStateFlow(false)
     val userStore: LiveData<UserStore> = _userStore
     val profileStore: LiveData<ProfileStore> = _profileStore
 
@@ -51,13 +53,14 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getProfile(){
+    open fun getProfile() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getUserStore().collectLatest {
-                if(it?.accessToken != null){
-                    repository.getProfile(it.accessToken.getBearer(), it.userId).collectLatest { res ->
-                        repository.updateProfileStore(res.result)
-                    }
+                if (it?.accessToken != null) {
+                    repository.getProfile(it.accessToken.getBearer(), it.userId)
+                        .collectLatest { res ->
+                            repository.updateProfileStore(res.result)
+                        }
                 }
             }
         }
@@ -71,8 +74,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun initProfileStore(){
-        viewModelScope.launch(Dispatchers.IO){
+    fun initProfileStore() {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.getProfileStore().collectLatest {
                 _profileStore.postValue(it)
             }
@@ -116,5 +119,18 @@ class MainViewModel @Inject constructor(
 
     fun stopLocationUpdate(locationCallback: LocationCallback) {
         locationHelper.stopLocationUpdate(locationCallback)
+    }
+
+    open fun postRefreshToken() {
+        viewModelScope.launch {
+            repository.getUserStore().collectLatest { userStore ->
+                repository.postRefreshToken(userStore, RefreshRequest(userStore?.userId))
+                    .collectLatest {
+                        if (it is Result.Success) {
+                            repository.updateUserStore(it.data.result)
+                        }
+                    }
+            }
+        }
     }
 }

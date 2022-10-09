@@ -3,9 +3,9 @@ package com.ayomicakes.app.screen.auth
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ayomicakes.app.architecture.BaseRepository
+import com.ayomicakes.app.architecture.repository.auth.AuthRepository
+import com.ayomicakes.app.architecture.repository.base.BaseRepository
 import com.ayomicakes.app.datastore.serializer.UserStore
-import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val repository: BaseRepository
+    private val repository: AuthRepository
 ) : ViewModel() {
 
     val userStore = repository.getUserStore()

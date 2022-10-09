@@ -42,4 +42,9 @@ object Versions {
         const val timber = "5.0.1"
         const val converter = "0.8.0"
     }
+    object AndroidX{
+        object Room {
+            const val version = "2.4.3"
+        }
+    }
 }

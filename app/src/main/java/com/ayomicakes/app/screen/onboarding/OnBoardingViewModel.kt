@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ayomicakes.app.architecture.BaseRepository
+import com.ayomicakes.app.architecture.repository.base.BaseRepository
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.screen.onboarding.enums.PageStateEnum
 import dagger.hilt.android.lifecycle.HiltViewModel

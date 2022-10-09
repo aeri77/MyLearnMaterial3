@@ -1,19 +1,26 @@
 package com.ayomicakes.app.di
 
 import android.app.Application
+import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
+import com.ayomicakes.app.database.dao.CakeDao
+import com.ayomicakes.app.database.database.CakeDatabase
 import com.ayomicakes.app.datastore.ProfileStoreSerializer
 import com.ayomicakes.app.datastore.UserStoreSerializer
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
+import com.ayomicakes.app.network.config.ApiConfig
+import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.google.crypto.tink.Aead
 import com.google.crypto.tink.KeyTemplates
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.io.File
@@ -59,4 +66,18 @@ class AppModule {
             serializer = ProfileStoreSerializer(aead)
         )
     }
+
+    @Singleton
+    @Provides
+    fun provideCakeDatabase(
+        @ApplicationContext app: Context
+    ) : CakeDatabase = CakeDatabase.getDatabase(app)
+
+    @Singleton
+    @Provides
+    fun provideCakeDao(db: CakeDatabase) : CakeDao = db.cakeDao()
+
+    @Singleton
+    @Provides
+    fun provideAyomiCakeServices() : AyomiCakeServices= ApiConfig.getAppServices()
 }

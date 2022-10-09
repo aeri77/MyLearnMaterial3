@@ -6,7 +6,8 @@ import android.location.Geocoder
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ayomicakes.app.architecture.BaseRepository
+import com.ayomicakes.app.architecture.repository.auth.AuthRepository
+import com.ayomicakes.app.architecture.repository.base.BaseRepository
 import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.requests.RegisterFormRequest
 import com.ayomicakes.app.network.responses.Response
@@ -23,7 +24,7 @@ import com.ayomicakes.app.utils.Result
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val repository: BaseRepository,
+    private val repository: AuthRepository,
     private var locationHelper: LocationHelper
 ) : ViewModel() {
 

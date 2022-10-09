@@ -42,10 +42,25 @@ object Deps {
         val navigationAnimation by lazy { "com.google.accompanist:accompanist-navigation-animation:${Versions.Accompanist.version}" }
         val flowLayout by lazy { "com.google.accompanist:accompanist-flowlayout:${Versions.Accompanist.version}" }
         val permissions by lazy { "com.google.accompanist:accompanist-permissions:${Versions.Accompanist.version}" }
+        val swipeRefresh by lazy { "com.google.accompanist:accompanist-swiperefresh:${Versions.Accompanist.version}" }
     }
 
     object AndroidX {
         val security by lazy { "androidx.security:security-crypto:1.0.0" }
+
+        object Paging {
+            val paging by lazy { "androidx.paging:paging-runtime:3.1.1" }
+            val pagingCompose by lazy {"androidx.paging:paging-compose:1.0.0-alpha16"}
+        }
+
+        object Room {
+            val runtime by lazy {
+                "androidx.room:room-runtime:${Versions.AndroidX.Room.version}"
+            }
+            val compiler by lazy {
+                "androidx.room:room-compiler:${Versions.AndroidX.Room.version}"
+            }
+        }
     }
 
     object Hilt {
@@ -60,12 +75,13 @@ object Deps {
         val crypto by lazy { "com.google.crypto.tink:tink-android:1.6.1" }
         val mapsCompose by lazy { "com.google.maps.android:maps-compose:2.5.3" }
         val maps by lazy { "com.google.android.gms:play-services-maps:${Versions.Google.playServices}" }
-        val safetyNet by lazy {"com.google.android.gms:play-services-safetynet:18.0.1"}
+        val safetyNet by lazy { "com.google.android.gms:play-services-safetynet:18.0.1" }
         val locationServices by lazy { "com.google.android.gms:play-services-location:20.0.0" }
         val auth by lazy { "com.google.android.gms:play-services-auth:20.3.0" }
+
         object Firebase {
-            val bom by lazy {"com.google.firebase:firebase-bom:30.4.1"}
-            val analytic by lazy {"com.google.firebase:firebase-analytics-ktx"}
+            val bom by lazy { "com.google.firebase:firebase-bom:30.4.1" }
+            val analytic by lazy { "com.google.firebase:firebase-analytics-ktx" }
         }
     }
 

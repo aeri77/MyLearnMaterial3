@@ -23,7 +23,11 @@ sealed class Screens(override val route: String, var image:ImageVector? = null, 
 
 
 object HomePageNavigation {
-    const val SHOPS_PAGE = "shops_page"
-    const val CART_PAGE = "cart_page"
-    const val MESSAGES_PAGE = "messages_page"
+    const val SHOPS_PAGE = "shops-page"
+    const val CART_PAGE = "cart-page"
+    const val MESSAGES_PAGE = "messages-page"
+    const val CAKES_PAGE = "cakes-page"
+    const val CAKES_ID = "cakesId"
+
+    const val CAKES_ITEM = "$CAKES_PAGE/{$CAKES_ID}"
 }

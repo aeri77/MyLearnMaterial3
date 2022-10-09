@@ -1,10 +1,7 @@
 package com.ayomicakes.app.screen.home.page
 
 import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,47 +10,54 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.intl.Locale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.ayomicakes.app.R
 import com.ayomicakes.app.screen.home.HomeViewModel
+import com.ayomicakes.app.screen.home.component.CakeList
 import com.ayomicakes.app.ui.theme.*
 import kotlin.math.floor
 import com.ayomicakes.app.utils.Result
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage(navController:NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
+fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
     viewModel.setToolbar(
         isHidden = false,
         isActive = true,
-        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route?.split("_")?.get(0)
+            ?.capitalize(Locale.current) ?: ""
     )
     val gridState = rememberLazyGridState()
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Primary95
     ) {
+        val isRefreshing by viewModel.cakeResponse.collectAsState(null)
+
+        LaunchedEffect(gridState) {
+            Timber.d("grid state ${gridState.firstVisibleItemIndex}")
+        }
         LazyColumn(
             modifier = Modifier
         ) {
@@ -153,98 +157,31 @@ fun ShopsPage(navController:NavHostController, viewModel: HomeViewModel = hiltVi
                 }
             }
             item {
-
-                val cakesResponse by viewModel.cakeResponse.collectAsState(initial = null)
-
-                LaunchedEffect(true){
-                    viewModel.getCakes()
-                }
-
-                val count = 20
-                val height = floor((count * 240.0 / 2)).dp
-
-                Crossfade(targetState = cakesResponse) {res ->
-                    if(res is Result.Success){
-                        LazyVerticalGrid(
-                            state = gridState,
-                            modifier = Modifier
-                                .height(height)
-                                .background(Primary95), columns = GridCells.Fixed(2)
-                        ) {
-                            items(res.data.result.perPage ?: 0) { index ->
-                                Box(
-                                    Modifier
-                                        .width(240.dp)
-                                        .height(380.dp)
-                                ) {
-                                    Card(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(12.dp),
-                                        shape = RoundedCornerShape(20.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                                        )
-                                    ) {
-                                        Image(
-                                            modifier = Modifier
-                                                .weight(0.7f)
-                                                .fillMaxWidth(),
-                                            painter = painterResource(id = R.drawable.image_sample_0),
-                                            contentDescription = ""
-                                        )
-                                        Column(
-                                            modifier = Modifier
-                                                .weight(0.35f)
-                                                .fillMaxSize()
-                                                .padding(12.dp)
-                                        ) {
-                                            Text(
-                                                text = res.data.result.result?.get(index)?.cakeName ?: "",
-                                                fontSize = 18.sp,
-                                                fontWeight = W700,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                            Text(
-                                                text = "Rp${res.data.result.result?.get(index)?.price ?: ""}",
-                                                fontSize = 12.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                            Spacer(modifier = Modifier.size(12.dp))
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.SpaceBetween,
-                                            ) {
-                                                OutlinedButton(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .weight(0.7f),
-                                                    onClick = { /*TODO*/ },
-                                                    border = BorderStroke(
-                                                        1.dp,
-                                                        MaterialTheme.colorScheme.primary
-                                                    )
-                                                ) {
-                                                    Text("BUY")
-                                                }
-                                                FilledIconButton(
-                                                    modifier = Modifier.padding(start = 4.dp),
-                                                    onClick = { /*TODO*/ }
-                                                ) {
-                                                    Icon(
-                                                        modifier = Modifier.size(14.dp),
-                                                        imageVector = Icons.Outlined.AddShoppingCart,
-                                                        contentDescription = "add to cart"
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                CakeList(
+                    gridState = gridState,
+                    navController = navController,
+                    cakeItems = viewModel.cakes
+                )
+//                SwipeRefresh(
+//                    state = rememberSwipeRefreshState(isRefreshing is Result.Loading),
+//                    onRefresh = {
+////                        viewModel.getCakes()
+//                    },
+//                ) {
+//                    val cakesResponse by viewModel.cakeResponse.collectAsState(initial = null)
+//                    val userStore by viewModel.userStore.observeAsState()
+////
+////                    LaunchedEffect(true) {
+////                        viewModel.getCakes()
+////                    }
+//
+//
+//                    Crossfade(targetState = cakesResponse) { res ->
+//                        if (res is Result.Success) {
+//
+//                        }
+//                    }
+//                }
             }
         }
     }

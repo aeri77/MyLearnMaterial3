@@ -4,6 +4,7 @@
 
 package com.ayomicakes.app.screen.register
 
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
@@ -67,7 +68,6 @@ fun RegisterForm(
     val fullName = remember { mutableStateOf("") }
     val phone = remember { mutableStateOf("") }
     val postalCode = remember { mutableStateOf("") }
-    val isPressed by interactionSource.collectIsPressedAsState()
     val registerResponse by viewModel.registerResponse.collectAsState(initial = null)
 
     LaunchedEffect(registerResponse) {
@@ -75,6 +75,9 @@ fun RegisterForm(
             navController.navigate(Navigation.HOME) {
                 popUpTo(0)
             }
+        }
+        if(registerResponse is Result.Error){
+            Toast.makeText(context, (registerResponse as Result.Error).error, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -87,12 +90,6 @@ fun RegisterForm(
             android.Manifest.permission.ACCESS_COARSE_LOCATION
         )
     )
-    if (isPressed) {
-        DisposableEffect(Unit) {
-            onDispose {
-            }
-        }
-    }
 
     permissions.permissions.forEach {
         when (it.status) {

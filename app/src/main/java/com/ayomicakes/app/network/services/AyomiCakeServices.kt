@@ -1,11 +1,11 @@
 package com.ayomicakes.app.network.services
 
+import com.ayomicakes.app.database.model.CakeItem
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.config.RouteConstant
 import com.ayomicakes.app.network.requests.*
 import com.ayomicakes.app.network.responses.*
-import retrofit2.Call
 import retrofit2.http.*
 import java.util.UUID
 
@@ -35,7 +35,9 @@ interface AyomiCakeServices {
     suspend fun getProfile(@Header("Authorization") authHeader: String, @Path("idx") idx: UUID?): FullResponse<ProfileStore>
 
     @GET(RouteConstant.CAKES)
-    suspend fun getCakes(@Header("Authorization") authHeader: String?) :FullResponse<PageModel<CakeItem>>
+    suspend fun getCakes(
+        @Query("page") page : Int
+    ) :FullResponse<PageModel<CakeItem>>
 
     @POST(RouteConstant.REFRESH_TOKEN)
     suspend fun postRefreshToken(@Header("Authorization") authHeader: String?, @Body refreshRequest: RefreshRequest): FullResponse<UserStore>

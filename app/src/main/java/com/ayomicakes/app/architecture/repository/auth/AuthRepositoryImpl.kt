@@ -2,7 +2,6 @@ package com.ayomicakes.app.architecture.repository.auth
 
 import androidx.datastore.core.DataStore
 import com.ayomicakes.app.architecture.repository.base.BaseRepositoryImpl
-import com.ayomicakes.app.database.dao.CakeDao
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.requests.*
@@ -11,8 +10,8 @@ import com.ayomicakes.app.network.responses.CaptchaResponse
 import com.ayomicakes.app.network.responses.FullResponse
 import com.ayomicakes.app.network.responses.Response
 import com.ayomicakes.app.network.services.AyomiCakeServices
-import com.ayomicakes.app.utils.StringUtils.getBearer
 import com.ayomicakes.app.utils.Result
+import com.ayomicakes.app.utils.StringUtils.getBearer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

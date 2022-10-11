@@ -71,6 +71,8 @@ dependencies {
     implementation(Deps.Lifecycle.lifeCycleViewModel)
     implementation(Deps.AndroidX.security)
     implementation(Deps.AndroidX.Room.runtime)
+    implementation(Deps.AndroidX.Room.ktx)
+    implementation(Deps.AndroidX.Room.paging)
     implementation(Deps.AndroidX.Paging.paging)
     implementation(Deps.AndroidX.Paging.pagingCompose)
     implementation(Deps.Hilt.hilt)

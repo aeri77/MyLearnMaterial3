@@ -29,17 +29,29 @@ interface AyomiCakeServices {
     suspend fun verifyOAuth(@Body oAuthRequest: OAuthRequest): FullResponse<AuthResponse>
 
     @POST(RouteConstant.REGISTER_FORM)
-    suspend fun postRegisterForm(@Header("Authorization") authHeader: String, @Body registerFormRequest: RegisterFormRequest): Response
+    suspend fun postRegisterForm(
+        @Header("Authorization") authHeader: String,
+        @Body registerFormRequest: RegisterFormRequest
+    ): Response
 
     @GET(RouteConstant.PROFILE + "/{idx}")
-    suspend fun getProfile(@Header("Authorization") authHeader: String, @Path("idx") idx: UUID?): FullResponse<ProfileStore>
+    suspend fun getProfile(
+        @Header("Authorization") authHeader: String,
+        @Path("idx") idx: UUID?
+    ): FullResponse<ProfileStore>
 
     @GET(RouteConstant.CAKES)
     suspend fun getCakes(
-        @Query("page") page : Int
-    ) :FullResponse<PageModel<CakeItem>>
+        @Query("page") page: Int
+    ): FullResponse<PageModel<CakeItem>>
+
+    @GET(RouteConstant.CAKES + "/{idx}")
+    suspend fun getCakes(@Path("idx") idx: UUID?): FullResponse<CakeItem>
 
     @POST(RouteConstant.REFRESH_TOKEN)
-    suspend fun postRefreshToken(@Header("Authorization") authHeader: String?, @Body refreshRequest: RefreshRequest): FullResponse<UserStore>
+    suspend fun postRefreshToken(
+        @Header("Authorization") authHeader: String?,
+        @Body refreshRequest: RefreshRequest
+    ): FullResponse<UserStore>
 
 }

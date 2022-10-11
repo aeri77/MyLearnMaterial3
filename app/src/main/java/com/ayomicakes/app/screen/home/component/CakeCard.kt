@@ -1,4 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class
+)
 
 package com.ayomicakes.app.screen.home.component
 
@@ -11,18 +13,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ayomicakes.app.R
 import com.ayomicakes.app.database.model.CakeItem
 import com.ayomicakes.app.screen.home.HomePageNavigation
 
 @Composable
-fun CakeCard(navController:NavHostController, cakeItem: CakeItem?) {
+fun CakeCard(navController: NavHostController, cakeItem: CakeItem?) {
     Box(
         Modifier
             .width(240.dp)
@@ -33,11 +39,13 @@ fun CakeCard(navController:NavHostController, cakeItem: CakeItem?) {
                 .fillMaxSize()
                 .padding(12.dp)
                 .clickable {
-                    navController.navigate(
-                        "${HomePageNavigation.CAKES_PAGE}/${
-                            cakeItem?.uid
-                        }"
-                    )
+                    if(cakeItem != null){
+                        navController.navigate(
+                            "${HomePageNavigation.CAKES_PAGE}/${
+                                cakeItem.uid
+                            }"
+                        )
+                    }
                 },
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
@@ -46,14 +54,12 @@ fun CakeCard(navController:NavHostController, cakeItem: CakeItem?) {
         ) {
             Image(
                 modifier = Modifier
-                    .weight(0.7f)
                     .fillMaxWidth(),
                 painter = painterResource(id = R.drawable.image_sample_0),
                 contentDescription = ""
             )
             Column(
                 modifier = Modifier
-                    .weight(0.35f)
                     .fillMaxSize()
                     .padding(12.dp)
             ) {
@@ -76,8 +82,7 @@ fun CakeCard(navController:NavHostController, cakeItem: CakeItem?) {
                 ) {
                     OutlinedButton(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(0.7f),
+                            .fillMaxWidth(),
                         onClick = { /*TODO*/ },
                         border = BorderStroke(
                             1.dp,

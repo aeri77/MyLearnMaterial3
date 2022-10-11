@@ -50,16 +50,14 @@ object Deps {
 
         object Paging {
             val paging by lazy { "androidx.paging:paging-runtime:3.1.1" }
-            val pagingCompose by lazy {"androidx.paging:paging-compose:1.0.0-alpha16"}
+            val pagingCompose by lazy { "androidx.paging:paging-compose:1.0.0-alpha16" }
         }
 
         object Room {
-            val runtime by lazy {
-                "androidx.room:room-runtime:${Versions.AndroidX.Room.version}"
-            }
-            val compiler by lazy {
-                "androidx.room:room-compiler:${Versions.AndroidX.Room.version}"
-            }
+            val runtime by lazy { "androidx.room:room-runtime:${Versions.AndroidX.Room.version}" }
+            val compiler by lazy { "androidx.room:room-compiler:${Versions.AndroidX.Room.version}" }
+            val ktx by lazy { "androidx.room:room-ktx:${Versions.AndroidX.Room.version}" }
+            val paging by lazy { "androidx.room:room-paging:${Versions.AndroidX.Room.version}" }
         }
     }
 

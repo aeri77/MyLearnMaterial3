@@ -4,18 +4,12 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -29,14 +23,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.intl.Locale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.screen.home.component.CakeList
 import com.ayomicakes.app.ui.theme.*
-import kotlin.math.floor
-import com.ayomicakes.app.utils.Result
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
@@ -45,7 +35,7 @@ fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltV
     viewModel.setToolbar(
         isHidden = false,
         isActive = true,
-        title = navController.currentDestination?.route?.split("_")?.get(0)
+        title = navController.currentDestination?.route?.split("-")?.get(0)
             ?.capitalize(Locale.current) ?: ""
     )
     val gridState = rememberLazyGridState()
@@ -53,11 +43,6 @@ fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltV
         modifier = Modifier.fillMaxSize(),
         color = Primary95
     ) {
-        val isRefreshing by viewModel.cakeResponse.collectAsState(null)
-
-        LaunchedEffect(gridState) {
-            Timber.d("grid state ${gridState.firstVisibleItemIndex}")
-        }
         LazyColumn(
             modifier = Modifier
         ) {
@@ -160,28 +145,8 @@ fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltV
                 CakeList(
                     gridState = gridState,
                     navController = navController,
-                    cakeItems = viewModel.cakes
+                    lazyCakeItems = viewModel.cakes.collectAsLazyPagingItems()
                 )
-//                SwipeRefresh(
-//                    state = rememberSwipeRefreshState(isRefreshing is Result.Loading),
-//                    onRefresh = {
-////                        viewModel.getCakes()
-//                    },
-//                ) {
-//                    val cakesResponse by viewModel.cakeResponse.collectAsState(initial = null)
-//                    val userStore by viewModel.userStore.observeAsState()
-////
-////                    LaunchedEffect(true) {
-////                        viewModel.getCakes()
-////                    }
-//
-//
-//                    Crossfade(targetState = cakesResponse) { res ->
-//                        if (res is Result.Success) {
-//
-//                        }
-//                    }
-//                }
             }
         }
     }

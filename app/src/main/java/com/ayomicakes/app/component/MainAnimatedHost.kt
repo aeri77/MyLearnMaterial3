@@ -157,7 +157,7 @@ fun NavGraphBuilder.homeHost(
         }
 
         composable(CAKES_ITEM){backStackEntry ->
-            CakesPage(navController, backStackEntry.arguments?.getString(CAKES_ID))
+            CakesPage(navController, backStackEntry.arguments?.getString(CAKES_ID), homeViewModel)
         }
     }
 }

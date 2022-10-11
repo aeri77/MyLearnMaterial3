@@ -1,11 +1,8 @@
 package com.ayomicakes.app.di
 
 import android.app.Application
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
-import com.ayomicakes.app.database.dao.CakeDao
-import com.ayomicakes.app.database.database.CakeDatabase
 import com.ayomicakes.app.datastore.ProfileStoreSerializer
 import com.ayomicakes.app.datastore.UserStoreSerializer
 import com.ayomicakes.app.datastore.serializer.ProfileStore
@@ -16,11 +13,9 @@ import com.google.crypto.tink.Aead
 import com.google.crypto.tink.KeyTemplates
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.integration.android.AndroidKeysetManager
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.io.File
@@ -52,6 +47,7 @@ class AppModule {
             .getPrimitive(Aead::class.java)
     }
 
+    @Singleton
     @Provides
     fun provideUserStore(application: Application, aead: Aead): DataStore<UserStore> {
         return DataStoreFactory.create(
@@ -59,6 +55,7 @@ class AppModule {
             serializer = UserStoreSerializer(aead)
         )
     }
+    @Singleton
     @Provides
     fun provideProfileStore(application: Application, aead: Aead): DataStore<ProfileStore> {
         return DataStoreFactory.create(
@@ -66,16 +63,6 @@ class AppModule {
             serializer = ProfileStoreSerializer(aead)
         )
     }
-
-    @Singleton
-    @Provides
-    fun provideCakeDatabase(
-        @ApplicationContext app: Context
-    ) : CakeDatabase = CakeDatabase.getDatabase(app)
-
-    @Singleton
-    @Provides
-    fun provideCakeDao(db: CakeDatabase) : CakeDao = db.cakeDao()
 
     @Singleton
     @Provides

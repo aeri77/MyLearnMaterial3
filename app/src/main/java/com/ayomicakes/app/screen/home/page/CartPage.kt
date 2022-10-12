@@ -14,7 +14,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,10 +32,10 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ayomicakes.app.R
+import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.*
-import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @Composable
@@ -46,7 +47,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
             ?.capitalize(Locale.current) ?: ""
     )
 
-    val cakeCart = remember { viewModel.cakesCart }
+    val cakeCart by viewModel.cakesCart.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -69,7 +70,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp)
             ) {
-                items(cakeCart.value.toList()) { item ->
+                items(cakeCart.map { CartItem(it.value, it.key) }) { item ->
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -101,7 +102,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                                     top.linkTo(image.top)
                                 }
                                 .clickable {
-                                    viewModel.cakesCart.value.remove(item)
+                                    viewModel.removeFromCart(cart = item.item)
                                 }) {
                                 Icon(
                                     modifier = Modifier.size(18.dp),
@@ -160,7 +161,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            viewModel.cakesCart.value[viewModel.cakesCart.value.indexOf(item)].count++
+                                            viewModel.addToCart(cartItem = item.item)
                                         }) {
                                     Icon(
                                         imageVector = Icons.Filled.Add,
@@ -177,7 +178,9 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            viewModel.cakesCart.value[viewModel.cakesCart.value.indexOf(item)].count--
+                                            if(item.count > 1){
+                                                viewModel.removeFromCart(1, item.item)
+                                            }
                                         }) {
                                     Icon(
                                         imageVector = Icons.Filled.Remove,
@@ -210,7 +213,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "${cakeCart.value.sumOf { item -> item.count * (item.item.price ?: 0.0) }}",
+                        text = "${cakeCart.toList().sumOf { item -> item.second * (item.first.price ?: 0.0) }}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W700,
                         color = MaterialTheme.colorScheme.primary

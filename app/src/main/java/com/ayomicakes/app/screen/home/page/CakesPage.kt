@@ -86,7 +86,9 @@ fun CakeContent(cakeItem: CakeItem, homeViewModel: HomeViewModel = hiltViewModel
                     }
                     FilledIconButton(
                         modifier = Modifier.padding(start = 4.dp),
-                        onClick = { homeViewModel.cakesCart.value.add(CartItem(1, cakeItem)) }
+                        onClick = {
+                            homeViewModel.addToCart(1, cartItem = cakeItem)
+                        }
                     ) {
                         Icon(
                             modifier = Modifier.size(14.dp),

@@ -34,7 +34,7 @@ fun MainScaffold(
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    val cartCount by remember { homeViewModel.cakesCart }
+    val cartCount by homeViewModel.cakesCart.collectAsState( null)
     val scope = rememberCoroutineScope()
     val toolbarTitle by homeViewModel.toolbarTitle.collectAsState()
     val selectedItem = homeViewModel.selectedItems
@@ -73,7 +73,7 @@ fun MainScaffold(
             }, trailingIcons = {
                 if (navController.currentDestination?.parent?.route == Navigation.HOME) {
                     BadgedBox(badge = {
-                        if (cartCount.size != 0) {
+                        if (cartCount?.size != 0) {
                             Badge { Text("8") }
                         }
                     }) {
@@ -87,10 +87,6 @@ fun MainScaffold(
             }, trailingOnActions = {
                 if (navController.currentDestination?.parent?.route == Navigation.HOME) {
                     navController.navigate(HomePageNavigation.CART_PAGE) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
                         restoreState = true
                     }
                 }

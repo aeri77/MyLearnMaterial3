@@ -8,6 +8,7 @@ package com.ayomicakes.app.component
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -36,6 +38,7 @@ import com.ayomicakes.app.screen.home.page.ShopsPage
 import com.ayomicakes.app.screen.landing.Landing
 import com.ayomicakes.app.screen.onboarding.OnBoarding
 import com.ayomicakes.app.screen.register.RegisterForm
+import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
@@ -51,9 +54,10 @@ fun MainAnimatedHost(
     val items = homeViewModel.items
     val selectedItem = remember { homeViewModel.selectedItems }
     Surface(
-        modifier = androidx.compose.ui.Modifier
+        modifier = Modifier
             .padding(paddingValues)
-            .fillMaxSize()
+            .fillMaxSize(),
+        color = Primary95
     ) {
         AnimatedNavHost(
             navController = navController,

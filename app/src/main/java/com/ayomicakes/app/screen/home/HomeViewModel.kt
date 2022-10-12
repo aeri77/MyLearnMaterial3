@@ -1,5 +1,6 @@
 package com.ayomicakes.app.screen.home
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -9,6 +10,7 @@ import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.architecture.repository.home.HomeRepository
 import com.ayomicakes.app.architecture.source.CakeSource
 import com.ayomicakes.app.database.model.CakeItem
+import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.responses.FullResponse
 import com.ayomicakes.app.network.services.AyomiCakeServices
@@ -27,6 +29,9 @@ class HomeViewModel @Inject constructor(
     private val locationHelper: LocationHelper,
     private val mainApi: AyomiCakeServices
 ) : MainViewModel(repository, locationHelper) {
+
+
+    val cakesCart = mutableStateOf( arrayListOf<CartItem<CakeItem>>() )
 
     val cakes: Flow<PagingData<CakeItem>> =
         Pager(PagingConfig(pageSize = 4)) {

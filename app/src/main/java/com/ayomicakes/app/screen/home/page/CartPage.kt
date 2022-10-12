@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,21 +28,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.R
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.*
 import timber.log.Timber
 
 @ExperimentalMaterial3Api
 @Composable
-fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
-    mainViewModel.setToolbar(
+fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
+    viewModel.setToolbar(
         isHidden = false,
         isActive = true,
-        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route?.split("_")?.get(0)
+            ?.capitalize(Locale.current) ?: ""
     )
+
+    val cakeCart = remember { viewModel.cakesCart }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Primary95
@@ -62,7 +69,7 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp)
             ) {
-                items(20) {
+                items(cakeCart.value.toList()) { item ->
                     Card(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -94,7 +101,7 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                                     top.linkTo(image.top)
                                 }
                                 .clickable {
-                                    Timber.d("close")
+                                    viewModel.cakesCart.value.remove(item)
                                 }) {
                                 Icon(
                                     modifier = Modifier.size(18.dp),
@@ -111,13 +118,13 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                                 }
                             ) {
                                 Text(
-                                    text = "Cake Name",
+                                    text = item.item.cakeName ?: "",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.W700,
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Text(
-                                    text = "Rp. 20,000", fontSize = 12.sp,
+                                    text = item.item.price.toString() ?: "", fontSize = 12.sp,
                                     fontWeight = FontWeight.W600,
                                     color = NeutralVariant50
                                 )
@@ -131,7 +138,7 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                                     }
                                     .padding(vertical = 12.dp)
                                     .padding(end = 6.dp),
-                                text = "Rp 200,000",
+                                text = "${item.count.toDouble() * (item.item.price ?: 0.0)}",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.W700,
                                 color = NeutralVariant40
@@ -153,16 +160,16 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            Timber.d("close")
+                                            viewModel.cakesCart.value[viewModel.cakesCart.value.indexOf(item)].count++
                                         }) {
                                     Icon(
                                         imageVector = Icons.Filled.Add,
-                                        contentDescription = "add",
+                                        contentDescription = "increment",
                                         tint = NeutralVariant40
                                     )
                                 }
                                 Text(
-                                    text = "10",
+                                    text = item.count.toString(),
                                     fontWeight = W600,
                                     color = NeutralVariant40
                                 )
@@ -170,11 +177,11 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            Timber.d("close")
+                                            viewModel.cakesCart.value[viewModel.cakesCart.value.indexOf(item)].count--
                                         }) {
                                     Icon(
                                         imageVector = Icons.Filled.Remove,
-                                        contentDescription = "add",
+                                        contentDescription = "decrement",
                                         tint = NeutralVariant40
                                     )
                                 }
@@ -203,7 +210,7 @@ fun CartPage(navController: NavHostController, mainViewModel: MainViewModel) {
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "Rp. 200,000",
+                        text = "${cakeCart.value.sumOf { item -> item.count * (item.item.price ?: 0.0) }}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W700,
                         color = MaterialTheme.colorScheme.primary

@@ -1,15 +1,10 @@
 package com.ayomicakes.app.database.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 
-@Entity(tableName = "cakes")
 @kotlinx.serialization.Serializable
 data class CakeItem(
 
-    @PrimaryKey
     @SerialName("uid")
     val uid: String,
 

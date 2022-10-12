@@ -51,6 +51,7 @@ object Deps {
         object Paging {
             val paging by lazy { "androidx.paging:paging-runtime:3.1.1" }
             val pagingCompose by lazy { "androidx.paging:paging-compose:1.0.0-alpha16" }
+            val pagingCommon by lazy {"androidx.paging:paging-common-ktx:3.1.1"}
         }
 
         object Room {

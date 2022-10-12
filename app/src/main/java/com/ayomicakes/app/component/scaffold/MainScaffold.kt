@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
     ExperimentalMaterial3Api::class
 )
 
@@ -10,10 +11,7 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.ShoppingBasket
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -36,6 +34,7 @@ fun MainScaffold(
     homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val cartCount by remember { homeViewModel.cakesCart }
     val scope = rememberCoroutineScope()
     val toolbarTitle by homeViewModel.toolbarTitle.collectAsState()
     val selectedItem = homeViewModel.selectedItems
@@ -73,11 +72,17 @@ fun MainScaffold(
                 }
             }, trailingIcons = {
                 if (navController.currentDestination?.parent?.route == Navigation.HOME) {
-                    Icon(
-                        imageVector = Icons.Outlined.ShoppingBasket,
-                        contentDescription = "cart",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    BadgedBox(badge = {
+                        if (cartCount.size != 0) {
+                            Badge { Text("8") }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ShoppingBasket,
+                            contentDescription = "cart",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }, trailingOnActions = {
                 if (navController.currentDestination?.parent?.route == Navigation.HOME) {
@@ -100,6 +105,6 @@ fun MainScaffold(
                 }
             }
         }) {
-        MainAnimatedHost(it,navController, homeViewModel)
+        MainAnimatedHost(it, navController, homeViewModel)
     }
 }

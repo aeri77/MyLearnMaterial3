@@ -12,6 +12,6 @@ fun Checkout(navController: NavHostController, mainViewModel: MainViewModel = hi
     mainViewModel.setToolbar(
         isHidden = false,
         isActive = false,
-        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route ?: ""
     )
 }

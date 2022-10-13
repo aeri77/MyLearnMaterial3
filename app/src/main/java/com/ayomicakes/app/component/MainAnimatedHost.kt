@@ -14,10 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -160,7 +160,7 @@ fun NavGraphBuilder.homeHost(
             selectedItem.value = items[2]
         }
 
-        composable(CAKES_ITEM){backStackEntry ->
+        composable(CAKES_ITEM) { backStackEntry ->
             CakesPage(navController, backStackEntry.arguments?.getString(CAKES_ID), homeViewModel)
         }
     }

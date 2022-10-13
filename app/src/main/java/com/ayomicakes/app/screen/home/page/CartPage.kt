@@ -43,8 +43,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
     viewModel.setToolbar(
         isHidden = false,
         isActive = true,
-        title = navController.currentDestination?.route?.split("_")?.get(0)
-            ?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route ?: ""
     )
 
     val cakeCart by viewModel.cakesCart.collectAsState()

@@ -35,8 +35,7 @@ fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltV
     viewModel.setToolbar(
         isHidden = false,
         isActive = true,
-        title = navController.currentDestination?.route?.split("-")?.get(0)
-            ?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route ?: ""
     )
     val gridState = rememberLazyGridState()
     Surface(

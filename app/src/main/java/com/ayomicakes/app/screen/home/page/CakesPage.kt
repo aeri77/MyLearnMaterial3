@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -42,7 +44,11 @@ fun CakesPage(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val cakeResponse by homeViewModel.cake.collectAsState(initial = null)
-
+    homeViewModel.setToolbar(
+        isHidden = false,
+        isActive = true,
+        title = navController.currentDestination?.route ?: ""
+    )
     LaunchedEffect(true) {
         homeViewModel.getCakes(UUID.fromString(string))
     }

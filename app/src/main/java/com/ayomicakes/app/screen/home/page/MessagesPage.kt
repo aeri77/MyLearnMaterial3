@@ -11,6 +11,6 @@ fun MessagesPage(navController: NavHostController, mainViewModel: MainViewModel)
     mainViewModel.setToolbar(
         isHidden = false,
         isActive = true,
-        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route ?: ""
     )
 }

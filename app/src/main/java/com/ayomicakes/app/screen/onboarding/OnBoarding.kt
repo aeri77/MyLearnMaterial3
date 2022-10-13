@@ -40,7 +40,7 @@ fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hi
     mainViewModel.setToolbar(
         isHidden = true,
         isActive = false,
-        title = navController.currentDestination?.route?.split("_")?.get(0)?.capitalize(Locale.current) ?: ""
+        title = navController.currentDestination?.route ?: ""
     )
 
     ConstraintLayout(

@@ -31,6 +31,7 @@ import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.component.NoRippleEffect
 import com.ayomicakes.app.component.scaffold.MainScaffold
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.navigation.navigateSingleTopTo
 import com.ayomicakes.app.oauth.GoogleOauth
 import com.ayomicakes.app.screen.home.Screens
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -131,19 +132,7 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
                     selected = item == selectedItem.value,
                     onClick = {
                         scope.launch {
-                            navController.navigate(item.route) {
-                                // Pop up to the start destination of the graph to
-                                // avoid building up a large stack of destinations
-                                // on the back stack as users select items
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
-                                launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
-                                restoreState = true
-                            }
+                            navController.navigateSingleTopTo(item.route)
                             drawerState.close()
                         }
                         selectedItem.value = item

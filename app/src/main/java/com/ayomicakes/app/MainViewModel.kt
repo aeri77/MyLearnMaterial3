@@ -2,6 +2,8 @@ package com.ayomicakes.app
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -120,7 +122,9 @@ open class MainViewModel @Inject constructor(
     fun setToolbar(isHidden: Boolean, isActive: Boolean, title: String) {
         setToolbarHidden(isHidden)
         setSideDrawerActive(isActive)
-        setToolbarTitle(title)
+        setToolbarTitle(
+            title.split("-")[0]
+            .capitalize(Locale.current))
     }
 
     @SuppressLint("MissingPermission")

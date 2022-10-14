@@ -160,11 +160,13 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            viewModel.addToCart(cartItem = item.item)
+                                            if(item.count > 1){
+                                                viewModel.removeFromCart(1, item.item)
+                                            }
                                         }) {
                                     Icon(
-                                        imageVector = Icons.Filled.Add,
-                                        contentDescription = "increment",
+                                        imageVector = Icons.Filled.Remove,
+                                        contentDescription = "decrement",
                                         tint = NeutralVariant40
                                     )
                                 }
@@ -177,13 +179,11 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            if(item.count > 1){
-                                                viewModel.removeFromCart(1, item.item)
-                                            }
+                                            viewModel.addToCart(cartItem = item.item)
                                         }) {
                                     Icon(
-                                        imageVector = Icons.Filled.Remove,
-                                        contentDescription = "decrement",
+                                        imageVector = Icons.Filled.Add,
+                                        contentDescription = "increment",
                                         tint = NeutralVariant40
                                     )
                                 }

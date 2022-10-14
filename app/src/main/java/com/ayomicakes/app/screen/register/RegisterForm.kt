@@ -349,24 +349,24 @@ fun MapScreen(
         userMarker
     )
     LaunchedEffect(position) {
-        cameraPositionState.animate(
-            CameraUpdateFactory.newCameraPosition(
-                CameraPosition.fromLatLngZoom(
-                    position,
-                    12f
-                )
-            )
-        )
+//        cameraPositionState.animate(
+//            CameraUpdateFactory.newCameraPosition(
+////                CameraPosition.fromLatLngZoom(
+////                    position,
+////                    12f
+////                )
+//            )
+//        )
         markerState.position = position
         isInbounds.value = bounds.isInBounds(position)
     }
     val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 400.dp)
-    Crossfade(isInbounds.value) {
-        if (it) {
+//    Crossfade(isInbounds.value) {
+//        if (it) {
             GoogleMap(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(mapHeight),
+                    .height(mapHeight).padding(4.dp).clip(RoundedCornerShape(24.dp)),
                 cameraPositionState = cameraPositionState
             ) {
                 LaunchedEffect(markerState) {
@@ -406,8 +406,8 @@ fun MapScreen(
                 )
             }
         }
-    }
-}
+//    }
+//}
 
 class BoundsLocation(bounds: List<LatLng>) {
     var maxLat: Double

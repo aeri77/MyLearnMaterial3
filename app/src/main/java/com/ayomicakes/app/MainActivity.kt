@@ -16,6 +16,7 @@ import com.ayomicakes.app.component.*
 import com.ayomicakes.app.component.scaffold.MainScaffold
 import com.ayomicakes.app.component.sidedrawer.MainDrawer
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.MyLearnTheme
 import com.ayomicakes.app.ui.theme.Primary95
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity(){
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             systemUiController.setStatusBarColor(Primary95)
             val navController = rememberAnimatedNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
 
 
             when (navController.currentDestination?.route) {
@@ -62,11 +64,11 @@ class MainActivity : ComponentActivity(){
                         }
                     })
                 }
-                else -> {
-                    DefaultBackHandler(backNavElement = ExitDialog {
-
-                    })
-                }
+            }
+            if(navBackStackEntry?.destination?.route == HomePageNavigation.SHOPS_PAGE){
+                DefaultBackHandler(backNavElement = ExitDialog {
+                    finish()
+                })
             }
 
             MainEffect(navController = navController, homeViewModel)

@@ -33,12 +33,18 @@ import com.ayomicakes.app.component.scaffold.MainScaffold
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.navigation.navigateSingleTopTo
 import com.ayomicakes.app.oauth.GoogleOauth
+import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.screen.home.Screens
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewModel(), navController: NavHostController, content : @Composable () -> Unit){
+fun MainDrawer(
+    drawerState: DrawerState,
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    navController: NavHostController,
+    content: @Composable () -> Unit
+) {
 
     val isSideDrawerActive by homeViewModel.isSideDrawerActive.collectAsState()
     val profileStore by homeViewModel.profileStore.observeAsState()
@@ -47,8 +53,10 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val account = GoogleSignIn.getLastSignedInAccount(context)
+    val cartCount by homeViewModel.cakesCart.collectAsState()
 
-    ModalNavigationDrawer(drawerState = drawerState,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
         gesturesEnabled = isSideDrawerActive,
         drawerContent = {
             ConstraintLayout(
@@ -114,7 +122,8 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
             CompositionLocalProvider(
                 LocalRippleTheme provides NoRippleEffect
             ) {
-                NavigationDrawerItem(label = { Text("Navigation") },
+                NavigationDrawerItem(
+                    label = { Text("Navigation") },
                     selected = false,
                     onClick = { /*TODO*/ },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -137,7 +146,14 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
                         }
                         selectedItem.value = item
                     },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    badge = {
+                        if (item.title == Screens.CartPage.title) {
+                            if(cartCount.isNotEmpty()){
+                                Text("${cartCount.size}")
+                            }
+                        }
+                    }
                 )
             }
             Spacer(
@@ -151,7 +167,8 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
             CompositionLocalProvider(
                 LocalRippleTheme provides NoRippleEffect
             ) {
-                NavigationDrawerItem(label = { Text("Other") },
+                NavigationDrawerItem(
+                    label = { Text("Other") },
                     selected = false,
                     onClick = { },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
@@ -169,7 +186,7 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
                     scope.launch {
                         drawerState.close()
                     }
-                    if(account != null){
+                    if (account != null) {
                         GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
                             homeViewModel.clearStore()
                             return@addOnSuccessListener
@@ -196,5 +213,5 @@ fun MainDrawer(drawerState: DrawerState,homeViewModel: MainViewModel = hiltViewM
             }
         },
         content = content
-        )
+    )
 }

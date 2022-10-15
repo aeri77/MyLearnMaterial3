@@ -29,6 +29,7 @@ fun SetAddressDialog(onDismissRequest: () -> Unit) {
     ) {
 
         var mapShow by remember { mutableStateOf(false) }
+        var bounded by remember {mutableStateOf(false)}
 
         Card() {
             Column(
@@ -36,7 +37,11 @@ fun SetAddressDialog(onDismissRequest: () -> Unit) {
             ) {
                 Crossfade(mapShow) {
                     if(it){
-                        MapScreen()
+                        MapScreen(
+                            isBound = { isBound ->
+                                bounded = isBound
+                            }
+                        )
                     } else {
                         Box(
                             modifier = Modifier
@@ -54,6 +59,7 @@ fun SetAddressDialog(onDismissRequest: () -> Unit) {
                         }
                     }
                 }
+                Text("Apakah di luar jangkauan : $bounded")
                 Text("Pilih alamat tersimpan")
                 LazyRow(modifier = Modifier.fillMaxWidth()) {
                     item(20) {

@@ -72,8 +72,6 @@ object Deps {
     object Google {
         val protobuf by lazy { "com.google.protobuf:protobuf-javalite:${Versions.Google.javaLiteVersion}" }
         val crypto by lazy { "com.google.crypto.tink:tink-android:1.6.1" }
-        val mapsCompose by lazy { "com.google.maps.android:maps-compose:2.5.3" }
-        val maps by lazy { "com.google.android.gms:play-services-maps:${Versions.Google.playServices}" }
         val safetyNet by lazy { "com.google.android.gms:play-services-safetynet:18.0.1" }
         val locationServices by lazy { "com.google.android.gms:play-services-location:20.0.0" }
         val auth by lazy { "com.google.android.gms:play-services-auth:20.3.0" }
@@ -81,6 +79,11 @@ object Deps {
         object Firebase {
             val bom by lazy { "com.google.firebase:firebase-bom:30.4.1" }
             val analytic by lazy { "com.google.firebase:firebase-analytics-ktx" }
+        }
+        object Map {
+            val mapsUtil by lazy {  "com.google.maps.android:android-maps-utils:2.3.0" }
+            val mapsCompose by lazy { "com.google.maps.android:maps-compose:2.5.3" }
+            val maps by lazy { "com.google.android.gms:play-services-maps:${Versions.Google.playServices}" }
         }
     }
 

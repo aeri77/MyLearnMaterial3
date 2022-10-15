@@ -9,14 +9,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoMode
 import androidx.compose.material3.*
@@ -38,17 +35,16 @@ import com.ayomicakes.app.screen.register.MapConfig.GAP
 import com.ayomicakes.app.screen.register.MapConfig.getBogorBound
 import com.ayomicakes.app.screen.register.component.AddressForm
 import com.ayomicakes.app.screen.register.component.UserForm
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.ayomicakes.app.utils.Result
+import com.google.maps.android.PolyUtil
 
 @ExperimentalPermissionsApi
 @Composable
@@ -76,8 +72,9 @@ fun RegisterForm(
                 popUpTo(0)
             }
         }
-        if(registerResponse is Result.Error){
-            Toast.makeText(context, (registerResponse as Result.Error).error, Toast.LENGTH_SHORT).show()
+        if (registerResponse is Result.Error) {
+            Toast.makeText(context, (registerResponse as Result.Error).error, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -200,7 +197,7 @@ fun RegisterForm(
         item {
             Box(modifier = Modifier.padding(28.dp)) {
                 Crossfade(targetState = registerResponse) {
-                    if(it is Result.Loading){
+                    if (it is Result.Loading) {
                         CircularProgressIndicator()
                         return@Crossfade
                     }
@@ -278,7 +275,6 @@ object MapConfig {
             LatLng(-6.6074131568270404, 106.77997123420366),
             LatLng(-6.607654310132612, 106.77523730024564),
             LatLng(-6.6002990814378055, 106.77402347102566),
-            LatLng(-6.606810273048727, 106.77560144901165),
             LatLng(-6.6002990814378055, 106.77390208810365),
             LatLng(-6.5953553417316195, 106.76928953706764),
             LatLng(-6.5952347620980944, 106.76649772986164),
@@ -334,9 +330,9 @@ object MapConfig {
 fun MapScreen(
     mainViewModel: MainViewModel = hiltViewModel(),
     defaultLoc: LatLng = LatLng(-6.598268, 106.799374),
-    position: LatLng = defaultLoc,
     viewModel: RegisterViewModel = hiltViewModel(),
-    isMapExpanded: Boolean = false
+    isMapExpanded: Boolean = false,
+    isBound: (Boolean) -> Unit = {}
 ) {
     val cameraPositionState = rememberCameraPositionState {
         this.position = CameraPosition.fromLatLngZoom(defaultLoc, 12f)
@@ -348,7 +344,7 @@ fun MapScreen(
     val markerState = rememberMarkerState(
         userMarker
     )
-    LaunchedEffect(position) {
+    LaunchedEffect(cameraPositionState.position.target) {
 //        cameraPositionState.animate(
 //            CameraUpdateFactory.newCameraPosition(
 ////                CameraPosition.fromLatLngZoom(
@@ -356,82 +352,65 @@ fun MapScreen(
 ////                    12f
 ////                )
 //            )
-//        )
-        markerState.position = position
-        isInbounds.value = bounds.isInBounds(position)
+//
+        markerState.position = cameraPositionState.position.target
     }
+    isBound(bounds.isInBounds(cameraPositionState.position.target))
     val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 400.dp)
 //    Crossfade(isInbounds.value) {
 //        if (it) {
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(mapHeight).padding(4.dp).clip(RoundedCornerShape(24.dp)),
-                cameraPositionState = cameraPositionState
-            ) {
-                LaunchedEffect(markerState) {
-                    markerState.showInfoWindow()
-                }
-
-                MarkerInfoWindow(
-                    visible = true,
-                    state = markerState,
-                    content = {
-                        ElevatedButton(
-                            elevation = ButtonDefaults.buttonElevation(8.dp),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(40.dp))
-                                .padding(12.dp), onClick = {},
-                            colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Text("Set Location", color = MaterialTheme.colorScheme.onPrimary)
-                        }
-                    }, onInfoWindowClick = {
-                        viewModel.getAddressByLatLng(context, position)
-                    }
-                )
-                Polygon(
-                    points = getBogorBound(),
-                    strokeColor = Color(
-                        182,
-                        115,
-                        135
-                    ),
-                    strokePattern = listOf(
-                        GAP, DOT
-                    )
-                )
-            }
+    GoogleMap(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(mapHeight)
+            .padding(4.dp)
+            .clip(RoundedCornerShape(24.dp)),
+        cameraPositionState = cameraPositionState
+    ) {
+        LaunchedEffect(markerState) {
+            markerState.showInfoWindow()
         }
+
+        MarkerInfoWindow(
+            visible = true,
+            state = markerState,
+            content = {
+                ElevatedButton(
+                    elevation = ButtonDefaults.buttonElevation(8.dp),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(40.dp))
+                        .padding(12.dp), onClick = {},
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text("Set Location", color = MaterialTheme.colorScheme.onPrimary)
+                }
+            }, onInfoWindowClick = {
+                viewModel.getAddressByLatLng(context, cameraPositionState.position.target)
+            }
+        )
+        Polygon(
+            points = getBogorBound(),
+            geodesic = true,
+            fillColor = Color.Transparent,
+            strokeColor = Color(
+                182,
+                115,
+                135
+            ),
+            strokePattern = listOf(
+                GAP, DOT
+            )
+        )
+    }
+}
 //    }
 //}
 
-class BoundsLocation(bounds: List<LatLng>) {
-    var maxLat: Double
-    var minLat: Double
-    var maxLng: Double
-    var minLng: Double
-
-    init {
-        val listLat = bounds.map {
-            it.latitude
-        }
-        val listLng = bounds.map {
-            it.longitude
-        }
-        maxLat = listLat.max()
-        minLat = listLat.min()
-        maxLng = listLng.max()
-        minLng = listLng.min()
-    }
-
+class BoundsLocation(private val bounds: List<LatLng>) {
     fun isInBounds(position: LatLng): Boolean {
-        return position.latitude < maxLat
-                && position.longitude > minLat
-                && position.longitude < maxLng
-                && position.longitude > minLng
+        return PolyUtil.containsLocation(position.latitude,position.longitude, bounds, true)
     }
 }

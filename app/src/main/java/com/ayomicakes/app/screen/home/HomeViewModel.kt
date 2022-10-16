@@ -36,6 +36,8 @@ class HomeViewModel @Inject constructor(
         }.flow.cachedIn(viewModelScope)
     private val _cake = MutableSharedFlow<com.ayomicakes.app.utils.Result<FullResponse<CakeItem>>>()
     val cake = _cake.asSharedFlow()
+
+    val getUserAddress = repository.getProfileStore()
     fun getCakes(uuid: UUID) {
         viewModelScope.launch {
             repository.getCakes(uuid).collectLatest {

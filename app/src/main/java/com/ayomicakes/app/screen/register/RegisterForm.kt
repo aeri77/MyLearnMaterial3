@@ -4,6 +4,8 @@
 
 package com.ayomicakes.app.screen.register
 
+import android.location.Address
+import android.location.Geocoder
 import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -26,6 +28,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.ayomicakes.app.MainViewModel
@@ -35,6 +38,7 @@ import com.ayomicakes.app.screen.register.MapConfig.GAP
 import com.ayomicakes.app.screen.register.MapConfig.getBogorBound
 import com.ayomicakes.app.screen.register.component.AddressForm
 import com.ayomicakes.app.screen.register.component.UserForm
+import com.ayomicakes.app.utils.MapUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -44,6 +48,8 @@ import com.google.maps.android.compose.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import com.ayomicakes.app.utils.Result
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener
 import com.google.maps.android.PolyUtil
 
 @ExperimentalPermissionsApi
@@ -328,44 +334,73 @@ object MapConfig {
 
 @Composable
 fun MapScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
-    defaultLoc: LatLng = LatLng(-6.598268, 106.799374),
-    viewModel: RegisterViewModel = hiltViewModel(),
+    defaultLoc: LatLng?,
     isMapExpanded: Boolean = false,
-    isBound: (Boolean) -> Unit = {}
+    isBound: (Boolean) -> Unit = {},
+    addressResult: (List<Address>?) -> Unit = {}
 ) {
     val cameraPositionState = rememberCameraPositionState {
-        this.position = CameraPosition.fromLatLngZoom(defaultLoc, 12f)
+        this.position = CameraPosition.fromLatLngZoom(LatLng(-6.598268, 106.799374), 16f)
+    }
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                compassEnabled = true,
+                zoomControlsEnabled = true,
+                myLocationButtonEnabled = true
+            )
+        )
+    }
+    val properties by remember {
+        mutableStateOf(MapProperties(isMyLocationEnabled = true))
     }
     val context = LocalContext.current
     val userMarker = "user_marker"
     val bounds = BoundsLocation(getBogorBound())
-    val isInbounds = remember { mutableStateOf(false) }
     val markerState = rememberMarkerState(
         userMarker
     )
-    LaunchedEffect(cameraPositionState.position.target) {
-//        cameraPositionState.animate(
-//            CameraUpdateFactory.newCameraPosition(
-////                CameraPosition.fromLatLngZoom(
-////                    position,
-////                    12f
-////                )
-//            )
-//
-        markerState.position = cameraPositionState.position.target
+    LaunchedEffect(defaultLoc) {
+        if(defaultLoc != null){
+            cameraPositionState.animate(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.fromLatLngZoom(
+                        defaultLoc,
+                        16f
+                    )
+                )
+            )
+        }
     }
-    isBound(bounds.isInBounds(cameraPositionState.position.target))
-    val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 400.dp)
-//    Crossfade(isInbounds.value) {
-//        if (it) {
+    LaunchedEffect(cameraPositionState.position.target) {
+        markerState.position = cameraPositionState.position.target
+        isBound(bounds.isInBounds(cameraPositionState.position.target))
+    }
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (!cameraPositionState.isMoving) {
+            try{
+                addressResult(
+                    MapUtils.getLocationByLatLng(
+                        cameraPositionState.position.target,
+                        context
+                    )
+                )
+            } catch (_: Exception){
+
+            }
+        }
+    }
+
+    val mapHeight by animateDpAsState(targetValue = if (isMapExpanded) 800.dp else 300.dp)
     GoogleMap(
         modifier = Modifier
             .fillMaxWidth()
             .height(mapHeight)
             .padding(4.dp)
             .clip(RoundedCornerShape(24.dp)),
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        uiSettings = uiSettings,
+        properties = properties
     ) {
         LaunchedEffect(markerState) {
             markerState.showInfoWindow()
@@ -385,10 +420,15 @@ fun MapScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
-                    Text("Set Location", color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Pilih lokasi ini", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp)
                 }
             }, onInfoWindowClick = {
-                viewModel.getAddressByLatLng(context, cameraPositionState.position.target)
+                addressResult(
+                    MapUtils.getLocationByLatLng(
+                        cameraPositionState.position.target,
+                        context
+                    )
+                )
             }
         )
         Polygon(
@@ -406,11 +446,9 @@ fun MapScreen(
         )
     }
 }
-//    }
-//}
 
 class BoundsLocation(private val bounds: List<LatLng>) {
     fun isInBounds(position: LatLng): Boolean {
-        return PolyUtil.containsLocation(position.latitude,position.longitude, bounds, true)
+        return PolyUtil.containsLocation(position.latitude, position.longitude, bounds, true)
     }
 }

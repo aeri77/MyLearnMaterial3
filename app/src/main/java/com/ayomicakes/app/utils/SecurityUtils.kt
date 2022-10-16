@@ -9,7 +9,7 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
 
-class SecurityUtil
+class SecurityUtils
 @Inject
 constructor() {
     private val provider = "AndroidKeyStore"

@@ -102,6 +102,7 @@ dependencies {
     implementation(Deps.SquareUp.httpLogging)
     implementation(Deps.JakeWharton.timber)
     implementation(Deps.JakeWharton.serializerConverter)
+    implementation(Deps.ChrisBane.snapper)
     implementation(Deps.Google.protobuf)
     implementation(Deps.Google.crypto)
     implementation(Deps.Google.Map.mapsCompose)

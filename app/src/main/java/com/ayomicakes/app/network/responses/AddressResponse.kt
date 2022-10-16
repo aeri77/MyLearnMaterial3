@@ -37,5 +37,10 @@ data class AddressResponse(
     val latitude: Double? = null,
 
     @SerialName("longitude")
-    val longitude: Double? = null
-)
+    val longitude: Double? = null,
+
+    @SerialName("phoneNumber")
+    val phone: String? = null,
+
+
+    )

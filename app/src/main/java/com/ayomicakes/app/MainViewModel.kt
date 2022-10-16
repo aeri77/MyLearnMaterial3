@@ -9,7 +9,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.repository.auth.AuthRepository
-import com.ayomicakes.app.architecture.repository.base.BaseRepository
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.helper.LocationHelper
@@ -21,24 +20,23 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.ayomicakes.app.utils.Result
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 @HiltViewModel
 open class MainViewModel @Inject constructor(
-    private val repository: AuthRepository ,
+    private val repository: AuthRepository,
     private var locationHelper: LocationHelper
 ) : ViewModel() {
 
     val isToolbarHidden = MutableStateFlow(true)
     val isSideDrawerActive = MutableStateFlow(false)
     val toolbarTitle = MutableStateFlow("")
-    private var location: MutableSharedFlow<LatLng> = MutableSharedFlow()
+    private var _location: MutableSharedFlow<LatLng> = MutableSharedFlow()
+    val location: SharedFlow<LatLng> = _location.asSharedFlow()
     private val _userStore = MutableLiveData<UserStore>()
     private val _profileStore = MutableLiveData<ProfileStore>()
     val isAuthenticated = MutableStateFlow(false)
@@ -51,7 +49,7 @@ open class MainViewModel @Inject constructor(
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
             viewModelScope.launch {
-                location.emit(
+                _location.emit(
                     LatLng(
                         result.lastLocation?.latitude ?: 0.0,
                         result.lastLocation?.longitude ?: 0.0
@@ -124,7 +122,8 @@ open class MainViewModel @Inject constructor(
         setSideDrawerActive(isActive)
         setToolbarTitle(
             title.split("-")[0]
-            .capitalize(Locale.current))
+                .capitalize(Locale.current)
+        )
     }
 
     @SuppressLint("MissingPermission")
@@ -144,6 +143,20 @@ open class MainViewModel @Inject constructor(
                         repository.updateUserStore(it.data.result)
                     }
                 }
+        }
+    }
+
+    fun getLocation() {
+        locationHelper.fusedLocationClient?.lastLocation?.addOnSuccessListener { result ->
+            viewModelScope.launch {
+                Timber.d("location result :$result")
+                _location.emit(
+                    LatLng(
+                        result.latitude,
+                        result.longitude
+                    )
+                )
+            }
         }
     }
 

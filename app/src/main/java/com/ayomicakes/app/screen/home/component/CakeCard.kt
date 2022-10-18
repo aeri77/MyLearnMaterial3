@@ -28,7 +28,7 @@ import com.ayomicakes.app.database.model.CakeItem
 import com.ayomicakes.app.screen.home.HomePageNavigation
 
 @Composable
-fun CakeCard(navController: NavHostController, cakeItem: CakeItem?) {
+fun CakeCard(cakeItem: CakeItem?, onClicked : () -> Unit) {
     Box(
         Modifier
             .width(240.dp)
@@ -39,13 +39,7 @@ fun CakeCard(navController: NavHostController, cakeItem: CakeItem?) {
                 .fillMaxSize()
                 .padding(12.dp)
                 .clickable {
-                    if(cakeItem != null){
-                        navController.navigate(
-                            "${HomePageNavigation.CAKES_PAGE}/${
-                                cakeItem.uid
-                            }"
-                        )
-                    }
+                   onClicked()
                 },
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(

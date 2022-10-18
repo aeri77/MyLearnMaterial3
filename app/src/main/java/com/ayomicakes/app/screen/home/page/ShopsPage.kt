@@ -24,19 +24,22 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ayomicakes.app.database.model.CakeItem
+import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomeViewModel
+import com.ayomicakes.app.screen.home.Screens
 import com.ayomicakes.app.screen.home.component.CakeList
 import com.ayomicakes.app.ui.theme.*
 
 @ExperimentalMaterial3Api
 @ExperimentalFoundationApi
 @Composable
-fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
-    viewModel.setToolbar(
-        isHidden = false,
-        isActive = true,
-        title = navController.currentDestination?.route ?: ""
-    )
+fun ShopsPage(viewModel: HomeViewModel = hiltViewModel(), onItemClicked : (CakeItem?) -> Unit) {
+//    viewModel.setToolbar(
+//        isHidden = false,
+//        isActive = true,
+//        title = navController.currentDestination?.route ?: ""
+//    )
     val gridState = rememberLazyGridState()
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -143,9 +146,10 @@ fun ShopsPage(navController: NavHostController, viewModel: HomeViewModel = hiltV
             item {
                 CakeList(
                     gridState = gridState,
-                    navController = navController,
                     lazyCakeItems = viewModel.cakes.collectAsLazyPagingItems()
-                )
+                ){ cake ->
+                    onItemClicked(cake)
+                }
             }
         }
     }

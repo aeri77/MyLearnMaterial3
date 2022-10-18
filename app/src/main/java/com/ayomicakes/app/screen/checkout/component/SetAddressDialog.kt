@@ -45,10 +45,10 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 fun SetAddressDialog(
     viewModel: HomeViewModel = hiltViewModel(),
     onSave: (ReceiverAddress) -> Unit,
-    onDismiss : (Boolean) -> Unit
+    onDismiss: (Boolean) -> Unit
 ) {
     Dialog(
-        onDismissRequest = {  }
+        onDismissRequest = { }
     ) {
 
         val profileStore by viewModel.getUserAddress.collectAsState(initial = null)
@@ -56,7 +56,11 @@ fun SetAddressDialog(
         var mapShow by remember { mutableStateOf(false) }
         var bounded by remember { mutableStateOf(false) }
         var receiverName by remember { mutableStateOf(profileStore?.fullName ?: "") }
-        var receiverPhone by remember { mutableStateOf(profileStore?.addresses?.get(0)?.phone ?: "") }
+        var receiverPhone by remember {
+            mutableStateOf(
+                profileStore?.addresses?.get(0)?.phone ?: ""
+            )
+        }
         var addressRes by remember { mutableStateOf("") }
 
         val location by viewModel.location.collectAsState(initial = null)
@@ -73,7 +77,9 @@ fun SetAddressDialog(
                 mapShow = true
             }
         }
-        Card {
+        Card(
+            modifier = Modifier.padding(vertical = 12.dp)
+        ) {
             Column {
                 Box() {
                     Crossfade(mapShow) {
@@ -229,7 +235,7 @@ fun SetAddressDialog(
                                 items(profileStore?.addresses!!) { item ->
                                     Chip(onClick = {
                                         addressRes = item.address
-                                        receiverPhone = item.phone ?:""
+                                        receiverPhone = item.phone ?: ""
                                     }) {
                                         Text(item.subAdminArea, fontSize = 12.sp)
                                     }

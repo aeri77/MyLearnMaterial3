@@ -55,11 +55,6 @@ fun SignUp(
 
 
     systemUiController.setStatusBarColor(mainColor)
-//    mainViewModel.setToolbar(
-//        isHidden = false,
-//        isActive = false,
-//        title = navController.currentDestination?.route ?: ""
-//    )
 
     LaunchedEffect(captchaToken) {
         if (captchaToken?.isNotBlank() == true) {
@@ -73,6 +68,7 @@ fun SignUp(
         }
     }
     LaunchedEffect(userStore) {
+        Timber.d("userstore sign up :$userStore")
         if (userStore != null) {
             if (userStore?.userId != null) {
                 if (userStore?.userId?.toString()?.isNotBlank() == true) {

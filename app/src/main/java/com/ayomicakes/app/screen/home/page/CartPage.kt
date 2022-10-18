@@ -39,12 +39,12 @@ import com.ayomicakes.app.ui.theme.*
 
 @ExperimentalMaterial3Api
 @Composable
-fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltViewModel()) {
-    viewModel.setToolbar(
-        isHidden = false,
-        isActive = true,
-        title = navController.currentDestination?.route ?: ""
-    )
+fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: () -> Unit) {
+//    viewModel.setToolbar(
+//        isHidden = false,
+//        isActive = true,
+//        title = navController.currentDestination?.route ?: ""
+//    )
 
     val cakeCart by viewModel.cakesCart.collectAsState()
 
@@ -218,9 +218,7 @@ fun CartPage(navController: NavHostController, viewModel: HomeViewModel = hiltVi
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-                Button(onClick = {
-                    navController.navigate(Navigation.CHECKOUT)
-                }, shape = RoundedCornerShape(4.dp)) {
+                Button(onClick = onNext, shape = RoundedCornerShape(4.dp)) {
                     Text(text = "CHECKOUT")
                 }
             }

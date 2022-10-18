@@ -25,7 +25,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+open class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
 ) : MainViewModel(
     repository = repository

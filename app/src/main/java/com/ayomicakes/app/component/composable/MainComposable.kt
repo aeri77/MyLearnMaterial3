@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.ayomicakes.app.screen.auth.signin.SignIn
 import com.ayomicakes.app.screen.auth.singup.SignUp
 import com.ayomicakes.app.screen.checkout.Checkout
@@ -53,13 +54,14 @@ fun NavGraphBuilder.onBoardingComposable(
     composable(Navigation.ONBOARD) {
         OnBoarding {
             scope.launch {
-                navController.navigate(Navigation.SIGN_UP)
+                navController.navigate(Navigation.AUTH)
             }
         }
     }
 }
 
 fun NavGraphBuilder.signInComposable(
+    authViewModel: AuthViewModel,
     navController: NavHostController
 ) {
     composable(Navigation.SIGN_IN, enterTransition = {
@@ -72,7 +74,7 @@ fun NavGraphBuilder.signInComposable(
             else -> null
         }
     }) {
-        SignIn(onSuccessSignIn = {
+        SignIn(authViewModel, onSuccessSignIn = {
             navController.navigate(Navigation.HOME) {
                 popUpTo(0)
             }
@@ -82,7 +84,10 @@ fun NavGraphBuilder.signInComposable(
     }
 }
 
-fun NavGraphBuilder.signUpComposable(navController: NavHostController) {
+fun NavGraphBuilder.signUpComposable(
+    authViewModel: AuthViewModel,
+    navController: NavHostController
+) {
     composable(Navigation.SIGN_UP, enterTransition = {
         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
     }, exitTransition = {
@@ -93,7 +98,7 @@ fun NavGraphBuilder.signUpComposable(navController: NavHostController) {
             else -> null
         }
     }) {
-        SignUp(onSuccessSignUp = {
+        SignUp(authViewModel, onSuccessSignUp = {
             navController.navigate(Navigation.REGISTER_FORM) {
                 popUpTo(0)
             }
@@ -103,7 +108,9 @@ fun NavGraphBuilder.signUpComposable(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.registerFormComposable(navController: NavHostController) {
+fun NavGraphBuilder.registerFormComposable(
+    navController: NavHostController
+) {
     composable(Navigation.REGISTER_FORM, enterTransition = {
         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
     }, exitTransition = {
@@ -122,7 +129,9 @@ fun NavGraphBuilder.registerFormComposable(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.checkoutComposable(homeViewModel: HomeViewModel, navController: NavHostController){
+fun NavGraphBuilder.checkoutComposable(
+    homeViewModel: HomeViewModel
+) {
     composable(Navigation.CHECKOUT, enterTransition = {
         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
     }, exitTransition = {

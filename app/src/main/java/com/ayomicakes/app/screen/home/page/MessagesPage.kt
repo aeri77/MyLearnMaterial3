@@ -7,10 +7,10 @@ import androidx.navigation.NavHostController
 import com.ayomicakes.app.MainViewModel
 
 @Composable
-fun MessagesPage(navController: NavHostController, mainViewModel: MainViewModel) {
-    mainViewModel.setToolbar(
-        isHidden = false,
-        isActive = true,
-        title = navController.currentDestination?.route ?: ""
-    )
+fun MessagesPage(mainViewModel: MainViewModel) {
+//    mainViewModel.setToolbar(
+//        isHidden = false,
+//        isActive = true,
+//        title = navController.currentDestination?.route ?: ""
+//    )
 }

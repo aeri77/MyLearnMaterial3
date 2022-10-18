@@ -13,6 +13,7 @@ import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.responses.FullResponse
 import com.ayomicakes.app.network.services.AyomiCakeServices
+import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -26,7 +27,12 @@ class HomeViewModel @Inject constructor(
     private val repository: HomeRepository,
     private val locationHelper: LocationHelper,
     private val mainApi: AyomiCakeServices
-) : MainViewModel(repository) {
+) : AuthViewModel(repository) {
+
+
+    val screens = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
+    private val _selectedScreens = MutableStateFlow(screens[0])
+    val selectedScreens = _selectedScreens.asStateFlow()
 
     private var _location: MutableSharedFlow<LatLng> = MutableSharedFlow()
     val location: SharedFlow<LatLng> = _location.asSharedFlow()
@@ -87,6 +93,12 @@ class HomeViewModel @Inject constructor(
                     )
                 )
             }
+        }
+    }
+
+    fun setSelectedScreen(screens: Screens){
+        viewModelScope.launch {
+            _selectedScreens.emit(screens)
         }
     }
 }

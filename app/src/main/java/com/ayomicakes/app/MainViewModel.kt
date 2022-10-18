@@ -1,6 +1,5 @@
 package com.ayomicakes.app
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
 import androidx.lifecycle.LiveData
@@ -30,14 +29,12 @@ open class MainViewModel @Inject constructor(
 
     val isToolbarHidden = MutableStateFlow(true)
     val isSideDrawerActive = MutableStateFlow(false)
-    val toolbarTitle = MutableStateFlow("")
+    val toolbarTitle: MutableStateFlow<String?> = MutableStateFlow(null)
     private val _userStore = MutableLiveData<UserStore>()
     private val _profileStore = MutableLiveData<ProfileStore>()
     val isAuthenticated = MutableStateFlow(false)
     val userStore: LiveData<UserStore> = _userStore
     val profileStore: LiveData<ProfileStore> = _profileStore
-    val items = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
-    val selectedItems = mutableStateOf(items[0])
 
 //    val locationCallback: LocationCallback = object : LocationCallback() {
 //        override fun onLocationResult(result: LocationResult) {
@@ -105,18 +102,18 @@ open class MainViewModel @Inject constructor(
         }
     }
 
-    fun setToolbarTitle(title: String) {
+    fun setToolbarTitle(title: String?) {
         viewModelScope.launch {
-            toolbarTitle.value = title
+            toolbarTitle.value = title ?: ""
         }
     }
 
-    fun setToolbar(isHidden: Boolean, isActive: Boolean, title: String) {
+    fun setToolbar(isHidden: Boolean, isActive: Boolean, title: String?) {
         setToolbarHidden(isHidden)
         setSideDrawerActive(isActive)
         setToolbarTitle(
-            title.split("-")[0]
-                .capitalize(Locale.current)
+            title?.split("-")?.get(0)
+                ?.capitalize(Locale.current)
         )
     }
 //

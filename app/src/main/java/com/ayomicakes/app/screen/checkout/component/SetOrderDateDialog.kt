@@ -108,7 +108,7 @@ fun SetOrderDateDialog(
                             }) {
                                 Column(
                                     modifier = Modifier.padding(8.dp)
-                                    .width(52.dp),
+                                    .padding(horizontal = 14.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(

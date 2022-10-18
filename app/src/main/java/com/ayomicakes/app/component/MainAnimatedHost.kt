@@ -1,6 +1,7 @@
 @file:OptIn(
     ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalPagerApi::class, ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class
+    ExperimentalFoundationApi::class, ExperimentalAnimationApi::class,
+    ExperimentalAnimationApi::class, ExperimentalAnimationApi::class
 )
 
 package com.ayomicakes.app.component
@@ -18,7 +19,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import com.ayomicakes.app.component.composable.registerFormComposable
+import com.ayomicakes.app.component.composable.signInComposable
+import com.ayomicakes.app.component.composable.signUpComposable
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomePageNavigation.CAKES_ID
 import com.ayomicakes.app.screen.home.HomePageNavigation.CAKES_ITEM
@@ -31,8 +36,6 @@ import com.ayomicakes.app.screen.home.page.ShopsPage
 import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @Composable
 fun MainAnimatedHost(
@@ -51,9 +54,7 @@ fun MainAnimatedHost(
 
 fun NavGraphBuilder.homeHost(
     navController: NavHostController,
-    homeViewModel: HomeViewModel,
-    selectedItem: MutableState<Screens>,
-    items: List<Screens>
+    homeViewModel: HomeViewModel
 ) {
     navigation(
         startDestination = HomePageNavigation.SHOPS_PAGE,
@@ -64,14 +65,24 @@ fun NavGraphBuilder.homeHost(
             enterTransition = {
                 slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
             }) {
-            ShopsPage(navController = navController, homeViewModel)
-            selectedItem.value = items[0]
+            ShopsPage(homeViewModel) { cake ->
+                if (cake != null) {
+                    navController.navigate(
+                        "${HomePageNavigation.CAKES_PAGE}/${
+                            cake.uid
+                        }"
+                    )
+                }
+            }
+            homeViewModel.setSelectedScreen(Screens.ShopsPage)
         }
         composable(HomePageNavigation.CART_PAGE, enterTransition = {
             slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
         }) {
-            CartPage(navController, homeViewModel)
-            selectedItem.value = items[1]
+            CartPage(homeViewModel) {
+                navController.navigate(Navigation.CHECKOUT)
+            }
+            homeViewModel.setSelectedScreen(Screens.CartPage)
         }
 
         composable(
@@ -87,12 +98,26 @@ fun NavGraphBuilder.homeHost(
                     else -> null
                 }
             }) {
-            MessagesPage(navController, homeViewModel)
-            selectedItem.value = items[2]
+            MessagesPage(homeViewModel)
+            homeViewModel.setSelectedScreen(Screens.MessagesPage)
         }
 
         composable(CAKES_ITEM) { backStackEntry ->
-            CakesPage(navController, backStackEntry.arguments?.getString(CAKES_ID), homeViewModel)
+            CakesPage(backStackEntry.arguments?.getString(CAKES_ID), homeViewModel)
         }
+    }
+}
+
+fun NavGraphBuilder.authHost(
+    authViewModel: AuthViewModel,
+    navController: NavHostController
+) {
+    navigation(
+        startDestination = Navigation.SIGN_UP,
+        route = Navigation.AUTH
+    ) {
+        signInComposable(authViewModel, navController)
+        signUpComposable(authViewModel, navController)
+        registerFormComposable(navController)
     }
 }

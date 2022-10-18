@@ -5,26 +5,17 @@
 
 package com.ayomicakes.app.component.scaffold
 
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ShoppingBasket
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.ayomicakes.app.component.AppBar
 import com.ayomicakes.app.component.MainAnimatedHost
 import com.ayomicakes.app.component.enums.TopAppBar
-import com.ayomicakes.app.navigation.Navigation
-import com.ayomicakes.app.navigation.navigateSingleTopTo
-import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomeViewModel
 
 @Composable
@@ -42,7 +33,7 @@ fun MainScaffold(
         topBar = {
             if (!isToolbarHidden) {
                 AppBar(
-                    title = toolbarTitle,
+                    title = toolbarTitle ?: "",
                     actions = appBarActions,
                     onActions = onActions,
                     trailingIcons = trailingIcons,

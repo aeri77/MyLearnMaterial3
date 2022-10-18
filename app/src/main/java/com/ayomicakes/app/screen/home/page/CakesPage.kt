@@ -39,16 +39,11 @@ import java.util.*
 
 @Composable
 fun CakesPage(
-    navController: NavHostController,
     string: String?,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val cakeResponse by homeViewModel.cake.collectAsState(initial = null)
-    homeViewModel.setToolbar(
-        isHidden = false,
-        isActive = true,
-        title = navController.currentDestination?.route ?: ""
-    )
+
     LaunchedEffect(true) {
         homeViewModel.getCakes(UUID.fromString(string))
     }

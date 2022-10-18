@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.ayomicakes.app.database.model.CakeItem
+import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -33,8 +34,8 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 @Composable
 fun CakeList(
     gridState: LazyGridState,
-    navController: NavHostController,
-    lazyCakeItems: LazyPagingItems<CakeItem>
+    lazyCakeItems: LazyPagingItems<CakeItem>,
+    onCakeClick : (CakeItem?) -> Unit
 ) {
     val configuration = LocalConfiguration.current
     val refreshState = rememberSwipeRefreshState(isRefreshing = false)
@@ -53,7 +54,9 @@ fun CakeList(
                 .background(Primary95), columns = GridCells.Fixed(2)
         ) {
             items(lazyCakeItems.itemCount) { item ->
-                CakeCard(navController, cakeItem = lazyCakeItems[item])
+                CakeCard(cakeItem = lazyCakeItems[item]){
+                    onCakeClick(lazyCakeItems[item])
+                }
             }
             lazyCakeItems.apply {
                 when {

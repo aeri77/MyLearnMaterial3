@@ -41,8 +41,8 @@ fun MainDrawer(
 
     val isSideDrawerActive by homeViewModel.isSideDrawerActive.collectAsState()
     val profileStore by homeViewModel.profileStore.observeAsState()
-    val items = homeViewModel.items
-    val selectedItem = remember { homeViewModel.selectedItems }
+    val items = homeViewModel.screens
+    val selectedItem by homeViewModel.selectedScreens.collectAsState()
     val cartCount by homeViewModel.cakesCart.collectAsState()
 
     ModalNavigationDrawer(
@@ -128,10 +128,10 @@ fun MainDrawer(
                     )
                 },
                     label = { Text(item.title) },
-                    selected = item == selectedItem.value,
+                    selected = item == selectedItem,
                     onClick = {
                         onSelectedDrawer(item)
-                        selectedItem.value = item
+                        homeViewModel.setSelectedScreen(item)
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     badge = {

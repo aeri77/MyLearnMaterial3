@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -22,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ayomicakes.app.component.*
@@ -33,19 +33,11 @@ import com.ayomicakes.app.component.snackbar.MainSnackBar
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.navigation.navigateSingleTopTo
 import com.ayomicakes.app.oauth.GoogleOauth
-import com.ayomicakes.app.screen.auth.signin.SignIn
-import com.ayomicakes.app.screen.auth.singup.SignUp
-import com.ayomicakes.app.screen.checkout.Checkout
 import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomeViewModel
-import com.ayomicakes.app.screen.landing.Landing
-import com.ayomicakes.app.screen.onboarding.OnBoarding
-import com.ayomicakes.app.screen.onboarding.OnBoardingViewModel
-import com.ayomicakes.app.screen.register.RegisterForm
 import com.ayomicakes.app.ui.theme.MyLearnTheme
 import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -70,22 +62,20 @@ class MainActivity : ComponentActivity() {
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        val accountGoogle = GoogleSignIn.getLastSignedInAccount(this)
-        val signOutGoogle = GoogleOauth.getGoogleLoginAuth(this)
 
         homeViewModel.initUserStore()
         homeViewModel.initProfileStore()
 
         setContent {
-
+            val accountGoogle = GoogleSignIn.getLastSignedInAccount(this)
+            val signOutGoogle = GoogleOauth.getGoogleLoginAuth(this)
             val systemUiController = rememberSystemUiController()
             // icons to mimic drawer destinations
             val isToolbarHidden by homeViewModel.isToolbarHidden.collectAsState()
             val cartCount by homeViewModel.cakesCart.collectAsState(null)
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             systemUiController.setStatusBarColor(Primary95)
-            val selectedItem = homeViewModel.selectedItems
-            val items = homeViewModel.items
+            val selectedScreen by homeViewModel.selectedScreens.collectAsState()
             val navController = rememberAnimatedNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val scope = rememberCoroutineScope()
@@ -96,6 +86,9 @@ class MainActivity : ComponentActivity() {
             ) {
                 finish()
             }
+
+            ConfigureAppBar(homeViewModel, navBackStackEntry)
+
             MainEffect(navController = navController, homeViewModel)
 
             MyLearnTheme {
@@ -123,19 +116,35 @@ class MainActivity : ComponentActivity() {
                     }
                 ) {
                     MainScaffold(isToolbarHidden, homeViewModel, onActions = {
+                        when (navBackStackEntry?.destination?.route) {
+                            selectedScreen.route -> {
+                                scope.launch {
+                                    drawerState.open()
+                                }
+                            }
+                            Navigation.REGISTER_FORM -> {
+                                onBackPressedDispatcher.onBackPressed()
+                            }
+                            else -> {
+                                navController.navigateUp()
+                            }
+                        }
                     }, appBarActions = {
-                        if (navController.currentDestination?.route == selectedItem.value.route) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "Menu",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Filled.ChevronLeft,
-                                contentDescription = "Back",
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                        when (navBackStackEntry?.destination?.route) {
+                            in homeViewModel.screens.map { it.route } -> {
+                                Icon(
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = "Menu",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            else -> {
+                                Icon(
+                                    imageVector = Icons.Filled.ChevronLeft,
+                                    contentDescription = "Back",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }, snackBarHost = {
                         when (navBackStackEntry?.destination?.parent?.route) {
@@ -144,7 +153,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }, trailingIcons = {
-                        if (navController.currentDestination?.parent?.route == Navigation.HOME) {
+                        if (navBackStackEntry?.destination?.parent?.route == Navigation.HOME) {
                             BadgedBox(modifier = Modifier
                                 .align(Alignment.CenterEnd)
                                 .let {
@@ -153,7 +162,7 @@ class MainActivity : ComponentActivity() {
                                     } else it
                                 }
                                 .clickable {
-                                    if (navController.currentDestination?.parent?.route == Navigation.HOME) {
+                                    if (navBackStackEntry?.destination?.parent?.route == Navigation.HOME) {
                                         navController.navigateSingleTopTo(HomePageNavigation.CART_PAGE)
                                     }
                                 }
@@ -178,12 +187,10 @@ class MainActivity : ComponentActivity() {
                             startDestination = Navigation.LANDING
                         ) {
                             landingComposable(accountGoogle, homeViewModel, navController)
+                            authHost(homeViewModel, navController)
                             onBoardingComposable(scope, navController)
-                            signInComposable(navController)
-                            signUpComposable(navController)
-                            registerFormComposable(navController)
-                            checkoutComposable(homeViewModel, navController)
-                            homeHost(navController, homeViewModel, selectedItem, items)
+                            checkoutComposable(homeViewModel)
+                            homeHost(navController, homeViewModel)
                         }
                     }
                 }
@@ -218,6 +225,41 @@ fun MainEffect(navController: NavHostController, homeViewModel: HomeViewModel = 
         }
         if (userStore?.userId != null) {
             homeViewModel.isAuthenticated.emit(true)
+        }
+    }
+}
+
+@Composable
+fun ConfigureAppBar(mainViewModel: MainViewModel, navBackStackEntry: NavBackStackEntry?) {
+    if (navBackStackEntry?.destination?.parent?.route == Navigation.HOME) {
+        mainViewModel.setToolbar(
+            isHidden = false,
+            isActive = true,
+            title = navBackStackEntry.destination.route
+        )
+        return
+    }
+    when (navBackStackEntry?.destination?.route) {
+        Navigation.ONBOARD -> {
+            mainViewModel.setToolbar(
+                isHidden = true,
+                isActive = false,
+                title = navBackStackEntry.destination.route
+            )
+        }
+        Navigation.LANDING -> {
+            mainViewModel.setToolbar(
+                isHidden = true,
+                isActive = false,
+                title = navBackStackEntry.destination.route
+            )
+        }
+        else -> {
+            mainViewModel.setToolbar(
+                isHidden = false,
+                isActive = false,
+                title = navBackStackEntry?.destination?.route
+            )
         }
     }
 }

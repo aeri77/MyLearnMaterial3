@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,9 +38,9 @@ import timber.log.Timber
 @ExperimentalMaterial3Api
 @Composable
 fun SignIn(
-    navController: NavHostController,
     viewModel: AuthViewModel = hiltViewModel(),
-    mainViewModel: MainViewModel = hiltViewModel()
+    onSuccessSignIn: () -> Unit,
+    onSignUp: () -> Unit
 ) {
     val context = LocalContext.current
     val systemUiController = rememberSystemUiController()
@@ -52,14 +53,14 @@ fun SignIn(
     var captchaToken by remember { mutableStateOf<String?>(null) }
     var isCaptchaSuccess by remember { mutableStateOf<Boolean?>(null) }
     val captchaResponse by viewModel.captchaResponse.collectAsState(null)
-    val userStore by viewModel.userStore.collectAsState(null)
+    val userStore by viewModel.userStore.observeAsState(null)
 
     systemUiController.setStatusBarColor(mainColor)
-    mainViewModel.setToolbar(
-        isHidden = false,
-        isActive = false,
-        title = navController.currentDestination?.route ?: ""
-    )
+//    mainViewModel.setToolbar(
+//        isHidden = false,
+//        isActive = false,
+//        title = navController.currentDestination?.route ?: ""
+//    )
 
     LaunchedEffect(captchaToken) {
         if (captchaToken?.isNotBlank() == true) {
@@ -76,9 +77,7 @@ fun SignIn(
         if (userStore != null) {
             if (userStore?.userId != null) {
                 if (userStore?.userId?.toString()?.isNotBlank() == true) {
-                    navController.navigate(HOME) {
-                        popUpTo(0)
-                    }
+                    onSuccessSignIn()
                 }
             }
         }
@@ -123,20 +122,16 @@ fun SignIn(
                     .height(54.dp),
                 onClick = {
                     viewModel.signIn(username.value, password.value)
-                    navController.navigate(HOME) {
-                        popUpTo(0)
-                    }
                 }) {
                 Text(text = "Sign In", fontSize = 16.sp)
             }
             Text("or", fontSize = 16.sp)
             Crossfade(targetState = oauthLoading) {
-                if(!it){
+                if (!it) {
                     SignWithGoogle("Sign In With Google") { authResult ->
                         viewModel.verifyOAuth(authResult?.idToken.toString(), context)
                     }
-                }
-                else CircularProgressIndicator()
+                } else CircularProgressIndicator()
             }
         }
         Row(
@@ -148,7 +143,7 @@ fun SignIn(
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 modifier = Modifier.clickable {
-                    navController.navigateUp()
+                                              onSignUp()
                 },
                 text = "Sign Up", style = TextStyle(
                     textDecoration = TextDecoration.Underline
@@ -162,5 +157,5 @@ fun SignIn(
 @Preview
 @Composable
 fun SignInPreview() {
-    SignIn(rememberNavController())
+    SignIn(onSuccessSignIn = {}, onSignUp = {})
 }

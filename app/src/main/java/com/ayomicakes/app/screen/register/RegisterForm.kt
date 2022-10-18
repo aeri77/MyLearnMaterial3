@@ -55,8 +55,8 @@ import com.google.maps.android.PolyUtil
 @ExperimentalPermissionsApi
 @Composable
 fun RegisterForm(
-    navController: NavHostController,
-    viewModel: RegisterViewModel = hiltViewModel()
+    viewModel: RegisterViewModel = hiltViewModel(),
+    onSuccessRegister: () -> Unit
 ) {
     val systemUiController = rememberSystemUiController()
     val mainColor = MaterialTheme.colorScheme.primary
@@ -74,9 +74,7 @@ fun RegisterForm(
 
     LaunchedEffect(registerResponse) {
         if (registerResponse is Result.Success) {
-            navController.navigate(Navigation.HOME) {
-                popUpTo(0)
-            }
+            onSuccessRegister()
         }
         if (registerResponse is Result.Error) {
             Toast.makeText(context, (registerResponse as Result.Error).error, Toast.LENGTH_SHORT)

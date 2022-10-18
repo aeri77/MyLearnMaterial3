@@ -24,39 +24,34 @@ import androidx.navigation.compose.rememberNavController
 import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.navigation.Navigation
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
 
 @Composable
-fun Landing(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
+fun Landing(
+    account: GoogleSignInAccount?,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    onLandingSuccessful: () -> Unit,
+    onLandingFailed: () -> Unit
+) {
 
     val userStore by mainViewModel.userStore.observeAsState()
-    val context = LocalContext.current
-    mainViewModel.setToolbar(
-        isHidden = true,
-        isActive = false,
-        title = navController.currentDestination?.route ?: ""
-    )
+
+//    mainViewModel.setToolbar(
+//        isHidden = true,
+//        isActive = false,
+//        title = navController.currentDestination?.route ?: ""
+//    )
 
     LaunchedEffect(userStore) {
-        val account = GoogleSignIn.getLastSignedInAccount(context)
         delay(1700)
-        Timber.d(
-            "forward ${
-                userStore?.userId?.toString()?.isNotBlank() == true
-            } || ${account != null}"
-        )
         if (userStore?.userId?.toString()?.isNotBlank() == true || account != null) {
-            navController.navigate(Navigation.HOME) {
-                popUpTo(0)
-            }
+            onLandingSuccessful()
             return@LaunchedEffect
         }
-
-        navController.navigate(Navigation.ONBOARD) {
-            popUpTo(0)
-        }
+        onLandingFailed()
     }
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -74,5 +69,5 @@ fun Landing(navController: NavHostController, mainViewModel: MainViewModel = hil
 @Preview
 @Composable
 fun LandingPreview() {
-    Landing(navController = rememberNavController())
+    Landing(account = null, onLandingFailed = {}, onLandingSuccessful = {})
 }

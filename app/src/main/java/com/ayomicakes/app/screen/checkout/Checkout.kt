@@ -27,12 +27,12 @@ import com.ayomicakes.app.ui.theme.Primary80
 import com.ayomicakes.app.ui.theme.Tertiary60
 
 @Composable
-fun Checkout(navController: NavHostController, mainViewModel: MainViewModel = hiltViewModel()) {
-    mainViewModel.setToolbar(
-        isHidden = false,
-        isActive = false,
-        title = navController.currentDestination?.route ?: ""
-    )
+fun Checkout(mainViewModel: MainViewModel = hiltViewModel()) {
+//    mainViewModel.setToolbar(
+//        isHidden = false,
+//        isActive = false,
+//        title = navController.currentDestination?.route ?: ""
+//    )
     var addressDialogShow by remember { mutableStateOf(false) }
     var dateDialogShow by remember { mutableStateOf(false) }
 

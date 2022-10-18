@@ -7,7 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,25 +25,17 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import com.ayomicakes.app.BuildConfig
-import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.component.NoRippleEffect
-import com.ayomicakes.app.component.scaffold.MainScaffold
-import com.ayomicakes.app.navigation.Navigation
-import com.ayomicakes.app.navigation.navigateSingleTopTo
-import com.ayomicakes.app.oauth.GoogleOauth
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.screen.home.Screens
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import kotlinx.coroutines.launch
 
 @Composable
 fun MainDrawer(
     drawerState: DrawerState,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    navController: NavHostController,
+    onSelectedDrawer: (Screens) -> Unit,
+    onLogout: () -> Unit,
     content: @Composable () -> Unit
 ) {
 
@@ -50,9 +43,6 @@ fun MainDrawer(
     val profileStore by homeViewModel.profileStore.observeAsState()
     val items = homeViewModel.items
     val selectedItem = remember { homeViewModel.selectedItems }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val account = GoogleSignIn.getLastSignedInAccount(context)
     val cartCount by homeViewModel.cakesCart.collectAsState()
 
     ModalNavigationDrawer(
@@ -140,16 +130,13 @@ fun MainDrawer(
                     label = { Text(item.title) },
                     selected = item == selectedItem.value,
                     onClick = {
-                        scope.launch {
-                            navController.navigateSingleTopTo(item.route)
-                            drawerState.close()
-                        }
+                        onSelectedDrawer(item)
                         selectedItem.value = item
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     badge = {
                         if (item.title == Screens.CartPage.title) {
-                            if(cartCount.isNotEmpty()){
+                            if (cartCount.isNotEmpty()) {
                                 Text("${cartCount.size}")
                             }
                         }
@@ -182,21 +169,7 @@ fun MainDrawer(
                         contentDescription = "logout"
                     )
                 },
-                onClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
-                    if (account != null) {
-                        GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
-                            homeViewModel.clearStore()
-                            return@addOnSuccessListener
-                        }
-                    }
-                    homeViewModel.clearStore()
-                    navController.navigate(Navigation.LANDING) {
-                        popUpTo(0)
-                    }
-                },
+                onClick = onLogout,
                 label = { Text(text = "Logout") },
                 selected = false
             )

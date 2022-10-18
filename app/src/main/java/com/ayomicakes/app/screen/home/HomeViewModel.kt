@@ -13,9 +13,11 @@ import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.responses.FullResponse
 import com.ayomicakes.app.network.services.AyomiCakeServices
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 
@@ -24,8 +26,10 @@ class HomeViewModel @Inject constructor(
     private val repository: HomeRepository,
     private val locationHelper: LocationHelper,
     private val mainApi: AyomiCakeServices
-) : MainViewModel(repository, locationHelper) {
+) : MainViewModel(repository) {
 
+    private var _location: MutableSharedFlow<LatLng> = MutableSharedFlow()
+    val location: SharedFlow<LatLng> = _location.asSharedFlow()
 
     private val _cakesCart = MutableStateFlow(mapOf<CakeItem, Int>())
     val cakesCart = _cakesCart.asStateFlow()
@@ -69,6 +73,20 @@ class HomeViewModel @Inject constructor(
                 map[cart] = (map[cart] ?: 0) - count
             }
             _cakesCart.emit(map)
+        }
+    }
+
+    fun getLocation() {
+        locationHelper.fusedLocationClient?.lastLocation?.addOnSuccessListener { result ->
+            viewModelScope.launch {
+                Timber.d("location result :$result")
+                _location.emit(
+                    LatLng(
+                        result.latitude,
+                        result.longitude
+                    )
+                )
+            }
         }
     }
 }

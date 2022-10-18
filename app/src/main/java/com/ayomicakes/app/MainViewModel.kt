@@ -1,6 +1,5 @@
 package com.ayomicakes.app
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
@@ -11,32 +10,27 @@ import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.repository.auth.AuthRepository
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
-import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.requests.RefreshRequest
 import com.ayomicakes.app.screen.home.Screens
+import com.ayomicakes.app.utils.Result
 import com.ayomicakes.app.utils.StringUtils.getBearer
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.ayomicakes.app.utils.Result
-import kotlinx.coroutines.flow.*
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 open class MainViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private var locationHelper: LocationHelper
+//    private var locationHelper: LocationHelper
 ) : ViewModel() {
 
     val isToolbarHidden = MutableStateFlow(true)
     val isSideDrawerActive = MutableStateFlow(false)
     val toolbarTitle = MutableStateFlow("")
-    private var _location: MutableSharedFlow<LatLng> = MutableSharedFlow()
-    val location: SharedFlow<LatLng> = _location.asSharedFlow()
     private val _userStore = MutableLiveData<UserStore>()
     private val _profileStore = MutableLiveData<ProfileStore>()
     val isAuthenticated = MutableStateFlow(false)
@@ -45,19 +39,19 @@ open class MainViewModel @Inject constructor(
     val items = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
     val selectedItems = mutableStateOf(items[0])
 
-    val locationCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(result: LocationResult) {
-            super.onLocationResult(result)
-            viewModelScope.launch {
-                _location.emit(
-                    LatLng(
-                        result.lastLocation?.latitude ?: 0.0,
-                        result.lastLocation?.longitude ?: 0.0
-                    )
-                )
-            }
-        }
-    }
+//    val locationCallback: LocationCallback = object : LocationCallback() {
+//        override fun onLocationResult(result: LocationResult) {
+//            super.onLocationResult(result)
+//            viewModelScope.launch {
+//                _location.emit(
+//                    LatLng(
+//                        result.lastLocation?.latitude ?: 0.0,
+//                        result.lastLocation?.longitude ?: 0.0
+//                    )
+//                )
+//            }
+//        }
+//    }
 
     open fun getProfile() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -125,15 +119,15 @@ open class MainViewModel @Inject constructor(
                 .capitalize(Locale.current)
         )
     }
-
-    @SuppressLint("MissingPermission")
-    fun startLocationUpdate(locationCallback: LocationCallback) {
-        locationHelper.startLocationUpdate(locationCallback)
-    }
-
-    fun stopLocationUpdate(locationCallback: LocationCallback) {
-        locationHelper.stopLocationUpdate(locationCallback)
-    }
+//
+//    @SuppressLint("MissingPermission")
+//    fun startLocationUpdate(locationCallback: LocationCallback) {
+//        locationHelper.startLocationUpdate(locationCallback)
+//    }
+//
+//    fun stopLocationUpdate(locationCallback: LocationCallback) {
+//        locationHelper.stopLocationUpdate(locationCallback)
+//    }
 
     open fun postRefreshToken(userStore: UserStore?) {
         viewModelScope.launch {
@@ -146,21 +140,8 @@ open class MainViewModel @Inject constructor(
         }
     }
 
-    fun getLocation() {
-        locationHelper.fusedLocationClient?.lastLocation?.addOnSuccessListener { result ->
-            viewModelScope.launch {
-                Timber.d("location result :$result")
-                _location.emit(
-                    LatLng(
-                        result.latitude,
-                        result.longitude
-                    )
-                )
-            }
-        }
-    }
 
-    suspend inline fun <R> Result<R>.refreshToken(crossinline invoke: suspend (Result<R>) -> Unit) {
+    private suspend inline fun <R> Result<R>.refreshToken(crossinline invoke: suspend (Result<R>) -> Unit) {
         if (this is Result.Success) {
             invoke(this)
         }

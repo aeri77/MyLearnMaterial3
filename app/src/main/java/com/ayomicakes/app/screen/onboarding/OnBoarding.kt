@@ -33,15 +33,14 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
-fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hiltViewModel(), mainViewModel: MainViewModel = hiltViewModel()) {
+fun OnBoarding(viewModel: OnBoardingViewModel = hiltViewModel(), onNext: () -> Unit) {
     val pagerState = rememberPagerState()
-    val scope = rememberCoroutineScope()
 
-    mainViewModel.setToolbar(
-        isHidden = true,
-        isActive = false,
-        title = navController.currentDestination?.route ?: ""
-    )
+//    mainViewModel.setToolbar(
+//        isHidden = true,
+//        isActive = false,
+//        title = navController.currentDestination?.route ?: ""
+//    )
 
     ConstraintLayout(
         modifier = Modifier
@@ -53,7 +52,6 @@ fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hi
         val isLoading = viewModel.loading
         val baseColor = MaterialTheme.colorScheme.primary
         var color by remember { mutableStateOf(baseColor) }
-        var pagePosition by remember { viewModel.pagePosition }
         val success by viewModel.isSuccess.observeAsState()
 
         DefaultBackHandler(backNavElement = ExitDialog {
@@ -63,10 +61,8 @@ fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hi
         LaunchedEffect(success) {
             if (success == true) {
                 viewModel.isSuccess.value = false
-                scope.launch {
-                    navController.navigate(Navigation.SIGN_UP)
-                    viewModel.loading = false
-                }
+                onNext()
+                viewModel.loading = false
             }
         }
 
@@ -164,7 +160,9 @@ fun OnBoarding(navController: NavController, viewModel: OnBoardingViewModel = hi
 @Preview
 @Composable
 fun Preview() {
-    OnBoarding(rememberNavController())
+    OnBoarding(){
+
+    }
 }
 
 @Composable

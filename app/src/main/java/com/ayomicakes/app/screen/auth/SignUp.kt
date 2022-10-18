@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,9 +36,9 @@ import timber.log.Timber
 @ExperimentalMaterial3Api
 @Composable
 fun SignUp(
-    navController: NavHostController,
-    mainViewModel: MainViewModel = hiltViewModel(),
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel = hiltViewModel(),
+    onSuccessSignUp: () -> Unit,
+    onSignIn: () -> Unit
 ) {
     val context = LocalContext.current
     val systemUiController = rememberSystemUiController()
@@ -45,7 +46,7 @@ fun SignUp(
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val signUpLoading by viewModel.signLoading.collectAsState()
-    val userStore by viewModel.userStore.collectAsState(null)
+    val userStore by viewModel.userStore.observeAsState(null)
     val isCaptchaLoading by viewModel.captchaLoading.collectAsState()
     val oauthLoading by viewModel.oauthLoading.collectAsState()
     var captchaToken by remember { mutableStateOf<String?>(null) }
@@ -54,11 +55,11 @@ fun SignUp(
 
 
     systemUiController.setStatusBarColor(mainColor)
-    mainViewModel.setToolbar(
-        isHidden = false,
-        isActive = false,
-        title = navController.currentDestination?.route ?: ""
-    )
+//    mainViewModel.setToolbar(
+//        isHidden = false,
+//        isActive = false,
+//        title = navController.currentDestination?.route ?: ""
+//    )
 
     LaunchedEffect(captchaToken) {
         if (captchaToken?.isNotBlank() == true) {
@@ -75,9 +76,7 @@ fun SignUp(
         if (userStore != null) {
             if (userStore?.userId != null) {
                 if (userStore?.userId?.toString()?.isNotBlank() == true) {
-                    navController.navigate(Navigation.REGISTER_FORM) {
-                        popUpTo(0)
-                    }
+                    onSuccessSignUp()
                 }
             }
         }
@@ -133,12 +132,11 @@ fun SignUp(
             }
             Text("or", fontSize = 16.sp)
             Crossfade(targetState = oauthLoading) {
-                if(!it){
+                if (!it) {
                     SignWithGoogle("Sign Up With Google") { authResult ->
                         viewModel.verifyOAuth(authResult?.idToken.toString(), context)
                     }
-                }
-                else CircularProgressIndicator()
+                } else CircularProgressIndicator()
             }
         }
         Row(
@@ -150,7 +148,7 @@ fun SignUp(
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 modifier = Modifier.clickable {
-                    navController.navigate(Navigation.SIGN_IN)
+                    onSignIn()
                 },
                 text = "Sign In", style = TextStyle(
                     textDecoration = TextDecoration.Underline
@@ -164,5 +162,9 @@ fun SignUp(
 @Preview
 @Composable
 fun SignUpPreview() {
-    SignUp(rememberNavController())
+    SignUp(onSuccessSignUp = {
+
+    }, onSignIn = {
+
+    })
 }

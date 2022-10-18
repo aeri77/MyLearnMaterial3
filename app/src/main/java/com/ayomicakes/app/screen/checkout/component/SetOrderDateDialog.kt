@@ -6,6 +6,7 @@
 package com.ayomicakes.app.screen.checkout.component
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Size
@@ -73,13 +75,15 @@ fun SetOrderDateDialog(
             }
         }
         Card {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.Center
+            ) {
                 Text("Pilih Tanggal")
                 LazyRow(
-                    modifier = Modifier.padding(end = 16.dp, top = 16.dp, bottom = 16.dp),
+                    modifier = Modifier.padding(vertical = 24.dp),
                     state = listState,
-                    contentPadding = PaddingValues(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     flingBehavior = rememberSnapperFlingBehavior(
                         lazyListState = listState,
@@ -87,30 +91,41 @@ fun SetOrderDateDialog(
                     )
                 ) {
                     items(rangeDate) { data ->
-                        val animatedFloat by animateFloatAsState(targetValue = 1f * if (selectedDate == data) 1.4f else 1f)
-                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        val animatedFloat by animateFloatAsState(targetValue = 1f * if (selectedDate == data) 1.3f else 1f)
+                        Box(
+                        ) {
                             Card(modifier = Modifier
                                 .align(Alignment.Center)
-                                .scale(
-                                    animatedFloat
-                                ), colors = if (data.isSelected) {
-                                CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
-                                )
+                                .scale(animatedFloat),
+                                colors = if (data.isSelected) {
+                                    CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    )
 
-                            } else {
-                                CardDefaults.cardColors(
-                                    containerColor = Color.Gray
-                                )
-                            }, onClick = {
-                                selectedDate = data
-                            }) {
+                                } else {
+                                    CardDefaults.cardColors(
+                                        containerColor = Color.Gray
+                                    )
+                                },
+                                onClick = {
+                                    selectedDate = data
+                                }) {
                                 Column(
-                                    modifier = Modifier.padding(8.dp)
-                                    .padding(horizontal = 14.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .width(72.dp),
+                                    horizontalAlignment = CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
                                 ) {
+                                    Text(
+                                        text = date.withDayOfMonth(data.value).month.getDisplayName(
+                                            TextStyle.FULL,
+                                            locale
+                                        ),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        fontSize = 10.sp
+                                    )
                                     Text(
                                         text = "${data.value}",
                                         color = MaterialTheme.colorScheme.onPrimary,

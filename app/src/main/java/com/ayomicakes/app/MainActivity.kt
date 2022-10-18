@@ -67,17 +67,20 @@ class MainActivity : ComponentActivity() {
         homeViewModel.initProfileStore()
 
         setContent {
+            val systemUiController = rememberSystemUiController()
+            systemUiController.setStatusBarColor(Primary95)
+
             val accountGoogle = GoogleSignIn.getLastSignedInAccount(this)
             val signOutGoogle = GoogleOauth.getGoogleLoginAuth(this)
-            val systemUiController = rememberSystemUiController()
-            // icons to mimic drawer destinations
+
+            val navController = rememberAnimatedNavController()
+
             val isToolbarHidden by homeViewModel.isToolbarHidden.collectAsState()
             val cartCount by homeViewModel.cakesCart.collectAsState(null)
-            val drawerState = rememberDrawerState(DrawerValue.Closed)
-            systemUiController.setStatusBarColor(Primary95)
             val selectedScreen by homeViewModel.selectedScreens.collectAsState()
-            val navController = rememberAnimatedNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
             val scope = rememberCoroutineScope()
 
             ConfigureBackHandler(

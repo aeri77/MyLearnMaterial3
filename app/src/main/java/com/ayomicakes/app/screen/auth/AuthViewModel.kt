@@ -1,13 +1,10 @@
 package com.ayomicakes.app.screen.auth
 
 import android.content.Context
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.architecture.repository.auth.AuthRepository
-import com.ayomicakes.app.architecture.repository.base.BaseRepository
 import com.ayomicakes.app.datastore.serializer.UserStore
-import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
@@ -37,14 +34,11 @@ open class AuthViewModel @Inject constructor(
     val captchaLoading = MutableStateFlow(false)
     val signLoading = MutableStateFlow(false)
     val oauthLoading = MutableStateFlow(false)
-    fun signUp(username: String, password: String) {
+    fun signUp(authRequest: AuthRequest) {
         viewModelScope.launch {
             signLoading.emit(true)
             try {
-                val authRequest = AuthRequest(
-                    username,
-                    password
-                )
+
                 repository.signUp(authRequest).collectLatest {
                     repository.signIn(authRequest).collectLatest {
                         repository.updateUserStore(
@@ -83,11 +77,7 @@ open class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signIn(username: String, password: String) {
-        val authRequest = AuthRequest(
-            username,
-            password
-        )
+    fun signIn(authRequest: AuthRequest) {
         viewModelScope.launch {
             signLoading.emit(true)
             try {

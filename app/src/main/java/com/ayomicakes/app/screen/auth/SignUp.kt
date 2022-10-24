@@ -27,10 +27,12 @@ import com.ayomicakes.app.component.buttons.SignWithGoogle
 import com.ayomicakes.app.component.textfield.PasswordTextField
 import com.ayomicakes.app.component.textfield.UsernameTextField
 import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.firebase.messaging.FirebaseMessaging
 import timber.log.Timber
 
 @ExperimentalMaterial3Api
@@ -116,7 +118,16 @@ fun SignUp(
                     .fillMaxWidth()
                     .height(54.dp),
                 onClick = {
-                    viewModel.signUp(username.value, password.value)
+                    val firebaseMessaging = FirebaseMessaging.getInstance()
+                    firebaseMessaging.isAutoInitEnabled = true
+                    firebaseMessaging.token.addOnSuccessListener {
+                        val authRequest = AuthRequest(
+                            username.value,
+                            password.value,
+                            it
+                        )
+                        viewModel.signUp(authRequest)
+                    }
                 }) {
                 Crossfade(targetState = signUpLoading) {
                     if (!it) {

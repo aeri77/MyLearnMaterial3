@@ -11,6 +11,7 @@ plugins {
     kotlin("plugin.serialization") version "1.7.10"
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -111,8 +112,10 @@ dependencies {
     implementation(Deps.Google.safetyNet)
     implementation(Deps.Google.locationServices)
     implementation(Deps.Google.auth)
-    implementation(platform(Deps.Google.Firebase.bom))
     implementation(Deps.Google.Firebase.analytic)
+    implementation(Deps.Google.Firebase.crashlytics)
+    implementation(Deps.Google.Firebase.cloudMessaging)
+    implementation(platform(Deps.Google.Firebase.bom))
     kapt(Deps.Hilt.hiltCompiler)
     kapt(Deps.AndroidX.Room.compiler)
     testImplementation(Deps.junit)

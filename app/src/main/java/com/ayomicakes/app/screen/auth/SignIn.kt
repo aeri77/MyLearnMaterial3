@@ -12,27 +12,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.component.buttons.CaptchaButton
 import com.ayomicakes.app.component.buttons.SignWithGoogle
 import com.ayomicakes.app.component.textfield.PasswordTextField
 import com.ayomicakes.app.component.textfield.UsernameTextField
-import com.ayomicakes.app.navigation.Navigation
-import com.ayomicakes.app.navigation.Navigation.HOME
+import com.ayomicakes.app.firebase.AppFirebaseMessagingService
+import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.firebase.messaging.FirebaseMessaging
 import timber.log.Timber
 
 @ExperimentalMaterial3Api
@@ -121,7 +117,16 @@ fun SignIn(
                     .fillMaxWidth()
                     .height(54.dp),
                 onClick = {
-                    viewModel.signIn(username.value, password.value)
+                    val firebaseMessaging = FirebaseMessaging.getInstance()
+                    firebaseMessaging.isAutoInitEnabled = true
+                    firebaseMessaging.token.addOnSuccessListener {
+                        val authRequest = AuthRequest(
+                            username.value,
+                            password.value,
+                            it
+                        )
+                        viewModel.signIn(authRequest)
+                    }
                 }) {
                 Text(text = "Sign In", fontSize = 16.sp)
             }

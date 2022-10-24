@@ -79,6 +79,8 @@ object Deps {
         object Firebase {
             val bom by lazy { "com.google.firebase:firebase-bom:30.4.1" }
             val analytic by lazy { "com.google.firebase:firebase-analytics-ktx" }
+            val crashlytics by lazy { "com.google.firebase:firebase-crashlytics" }
+            val cloudMessaging by lazy { "com.google.firebase:firebase-messaging"}
         }
         object Map {
             val mapsUtil by lazy {  "com.google.maps.android:android-maps-utils:2.3.0" }

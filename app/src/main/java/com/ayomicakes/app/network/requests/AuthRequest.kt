@@ -6,7 +6,9 @@ import kotlinx.serialization.SerialName
 @kotlinx.serialization.Serializable
 data class AuthRequest(
     @SerialName("email")
-    val email : String,
+    val email: String,
     @SerialName("password")
-    val password : String
+    val password: String,
+    @SerialName("fcmToken")
+    val fcmToken: String?
 )

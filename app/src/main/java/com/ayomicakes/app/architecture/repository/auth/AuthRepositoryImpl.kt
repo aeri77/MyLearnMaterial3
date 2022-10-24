@@ -95,4 +95,14 @@ open class AuthRepositoryImpl @Inject constructor(
         return flowData.flowOn(Dispatchers.IO)
     }
 
+    override suspend fun removeFCM(fcmTokenRequest: FCMTokenRequest): Flow<Result<Response>> {
+        val flowData = flow {
+            handlingError {
+                val res = mainApi.deleteFCMToken(fcmTokenRequest)
+                emit(Result.Success(res))
+            }
+        }
+        return flowData.flowOn(Dispatchers.IO)
+    }
+
 }

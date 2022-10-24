@@ -22,8 +22,8 @@ import com.ayomicakes.app.component.buttons.CaptchaButton
 import com.ayomicakes.app.component.buttons.SignWithGoogle
 import com.ayomicakes.app.component.textfield.PasswordTextField
 import com.ayomicakes.app.component.textfield.UsernameTextField
-import com.ayomicakes.app.firebase.AppFirebaseMessagingService
 import com.ayomicakes.app.network.requests.AuthRequest
+import com.ayomicakes.app.network.requests.OAuthRequest
 import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.common.api.ApiException
@@ -134,7 +134,15 @@ fun SignIn(
             Crossfade(targetState = oauthLoading) {
                 if (!it) {
                     SignWithGoogle("Sign In With Google") { authResult ->
-                        viewModel.verifyOAuth(authResult?.idToken.toString(), context)
+                        val firebaseMessaging = FirebaseMessaging.getInstance()
+                        firebaseMessaging.isAutoInitEnabled = true
+                        firebaseMessaging.token.addOnSuccessListener { fcm ->
+                            val oAuthRequest = OAuthRequest(
+                                authResult?.idToken.toString(),
+                                fcm
+                            )
+                            viewModel.verifyOAuth(oAuthRequest, context)
+                        }
                     }
                 } else CircularProgressIndicator()
             }
@@ -148,7 +156,7 @@ fun SignIn(
             Spacer(modifier = Modifier.width(6.dp))
             Text(
                 modifier = Modifier.clickable {
-                                              onSignUp()
+                    onSignUp()
                 },
                 text = "Sign Up", style = TextStyle(
                     textDecoration = TextDecoration.Underline

@@ -54,4 +54,18 @@ interface AyomiCakeServices {
         @Body refreshRequest: RefreshRequest
     ): FullResponse<UserStore>
 
+    @POST(RouteConstant.FCM_TOKEN)
+    suspend fun postFCMToken(
+        @Body fcmRequest: FCMTokenRequest
+    ): Response
+    @POST(RouteConstant.FCM_TOKEN_DELETE)
+    suspend fun deleteFCMToken(
+        @Body fcmRequest: FCMTokenRequest
+    ): Response
+
+    @POST(RouteConstant.CHECKOUT)
+    suspend fun postCheckoutRequest(
+        @Header("Authorization") authHeader: String?,
+        @Body checkoutRequest: CheckoutRequest
+    ) : FullResponse<PaymentTransactionResponse>
 }

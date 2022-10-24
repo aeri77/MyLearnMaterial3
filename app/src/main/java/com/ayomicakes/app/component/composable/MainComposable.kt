@@ -141,5 +141,5 @@ fun NavGraphBuilder.checkoutComposable(
             }
             else -> null
         }
-    }) { Checkout(homeViewModel) }
+    }) { Checkout() }
 }

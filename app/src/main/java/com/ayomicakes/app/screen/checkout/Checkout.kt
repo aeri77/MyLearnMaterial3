@@ -18,8 +18,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.database.model.ReceiverAddress
 import com.ayomicakes.app.screen.checkout.component.SetAddressDialog
 import com.ayomicakes.app.screen.checkout.component.SetOrderDateDialog
@@ -27,15 +25,11 @@ import com.ayomicakes.app.ui.theme.Primary80
 import com.ayomicakes.app.ui.theme.Tertiary60
 
 @Composable
-fun Checkout(mainViewModel: MainViewModel = hiltViewModel()) {
-//    mainViewModel.setToolbar(
-//        isHidden = false,
-//        isActive = false,
-//        title = navController.currentDestination?.route ?: ""
-//    )
+fun Checkout(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
+
+
     var addressDialogShow by remember { mutableStateOf(false) }
     var dateDialogShow by remember { mutableStateOf(false) }
-
     var receiverAddress by remember {
         mutableStateOf(
             ReceiverAddress(
@@ -85,7 +79,7 @@ fun Checkout(mainViewModel: MainViewModel = hiltViewModel()) {
             PaymentMethod()
         }
         item {
-            ButtonPay()
+            ButtonPay(checkoutViewModel)
         }
     }
 }
@@ -202,7 +196,7 @@ fun OrderQueue(dateDialogShow: Boolean, onDateChange: () -> Unit) {
 }
 
 @Composable
-fun ButtonPay() {
+fun ButtonPay(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
     Card(modifier = Modifier.padding(top = 12.dp)) {
         Row(
             modifier = Modifier
@@ -212,7 +206,9 @@ fun ButtonPay() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("Rp65.000")
-            Button(onClick = {}) {
+            Button(onClick = {
+                checkoutViewModel.postCheckoutRequest()
+            }) {
                 Text("Bayar")
             }
         }

@@ -10,4 +10,7 @@ object RouteConstant {
     const val REGISTER_FORM = "register-form"
     const val PROFILE = "profile"
     const val CAKES = "cakes"
+    const val FCM_TOKEN = "fcm-token"
+    const val FCM_TOKEN_DELETE = "$FCM_TOKEN/delete"
+    const val CHECKOUT = "checkout"
 }

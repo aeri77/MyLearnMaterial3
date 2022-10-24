@@ -17,5 +17,8 @@ data class ProfileStore(
     val fullName: String? = null,
 
     @SerialName("addresses")
-    val addresses : List<AddressResponse>? = null
+    val addresses : List<AddressResponse>? = null,
+
+    @SerialName("email")
+    val email : String? = null
 )

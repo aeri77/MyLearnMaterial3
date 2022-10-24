@@ -107,12 +107,9 @@ class MainActivity : ComponentActivity() {
                             drawerState.close()
                         }
                         if (accountGoogle != null) {
-                            signOutGoogle.signOut().addOnSuccessListener {
-                                homeViewModel.clearStore()
-                                return@addOnSuccessListener
-                            }
+                            signOutGoogle.signOut().addOnSuccessListener{}
                         }
-                        homeViewModel.clearStore()
+                        homeViewModel.removeFCM()
                         navController.navigate(Navigation.LANDING) {
                             popUpTo(0)
                         }

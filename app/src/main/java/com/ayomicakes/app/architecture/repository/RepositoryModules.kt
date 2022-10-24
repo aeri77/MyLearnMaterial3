@@ -4,6 +4,8 @@ import com.ayomicakes.app.architecture.repository.auth.AuthRepository
 import com.ayomicakes.app.architecture.repository.auth.AuthRepositoryImpl
 import com.ayomicakes.app.architecture.repository.base.BaseRepository
 import com.ayomicakes.app.architecture.repository.base.BaseRepositoryImpl
+import com.ayomicakes.app.architecture.repository.checkout.CheckoutRepository
+import com.ayomicakes.app.architecture.repository.checkout.CheckoutRepositoryImpl
 import com.ayomicakes.app.architecture.repository.home.HomeRepository
 import com.ayomicakes.app.architecture.repository.home.HomeRepositoryImpl
 import dagger.Binds
@@ -23,4 +25,6 @@ interface RepositoryModules {
 
     @Binds
     fun provideHomeRepositoryImpl(repository: HomeRepositoryImpl): HomeRepository
+    @Binds
+    fun provideCheckoutRepositoryImpl(repository: CheckoutRepositoryImpl): CheckoutRepository
 }

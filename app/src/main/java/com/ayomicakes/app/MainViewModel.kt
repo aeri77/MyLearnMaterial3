@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.architecture.repository.auth.AuthRepository
 import com.ayomicakes.app.datastore.serializer.ProfileStore
 import com.ayomicakes.app.datastore.serializer.UserStore
+import com.ayomicakes.app.network.requests.FCMTokenRequest
 import com.ayomicakes.app.network.requests.RefreshRequest
 import com.ayomicakes.app.screen.home.Screens
 import com.ayomicakes.app.utils.Result
@@ -86,7 +87,18 @@ open class MainViewModel @Inject constructor(
 
     fun clearStore() {
         viewModelScope.launch {
-            repository.clearStore()
+            repository.getUserStore().collectLatest {
+                if (it?.userId != null) {
+                    repository.removeFCM(
+                        FCMTokenRequest(
+                            it.userId
+                        )
+                    ).collectLatest {res ->
+                        Timber.d("result ${res}.")
+                        repository.clearStore()
+                    }
+                }
+            }
         }
     }
 

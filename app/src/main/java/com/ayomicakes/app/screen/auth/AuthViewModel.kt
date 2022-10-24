@@ -7,6 +7,7 @@ import com.ayomicakes.app.architecture.repository.auth.AuthRepository
 import com.ayomicakes.app.datastore.serializer.UserStore
 import com.ayomicakes.app.network.requests.AuthRequest
 import com.ayomicakes.app.network.requests.CaptchaRequest
+import com.ayomicakes.app.network.requests.FCMTokenRequest
 import com.ayomicakes.app.network.requests.OAuthRequest
 import com.ayomicakes.app.network.responses.CaptchaResponse
 import com.ayomicakes.app.network.responses.FullResponse
@@ -15,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -99,12 +101,12 @@ open class AuthViewModel @Inject constructor(
         }
     }
 
-    fun verifyOAuth(idToken: String , context : Context) {
+    fun verifyOAuth(oAuthRequest: OAuthRequest, context: Context) {
         val account = GoogleSignIn.getLastSignedInAccount(context)
         viewModelScope.launch {
             oauthLoading.emit(true)
             try {
-                repository.verifyOAuth(OAuthRequest(idToken)).collectLatest {
+                repository.verifyOAuth(oAuthRequest).collectLatest {
                     repository.updateUserStore(
                         user = UserStore(
                             userId = it.result.userId,
@@ -115,8 +117,8 @@ open class AuthViewModel @Inject constructor(
                     oauthLoading.emit(false)
                 }
             } catch (e: Exception) {
-                if(e is HttpException){
-                    if(account != null){
+                if (e is HttpException) {
+                    if (account != null) {
                         GoogleOauth.getGoogleLoginAuth(context).signOut().addOnSuccessListener {
                             return@addOnSuccessListener
                         }
@@ -127,6 +129,10 @@ open class AuthViewModel @Inject constructor(
                 oauthLoading.emit(false)
             }
         }
+    }
+
+    fun removeFCM() {
+        clearStore()
     }
 
 }

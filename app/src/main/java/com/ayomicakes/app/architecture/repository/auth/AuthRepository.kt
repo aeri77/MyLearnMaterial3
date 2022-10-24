@@ -32,4 +32,6 @@ interface AuthRepository: BaseRepository {
         authHeader: String,
         userId: UUID?
     ): Flow<Result<FullResponse<ProfileStore>>>
+
+    suspend fun removeFCM(fcmTokenRequest: FCMTokenRequest): Flow<Result<Response>>
 }

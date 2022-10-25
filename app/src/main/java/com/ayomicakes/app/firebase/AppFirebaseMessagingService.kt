@@ -50,7 +50,6 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
             userStore.data.collectLatest {
                 if (it.userId != null) {
                     val res = mainApi.postFCMToken(FCMTokenRequest(it.userId, token))
-                    Timber.d("fcm new token res: ${res.result}")
                 }
             }
         }
@@ -68,7 +67,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
                 .setContentTitle(message.notification?.title)
                 .setContentText(message.notification?.body)
                 .setContentIntent(pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
 
             createNotificationChannel()
 
@@ -85,7 +84,7 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = CHANNEL_NAME
             val descriptionText = CHANNEL_DESCRIPTION
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }

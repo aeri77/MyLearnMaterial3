@@ -1,5 +1,7 @@
 package com.ayomicakes.app.screen.home
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -11,6 +13,7 @@ import com.ayomicakes.app.architecture.source.CakeSource
 import com.ayomicakes.app.database.model.CakeItem
 import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.helper.LocationHelper
+import com.ayomicakes.app.model.CheckoutModel
 import com.ayomicakes.app.network.responses.FullResponse
 import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.screen.auth.AuthViewModel
@@ -24,6 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val repository: HomeRepository,
     private val locationHelper: LocationHelper,
     private val mainApi: AyomiCakeServices
@@ -101,4 +105,12 @@ class HomeViewModel @Inject constructor(
             _selectedScreens.emit(screens)
         }
     }
+
+
+    fun setCheckout(checkoutId: String, checkoutModel: CheckoutModel) {
+        savedStateHandle[checkoutId] = checkoutModel
+    }
+
+    fun getCheckout(checkoutId: String): LiveData<CheckoutModel> =
+        savedStateHandle.getLiveData<CheckoutModel>(checkoutId)
 }

@@ -1,8 +1,11 @@
 package com.ayomicakes.app.database.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 
 @kotlinx.serialization.Serializable
+@Parcelize
 data class CakeItem(
 
     @SerialName("uid")
@@ -22,4 +25,4 @@ data class CakeItem(
 
     @SerialName("imgUrl")
     val imgUrl: String? = null
-)
+) : Parcelable

@@ -10,8 +10,12 @@ object Navigation {
     const val AUTH = "auth"
     const val SIGN_IN = "Login"
     const val SIGN_UP = "register"
-    const val CHECKOUT = "checkout"
     const val REGISTER_FORM = "register_form"
+    object Checkout {
+        const val ROUTE = "checkout"
+        const val ID = "checkoutId"
+        const val ROUTE_ITEM = "$ROUTE/{$ID}"
+    }
 }
 
 

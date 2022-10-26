@@ -124,7 +124,7 @@ open class MainViewModel @Inject constructor(
         setToolbarHidden(isHidden)
         setSideDrawerActive(isActive)
         setToolbarTitle(
-            title?.split("-")?.get(0)
+            title?.replace("/", "-")?.split("-")?.get(0)
                 ?.capitalize(Locale.current)
         )
     }

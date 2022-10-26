@@ -3,6 +3,7 @@ package com.ayomicakes.app.screen.checkout
 import androidx.lifecycle.viewModelScope
 import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.architecture.repository.checkout.CheckoutRepository
+import com.ayomicakes.app.model.CheckoutModel
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.network.requests.AddressCheckout
 import com.ayomicakes.app.network.requests.CheckoutItem
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
@@ -22,7 +24,15 @@ class CheckoutViewModel @Inject constructor(
     repository
 ) {
 
-    fun postCheckoutRequest() {
+    fun postCheckoutRequest(checkout: CheckoutModel) {
+        val listCheckoutItem = checkout.items.map {
+            CheckoutItem(
+                uid = UUID.fromString(it.key.uid),
+                name = it.key.cakeName,
+                quantity = it.value,
+                totalPrice = it.value * (it.key.price ?: 0.0)
+            )
+        }
         viewModelScope.launch {
             repository.getProfileStore().collectLatest { profileStore ->
                 repository.getUserStore().collectLatest { userStore ->
@@ -35,18 +45,13 @@ class CheckoutViewModel @Inject constructor(
                                 email = profileStore?.email ?: "",
                                 customerVaName = profileStore?.fullName ?: "",
                                 merchantCode = "DS13707",
-                                paymentAmount = 50000,
-                                itemDetails = listOf(
-                                    CheckoutItem(
-                                        name = "Brownis Panggang",
-                                        uid = UUID.fromString("50a660b4-2e64-4b47-bf5d-d3e577d38605"),
-                                        totalPrice = 50000.00,
-                                        quantity = 2
-                                    )
-                                ),
+                                paymentAmount = listCheckoutItem.sumOf { item ->
+                                    (item.totalPrice ?: 0.0).roundToInt()
+                                },
+                                itemDetails = listCheckoutItem,
                                 paymentMethod = "VA",
                                 productDetails = "Orderan atas nama ${profileStore?.fullName}",
-                                returnUrl = Navigation.CHECKOUT,
+                                returnUrl = Navigation.Checkout.ROUTE,
                                 receiverAddress = AddressCheckout(
                                     UUID.randomUUID(),
                                     "Bapak",
@@ -88,5 +93,4 @@ class CheckoutViewModel @Inject constructor(
             }
         }
     }
-
 }

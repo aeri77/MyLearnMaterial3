@@ -1,4 +1,5 @@
-@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class,
+@file:OptIn(
+    ExperimentalPermissionsApi::class, ExperimentalFoundationApi::class,
     ExperimentalFoundationApi::class, ExperimentalAnimationApi::class,
     ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class, ExperimentalPagerApi::class,
     ExperimentalPagerApi::class
@@ -12,6 +13,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,7 +51,11 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
         CoroutineScope(Dispatchers.IO).launch {
             userStore.data.collectLatest {
                 if (it.userId != null) {
-                    val res = mainApi.postFCMToken(FCMTokenRequest(it.userId, token))
+                    try {
+                        mainApi.postFCMToken(FCMTokenRequest(it.userId, token))
+                    } catch (e: Exception) {
+                        Toast.makeText(this@AppFirebaseMessagingService, e.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
@@ -57,11 +63,13 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        if(message.collapseKey == PAYMENTS_KEY){
+        Timber.d("fcm message receive $message")
+        if (message.collapseKey == PAYMENTS_KEY) {
             val intent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
-            val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntent: PendingIntent =
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
             val builder: NotificationCompat.Builder = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(message.notification?.title)

@@ -65,7 +65,7 @@ fun CakeCard(cakeItem: CakeItem?, onClicked : () -> Unit) {
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Rp${cakeItem?.price ?: ""}",
+                    text = "Rp ${cakeItem?.price ?: ""}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

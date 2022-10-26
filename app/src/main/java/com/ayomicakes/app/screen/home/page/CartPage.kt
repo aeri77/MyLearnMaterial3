@@ -20,32 +20,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.W600
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.ayomicakes.app.R
 import com.ayomicakes.app.database.model.CartItem
-import com.ayomicakes.app.navigation.Navigation
+import com.ayomicakes.app.model.CheckoutModel
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.*
+import java.util.*
+import kotlin.math.roundToInt
 
 @ExperimentalMaterial3Api
 @Composable
-fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: () -> Unit) {
-//    viewModel.setToolbar(
-//        isHidden = false,
-//        isActive = true,
-//        title = navController.currentDestination?.route ?: ""
-//    )
-
+fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: (CheckoutModel) -> Unit) {
     val cakeCart by viewModel.cakesCart.collectAsState()
 
     Surface(
@@ -124,8 +117,8 @@ fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: () -> Unit) {
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Text(
-                                    text = item.item.price.toString() ?: "", fontSize = 12.sp,
-                                    fontWeight = FontWeight.W600,
+                                    text = item.item.price?.roundToInt().toString(), fontSize = 12.sp,
+                                    fontWeight = W600,
                                     color = NeutralVariant50
                                 )
                             }
@@ -138,7 +131,7 @@ fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: () -> Unit) {
                                     }
                                     .padding(vertical = 12.dp)
                                     .padding(end = 6.dp),
-                                text = "${item.count.toDouble() * (item.item.price ?: 0.0)}",
+                                text = "Rp ${(item.count.toDouble() * (item.item.price ?: 0.0)).roundToInt()}",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.W700,
                                 color = NeutralVariant40
@@ -160,7 +153,7 @@ fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: () -> Unit) {
                                     Modifier
                                         .clip(CircleShape)
                                         .clickable {
-                                            if(item.count > 1){
+                                            if (item.count > 1) {
                                                 viewModel.removeFromCart(1, item.item)
                                             }
                                         }) {
@@ -208,17 +201,28 @@ fun CartPage(viewModel: HomeViewModel = hiltViewModel(), onNext: () -> Unit) {
             ) {
                 Column {
                     Text(
-                        text = "Total", fontStyle = FontStyle.Italic, fontWeight = FontWeight.W600,
+                        text = "Total", fontStyle = FontStyle.Italic, fontWeight = W600,
                         color = MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = "${cakeCart.toList().sumOf { item -> item.second * (item.first.price ?: 0.0) }}",
+                        text = "Rp ${
+                            cakeCart.toList()
+                                .sumOf { item -> item.second * (item.first.price ?: 0.0) }
+                                .roundToInt()
+                        }",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.W700,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
-                Button(onClick = onNext, shape = RoundedCornerShape(4.dp)) {
+                Button(onClick = {
+                    onNext(
+                        CheckoutModel(
+                            checkoutId = UUID.randomUUID(),
+                            cakeCart
+                        )
+                    )
+                }, shape = RoundedCornerShape(4.dp)) {
                     Text(text = "CHECKOUT")
                 }
             }

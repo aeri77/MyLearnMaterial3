@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -52,6 +51,7 @@ fun MainAnimatedHost(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.homeHost(
     navController: NavHostController,
     homeViewModel: HomeViewModel
@@ -80,7 +80,8 @@ fun NavGraphBuilder.homeHost(
             slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
         }) {
             CartPage(homeViewModel) {
-                navController.navigate(Navigation.CHECKOUT)
+                homeViewModel.setCheckout(it.checkoutId.toString(), checkoutModel = it)
+                navController.navigate("${Navigation.Checkout.ROUTE}/${it.checkoutId}")
             }
             homeViewModel.setSelectedScreen(Screens.CartPage)
         }

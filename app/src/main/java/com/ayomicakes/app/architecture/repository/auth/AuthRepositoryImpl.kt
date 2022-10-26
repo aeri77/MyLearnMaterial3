@@ -63,8 +63,10 @@ open class AuthRepositoryImpl @Inject constructor(
         refreshRequest: RefreshRequest
     ): Flow<Result<FullResponse<UserStore>>> {
         val flowData = flow {
-            val res = mainApi.postRefreshToken(userStore?.refreshToken?.getBearer(), refreshRequest)
-            emit(Result.Success(res))
+            handlingError {
+                val res = mainApi.postRefreshToken(userStore?.refreshToken?.getBearer(), refreshRequest)
+                emit(Result.Success(res))
+            }
         }
         return flowData.flowOn(Dispatchers.IO)
     }

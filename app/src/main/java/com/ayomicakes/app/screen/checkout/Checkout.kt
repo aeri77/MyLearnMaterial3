@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,16 +19,24 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W600
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.database.model.ReceiverAddress
+import com.ayomicakes.app.model.CheckoutModel
 import com.ayomicakes.app.screen.checkout.component.SetAddressDialog
 import com.ayomicakes.app.screen.checkout.component.SetOrderDateDialog
+import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.Primary80
 import com.ayomicakes.app.ui.theme.Tertiary60
+import timber.log.Timber
+import kotlin.math.roundToInt
 
 @Composable
-fun Checkout(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
-
-
+fun Checkout(
+    checkoutId: String?,
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    checkoutViewModel: CheckoutViewModel = hiltViewModel()
+) {
+    val checkout by homeViewModel.getCheckout(checkoutId ?: "").observeAsState()
     var addressDialogShow by remember { mutableStateOf(false) }
     var dateDialogShow by remember { mutableStateOf(false) }
     var receiverAddress by remember {
@@ -36,6 +45,10 @@ fun Checkout(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
                 "Nama Penerima", "No. Handphone", "Alamat"
             )
         )
+    }
+
+    LaunchedEffect(key1 = true) {
+        Timber.d("checkout item : $checkout")
     }
 
     if (addressDialogShow) {
@@ -73,13 +86,13 @@ fun Checkout(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
             }
         }
         item {
-            PaymentPriceDetail()
+            PaymentPriceDetail(checkout)
         }
         item {
             PaymentMethod()
         }
         item {
-            ButtonPay(checkoutViewModel)
+            ButtonPay(checkout, checkoutViewModel)
         }
     }
 }
@@ -115,7 +128,7 @@ fun AddressSend(receiverAddress: ReceiverAddress, onChangeAddress: () -> Unit) {
 }
 
 @Composable
-fun PaymentPriceDetail() {
+fun PaymentPriceDetail(checkout: CheckoutModel?) {
     Card(modifier = Modifier.padding(12.dp)) {
         Column(
             modifier = Modifier
@@ -123,12 +136,23 @@ fun PaymentPriceDetail() {
                 .padding(12.dp)
         ) {
             Text("Rincian Pembayaran", fontSize = 12.sp, fontWeight = W600)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("1 barang", fontSize = 12.sp)
-                Text("Rp65.000", fontSize = 12.sp)
+            if (checkout != null) {
+                val listItem = checkout.items.map { CartItem(it.value, it.key) }
+                repeat(listItem.size) { idx ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            "${listItem[idx].count} ${listItem[idx].item.cakeName}",
+                            fontSize = 12.sp
+                        )
+                        Text(
+                            "Rp ${(listItem[idx].count * (listItem[idx].item.price ?: 0.0)).roundToInt()}",
+                            fontSize = 12.sp
+                        )
+                    }
+                }
             }
         }
     }
@@ -196,7 +220,7 @@ fun OrderQueue(dateDialogShow: Boolean, onDateChange: () -> Unit) {
 }
 
 @Composable
-fun ButtonPay(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
+fun ButtonPay(checkout: CheckoutModel?, checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
     Card(modifier = Modifier.padding(top = 12.dp)) {
         Row(
             modifier = Modifier
@@ -205,11 +229,17 @@ fun ButtonPay(checkoutViewModel: CheckoutViewModel = hiltViewModel()) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Rp65.000")
-            Button(onClick = {
-                checkoutViewModel.postCheckoutRequest()
-            }) {
-                Text("Bayar")
+            if (checkout != null) {
+                Text("Rp ${
+                    checkout.items.toList()
+                        .sumOf { item -> item.second * (item.first.price ?: 0.0) }.roundToInt()
+                }"
+                )
+                Button(onClick = {
+                    checkoutViewModel.postCheckoutRequest(checkout)
+                }) {
+                    Text("Bayar")
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 @file:OptIn(
     ExperimentalAnimationApi::class, ExperimentalPagerApi::class,
-    ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class
+    ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class,
+    ExperimentalAnimationApi::class
 )
 
 package com.ayomicakes.app.component.composable
@@ -25,6 +26,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 fun NavGraphBuilder.landingComposable(
     accountGoogle: GoogleSignInAccount?,
@@ -132,7 +134,7 @@ fun NavGraphBuilder.registerFormComposable(
 fun NavGraphBuilder.checkoutComposable(
     homeViewModel: HomeViewModel
 ) {
-    composable(Navigation.CHECKOUT, enterTransition = {
+    composable(Navigation.Checkout.ROUTE_ITEM, enterTransition = {
         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
     }, exitTransition = {
         when (initialState.destination.route) {
@@ -141,5 +143,8 @@ fun NavGraphBuilder.checkoutComposable(
             }
             else -> null
         }
-    }) { Checkout() }
+    }) { navBackStackEntry ->
+        val checkoutId = navBackStackEntry.arguments?.getString(Navigation.Checkout.ID)
+        Checkout(checkoutId, homeViewModel)
+    }
 }

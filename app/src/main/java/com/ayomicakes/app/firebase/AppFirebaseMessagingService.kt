@@ -63,8 +63,6 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Timber.d("fcm message receive $message")
-        if (message.collapseKey == PAYMENTS_KEY) {
             val intent = Intent(this, MainActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
@@ -83,7 +81,6 @@ class AppFirebaseMessagingService : FirebaseMessagingService() {
                 // notificationId is a unique int for each notification that you must define
                 notify(NOTIFICATION_ID, builder.build())
             }
-        }
     }
 
     private fun createNotificationChannel() {

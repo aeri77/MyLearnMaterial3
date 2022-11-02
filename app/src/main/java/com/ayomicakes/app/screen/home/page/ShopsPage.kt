@@ -35,11 +35,6 @@ import com.ayomicakes.app.ui.theme.*
 @ExperimentalFoundationApi
 @Composable
 fun ShopsPage(viewModel: HomeViewModel = hiltViewModel(), onItemClicked : (CakeItem?) -> Unit) {
-//    viewModel.setToolbar(
-//        isHidden = false,
-//        isActive = true,
-//        title = navController.currentDestination?.route ?: ""
-//    )
     val gridState = rememberLazyGridState()
     Surface(
         modifier = Modifier.fillMaxSize(),

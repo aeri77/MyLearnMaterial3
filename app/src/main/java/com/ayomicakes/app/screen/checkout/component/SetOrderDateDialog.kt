@@ -1,6 +1,5 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalPagerApi::class
+    ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class
 )
 
 package com.ayomicakes.app.screen.checkout.component

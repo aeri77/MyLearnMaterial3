@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.ayomicakes.app.screen.home.page
 
@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -24,22 +23,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.ayomicakes.app.network.responses.PaymentTransactionResponse
+import com.ayomicakes.app.screen.checkout.component.PayVADialog
 import com.ayomicakes.app.ui.theme.Primary90
 import com.ayomicakes.app.ui.theme.Tertiary60
 
 @Preview
 @Composable
-fun OrderStatusPage() {
-   Column {
-       LazyColumn(
-           contentPadding = PaddingValues(6.dp),
-           verticalArrangement = Arrangement.spacedBy(8.dp)
-       ) {
-           items(10){
-               OrderStatusCard()
-           }
-       }
-   }
+fun OrderStatusPage(paymentTransactionRes: PaymentTransactionResponse? = null) {
+    Column {
+
+        var showPaymentRequest by remember { mutableStateOf(false) }
+
+        LaunchedEffect(paymentTransactionRes) {
+            if (paymentTransactionRes != null) {
+                showPaymentRequest = true
+            }
+        }
+
+        if (showPaymentRequest) {
+            PayVADialog(onDismiss = {
+                showPaymentRequest = false
+            }, transactionResponse = paymentTransactionRes)
+        }
+
+        LazyColumn(
+            contentPadding = PaddingValues(6.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(10) {
+                OrderStatusCard()
+            }
+        }
+    }
 }
 
 @Preview
@@ -121,7 +137,8 @@ fun DashedLine(modifier: Modifier) {
     Canvas(
         modifier
             .fillMaxWidth()
-            .height(1.dp)) {
+            .height(1.dp)
+    ) {
         drawLine(
             color = Tertiary60,
             start = Offset(0f, 0f),

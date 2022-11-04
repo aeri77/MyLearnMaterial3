@@ -22,11 +22,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.database.model.ReceiverAddress
 import com.ayomicakes.app.model.CheckoutModel
+import com.ayomicakes.app.network.responses.FullResponse
+import com.ayomicakes.app.network.responses.PaymentTransactionResponse
 import com.ayomicakes.app.screen.checkout.component.SetAddressDialog
 import com.ayomicakes.app.screen.checkout.component.SetOrderDateDialog
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.ui.theme.Primary80
 import com.ayomicakes.app.ui.theme.Tertiary60
+import com.ayomicakes.app.utils.Result
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -34,9 +37,11 @@ import kotlin.math.roundToInt
 fun Checkout(
     checkoutId: String?,
     homeViewModel: HomeViewModel = hiltViewModel(),
-    checkoutViewModel: CheckoutViewModel = hiltViewModel()
+    checkoutViewModel: CheckoutViewModel = hiltViewModel(),
+    onSuccessCreateTransaction : (String?) -> Unit
 ) {
     val checkout by homeViewModel.getCheckout(checkoutId ?: "").observeAsState()
+    val paymentReq by checkoutViewModel.transactionResponse.collectAsState(initial = null)
     var addressDialogShow by remember { mutableStateOf(false) }
     var dateDialogShow by remember { mutableStateOf(false) }
     var receiverAddress by remember {
@@ -49,6 +54,19 @@ fun Checkout(
 
     LaunchedEffect(key1 = true) {
         Timber.d("checkout item : $checkout")
+    }
+
+    LaunchedEffect(paymentReq) {
+        Timber.d("Payment Req status : $paymentReq")
+        if (paymentReq != null) {
+            if (paymentReq is Result.Success) {
+                homeViewModel.setTransactionRequest(
+                    (paymentReq as Result.Success<FullResponse<PaymentTransactionResponse>>).data.result.reference,
+                    (paymentReq as Result.Success<FullResponse<PaymentTransactionResponse>>).data.result
+                )
+                onSuccessCreateTransaction((paymentReq as Result.Success<FullResponse<PaymentTransactionResponse>>).data.result.reference)
+            }
+        }
     }
 
     if (addressDialogShow) {
@@ -230,10 +248,11 @@ fun ButtonPay(checkout: CheckoutModel?, checkoutViewModel: CheckoutViewModel = h
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (checkout != null) {
-                Text("Rp ${
-                    checkout.items.toList()
-                        .sumOf { item -> item.second * (item.first.price ?: 0.0) }.roundToInt()
-                }"
+                Text(
+                    "Rp ${
+                        checkout.items.toList()
+                            .sumOf { item -> item.second * (item.first.price ?: 0.0) }.roundToInt()
+                    }"
                 )
                 Button(onClick = {
                     checkoutViewModel.postCheckoutRequest(checkout)

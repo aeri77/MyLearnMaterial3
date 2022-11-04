@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.navArgument
 import com.ayomicakes.app.component.composable.registerFormComposable
 import com.ayomicakes.app.component.composable.signInComposable
 import com.ayomicakes.app.component.composable.signUpComposable
@@ -26,12 +29,10 @@ import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomePageNavigation.CAKES_ID
 import com.ayomicakes.app.screen.home.HomePageNavigation.CAKES_ITEM
+import com.ayomicakes.app.screen.home.HomePageNavigation.ORDER_ID
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.screen.home.Screens
-import com.ayomicakes.app.screen.home.page.CakesPage
-import com.ayomicakes.app.screen.home.page.CartPage
-import com.ayomicakes.app.screen.home.page.MessagesPage
-import com.ayomicakes.app.screen.home.page.ShopsPage
+import com.ayomicakes.app.screen.home.page.*
 import com.ayomicakes.app.ui.theme.Primary95
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
@@ -84,6 +85,20 @@ fun NavGraphBuilder.homeHost(
                 navController.navigate("${Navigation.Checkout.ROUTE}/${it.checkoutId}")
             }
             homeViewModel.setSelectedScreen(Screens.CartPage)
+        }
+        composable(HomePageNavigation.ORDER_STATUS_OPTIONAL_SHOW,
+            arguments = listOf(navArgument(ORDER_ID) { defaultValue = "" })
+            ,enterTransition = {
+            slideIntoContainer(AnimatedContentScope.SlideDirection.Down)
+        }) { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString(ORDER_ID)
+            if(orderId?.isNotBlank() == true){
+                val transactionResponse by homeViewModel.getTransactionRequest(orderId).observeAsState()
+                OrderStatusPage(transactionResponse)
+            } else {
+                OrderStatusPage()
+            }
+            homeViewModel.setSelectedScreen(Screens.OrderStatus)
         }
 
         composable(

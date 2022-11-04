@@ -4,8 +4,8 @@ package com.ayomicakes.app.screen.checkout.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,18 +15,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.ayomicakes.app.R
-import com.ayomicakes.app.database.model.DataPaymentMethod
+import com.ayomicakes.app.component.HyperlinkText
+import com.ayomicakes.app.network.responses.PaymentTransactionResponse
 
 @Composable
 fun PayVADialog(
-    onDismiss: (Boolean) -> Unit
+    onDismiss: (Boolean) -> Unit,
+    transactionResponse: PaymentTransactionResponse?
 ) {
     Dialog(onDismissRequest = { onDismiss(true) }) {
         Card {
@@ -60,17 +67,24 @@ fun PayVADialog(
                         )
                     }
                     Column(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(text = "No. Virtual Account", fontSize = 12.sp)
+                        val clipboardManager: ClipboardManager = LocalClipboardManager.current
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 8.dp),
+                                .padding(start = 8.dp)
+                                .clickable {
+                                    if (transactionResponse?.vaNumber?.isNotEmpty() == true) {
+                                        clipboardManager.setText(AnnotatedString(transactionResponse.vaNumber))
+                                    }
+                                },
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "12314123141152131")
+                            Text(text = transactionResponse?.vaNumber ?: "-")
                             Icon(
                                 modifier = Modifier.size(18.dp),
                                 imageVector = Icons.Filled.CopyAll,
@@ -78,7 +92,10 @@ fun PayVADialog(
                             )
                         }
                         Text(text = "Jumlah Biaya", fontSize = 12.sp)
-                        Text(modifier = Modifier.padding(start = 8.dp), text = "Rp. 20.000")
+                        Text(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = "Rp. ${transactionResponse?.amount ?: "-"}"
+                        )
                     }
 
                 }
@@ -100,7 +117,18 @@ fun PayVADialog(
                             imageVector = Icons.Filled.Link,
                             contentDescription = "bankName"
                         )
-                        Text(text = "Buka melalui browser")
+                        HyperlinkText(
+                            fullText = "Buka melalui browser",
+                            hyperLinks = mutableMapOf(
+                                "Buka melalui browser" to "${transactionResponse?.paymentUrl}"
+                            ),
+                            textStyle = TextStyle(
+                                textAlign = TextAlign.Center,
+                                color = Gray
+                            ),
+                            linkTextColor = MaterialTheme.colorScheme.tertiary,
+                            fontSize = 18.sp
+                        )
                     }
                 }
             }
@@ -114,6 +142,6 @@ fun PayVADialog(
 fun PayVADialogPreview() {
     PayVADialog(onDismiss = {
 
-    })
+    }, transactionResponse = PaymentTransactionResponse())
 }
 

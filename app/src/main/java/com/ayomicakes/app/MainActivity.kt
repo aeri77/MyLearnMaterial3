@@ -189,7 +189,7 @@ class MainActivity : ComponentActivity() {
                             landingComposable(accountGoogle, homeViewModel, navController)
                             authHost(homeViewModel, navController)
                             onBoardingComposable(scope, navController)
-                            checkoutComposable(homeViewModel)
+                            checkoutComposable(homeViewModel, navController)
                             homeHost(navController, homeViewModel)
                         }
                     }

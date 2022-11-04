@@ -9,13 +9,16 @@ package com.ayomicakes.app.component.composable
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.navigation.NavDirections
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import com.ayomicakes.app.component.homeHost
 import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.ayomicakes.app.screen.auth.signin.SignIn
 import com.ayomicakes.app.screen.auth.singup.SignUp
 import com.ayomicakes.app.screen.checkout.Checkout
+import com.ayomicakes.app.screen.home.HomePageNavigation
 import com.ayomicakes.app.screen.home.HomeViewModel
 import com.ayomicakes.app.screen.landing.Landing
 import com.ayomicakes.app.screen.onboarding.OnBoarding
@@ -26,7 +29,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 fun NavGraphBuilder.landingComposable(
     accountGoogle: GoogleSignInAccount?,
@@ -132,7 +134,8 @@ fun NavGraphBuilder.registerFormComposable(
 }
 
 fun NavGraphBuilder.checkoutComposable(
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
+    navController: NavHostController
 ) {
     composable(Navigation.Checkout.ROUTE_ITEM, enterTransition = {
         slideIntoContainer(AnimatedContentScope.SlideDirection.Left)
@@ -145,6 +148,9 @@ fun NavGraphBuilder.checkoutComposable(
         }
     }) { navBackStackEntry ->
         val checkoutId = navBackStackEntry.arguments?.getString(Navigation.Checkout.ID)
-        Checkout(checkoutId, homeViewModel)
+        Checkout(checkoutId, homeViewModel, onSuccessCreateTransaction = {
+            navController.navigate("${HomePageNavigation.ORDER_STATUS_PAGE}?showOnRequest=$it")
+//            navController.navigate(NavDirections.)
+        })
     }
 }

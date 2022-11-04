@@ -8,8 +8,12 @@ import com.ayomicakes.app.navigation.Navigation
 import com.ayomicakes.app.network.requests.AddressCheckout
 import com.ayomicakes.app.network.requests.CheckoutItem
 import com.ayomicakes.app.network.requests.CheckoutRequest
+import com.ayomicakes.app.network.responses.FullResponse
+import com.ayomicakes.app.network.responses.PaymentTransactionResponse
 import com.ayomicakes.app.utils.StringUtils.getBearer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,6 +27,9 @@ class CheckoutViewModel @Inject constructor(
 ) : MainViewModel(
     repository
 ) {
+
+    private val _transactionReqResponse = MutableSharedFlow<com.ayomicakes.app.utils.Result<FullResponse<PaymentTransactionResponse>>>()
+    val transactionResponse = _transactionReqResponse.asSharedFlow()
 
     fun postCheckoutRequest(checkout: CheckoutModel) {
         val listCheckoutItem = checkout.items.map {
@@ -86,7 +93,7 @@ class CheckoutViewModel @Inject constructor(
                                 )
                             )
                         ).collectLatest {
-                            Timber.d("result bayar $it")
+                            _transactionReqResponse.emit(it)
                         }
                     }
                 }

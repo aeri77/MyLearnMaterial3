@@ -15,6 +15,7 @@ import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.model.CheckoutModel
 import com.ayomicakes.app.network.responses.FullResponse
+import com.ayomicakes.app.network.responses.PaymentTransactionResponse
 import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.screen.auth.AuthViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -34,7 +35,8 @@ class HomeViewModel @Inject constructor(
 ) : AuthViewModel(repository) {
 
 
-    val screens = listOf(Screens.ShopsPage, Screens.CartPage, Screens.MessagesPage)
+    val screens =
+        listOf(Screens.ShopsPage, Screens.CartPage, Screens.OrderStatus, Screens.MessagesPage)
     private val _selectedScreens = MutableStateFlow(screens[0])
     val selectedScreens = _selectedScreens.asStateFlow()
 
@@ -100,7 +102,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun setSelectedScreen(screens: Screens){
+    fun setSelectedScreen(screens: Screens) {
         viewModelScope.launch {
             _selectedScreens.emit(screens)
         }
@@ -113,4 +115,13 @@ class HomeViewModel @Inject constructor(
 
     fun getCheckout(checkoutId: String): LiveData<CheckoutModel> =
         savedStateHandle.getLiveData<CheckoutModel>(checkoutId)
+
+    fun setTransactionRequest(ref: String?, transactionResponse: PaymentTransactionResponse) {
+        if(ref != null){
+            savedStateHandle[ref] = transactionResponse
+        }
+    }
+
+    fun getTransactionRequest(ref: String): LiveData<PaymentTransactionResponse> =
+        savedStateHandle.getLiveData<PaymentTransactionResponse>(ref)
 }

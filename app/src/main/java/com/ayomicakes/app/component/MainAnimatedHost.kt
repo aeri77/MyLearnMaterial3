@@ -94,9 +94,9 @@ fun NavGraphBuilder.homeHost(
             val orderId = backStackEntry.arguments?.getString(ORDER_ID)
             if(orderId?.isNotBlank() == true){
                 val transactionResponse by homeViewModel.getTransactionRequest(orderId).observeAsState()
-                OrderStatusPage(transactionResponse)
+                OrderStatusPage(transactionResponse, homeViewModel)
             } else {
-                OrderStatusPage()
+                OrderStatusPage( homeViewModel = homeViewModel)
             }
             homeViewModel.setSelectedScreen(Screens.OrderStatus)
         }

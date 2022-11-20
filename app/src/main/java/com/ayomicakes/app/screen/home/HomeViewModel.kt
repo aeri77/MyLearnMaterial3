@@ -7,14 +7,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.ayomicakes.app.MainViewModel
 import com.ayomicakes.app.architecture.repository.home.HomeRepository
 import com.ayomicakes.app.architecture.source.CakeSource
+import com.ayomicakes.app.architecture.source.CheckoutSource
 import com.ayomicakes.app.database.model.CakeItem
-import com.ayomicakes.app.database.model.CartItem
 import com.ayomicakes.app.helper.LocationHelper
 import com.ayomicakes.app.model.CheckoutModel
 import com.ayomicakes.app.network.responses.FullResponse
+import com.ayomicakes.app.network.responses.OrderStatusResponse
 import com.ayomicakes.app.network.responses.PaymentTransactionResponse
 import com.ayomicakes.app.network.services.AyomiCakeServices
 import com.ayomicakes.app.screen.auth.AuthViewModel
@@ -34,7 +34,6 @@ class HomeViewModel @Inject constructor(
     private val mainApi: AyomiCakeServices
 ) : AuthViewModel(repository) {
 
-
     val screens =
         listOf(Screens.ShopsPage, Screens.CartPage, Screens.OrderStatus, Screens.MessagesPage)
     private val _selectedScreens = MutableStateFlow(screens[0])
@@ -50,6 +49,13 @@ class HomeViewModel @Inject constructor(
         Pager(PagingConfig(pageSize = 4)) {
             CakeSource(mainApi)
         }.flow.cachedIn(viewModelScope)
+
+    fun checkouts(userId : UUID?, token : String?): Flow<PagingData<OrderStatusResponse>> {
+        return Pager(PagingConfig(pageSize = 10)) {
+            CheckoutSource(mainApi, userId, token)
+        }.flow.cachedIn(viewModelScope)
+    }
+
     private val _cake = MutableSharedFlow<com.ayomicakes.app.utils.Result<FullResponse<CakeItem>>>()
     val cake = _cake.asSharedFlow()
 
@@ -117,7 +123,7 @@ class HomeViewModel @Inject constructor(
         savedStateHandle.getLiveData<CheckoutModel>(checkoutId)
 
     fun setTransactionRequest(ref: String?, transactionResponse: PaymentTransactionResponse) {
-        if(ref != null){
+        if (ref != null) {
             savedStateHandle[ref] = transactionResponse
         }
     }

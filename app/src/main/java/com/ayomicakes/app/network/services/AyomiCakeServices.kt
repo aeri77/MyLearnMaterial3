@@ -45,6 +45,14 @@ interface AyomiCakeServices {
         @Query("page") page: Int
     ): FullResponse<PageModel<CakeItem>>
 
+    @POST(RouteConstant.STATUS_ORDER)
+    suspend fun getStatusOrders(
+        @Query("page") page: Int,
+        @Body orderStatusRequest: OrderStatusRequest,
+        @Header("Authorization") authHeader: String?,
+    ): FullResponse<PageModel<OrderStatusResponse>>
+
+
     @GET(RouteConstant.CAKES + "/{idx}")
     suspend fun getCakes(@Path("idx") idx: UUID?): FullResponse<CakeItem>
 

@@ -13,4 +13,5 @@ object RouteConstant {
     const val FCM_TOKEN = "fcm-token"
     const val FCM_TOKEN_DELETE = "$FCM_TOKEN/delete"
     const val CHECKOUT = "checkout"
+    const val STATUS_ORDER = "order-status"
 }
